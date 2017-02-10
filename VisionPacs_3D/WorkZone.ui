@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>WorkZone</class>
+ <widget class="QWidget" name="WorkZone">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>300</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <property name="autoFillBackground">
+   <bool>false</bool>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">background-color: rgb(95, 138, 172);</string>
+  </property>
+  <layout class="QGridLayout" name="WorkZoneGLayout" rowstretch="1,1" columnstretch="1,1">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <property name="spacing">
+    <number>1</number>
+   </property>
+   <item row="0" column="0">
+    <widget class="Vtk3DWnd" name="VR_Wnd" native="true"/>
+   </item>
+   <item row="0" column="1">
+    <widget class="Vtk2DWnd" name="Axial_Wnd" native="true"/>
+   </item>
+   <item row="1" column="0">
+    <widget class="Vtk2DWnd" name="Coronal_Wnd" native="true"/>
+   </item>
+   <item row="1" column="1">
+    <widget class="Vtk2DWnd" name="Sagittal_Wnd" native="true"/>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>Vtk3DWnd</class>
+   <extends>QWidget</extends>
+   <header>Vtk3DWnd.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>Vtk2DWnd</class>
+   <extends>QWidget</extends>
+   <header>Vtk2DWnd.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

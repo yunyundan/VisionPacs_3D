@@ -1,0 +1,64 @@
+QTabWidget::pane {
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius:5px;
+    border-top-right-radius: 5px; 
+    border: 1px solid rgb(95,138,172);
+    border-top:none;background-color: rgb(160, 185, 205);
+}
+QTabWidget::tab-bar {	
+    border-color: 1px solid rgb(255, 0, 0); 
+    background-color: rgb(160, 185, 205);
+} 
+QTabBar::tab {
+    width: 70px;
+    height: 20px; 
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px; 
+    border: 1px solid rgb(95, 138, 172); 
+    margin:0 1px 0px 0px; color:rgb(255,255,255);	
+    background-color: rgb(95, 138, 172);
+
+}
+QTabBar::tab:hover {
+    color: rgba(56, 173, 255, 150); 
+    border-bottom: rgba(250, 250, 250, 50);
+    color:rgb(0,0,0);	background-color: rgba(250, 250, 250, 50);
+
+}
+QTabBar::tab:selected {
+    border-bottom: 1px solid rgb(160, 185, 205);	
+    color: rgb(56, 173, 255); color:rgb(255,255,255);	
+    background-color: rgb(160, 185, 205);
+
+}
+
+.QPushButton[ToolButton = true]{
+	border-style: none;
+	border: 0px;
+	color: #F0F0F0;
+	padding: 5px;	
+	min-height: 20px;
+	border-radius:5px;
+	background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 #1B89CA, stop:1 #1077B5); 
+}
+
+.QPushButton[ToolButton = true]:hover{ 
+	background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 #5CACEE, stop:1 #4F94CD);
+}
+
+.QPushButton[ToolButton = true]:pressed{ 
+	background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 #1B89CA, stop:1 #1077B5);
+}
+
+
+QProgressBar {
+	border-radius: 5px;
+	text-align: center;
+	border: 1px solid #5CACEE;
+}
+
+QProgressBar::chunk {
+	width: 5px; 
+	margin: 0.5px;
+	background-color: #1B89CA;
+}

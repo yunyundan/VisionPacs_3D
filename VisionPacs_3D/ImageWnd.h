@@ -1,0 +1,70 @@
+#ifndef IMAGEWND_H
+#define IMAGEWND_H
+
+#include <QWidget>
+
+class CHsImage;
+
+namespace Ui {
+class ImageWnd;
+}
+
+class ImageWnd : public QWidget
+{
+    Q_OBJECT
+
+public:
+    explicit ImageWnd(QWidget *parent = 0);
+    ~ImageWnd();
+
+private:
+    Ui::ImageWnd *ui;
+
+	//聚焦标记
+	bool m_bFocused; 
+	//计算图像在窗口内显示的rc
+	RECT CalDisplayRect(CHsImage*pImg);//RECT DlgRc,
+
+	int m_nInteractionState;//鼠标操作的状态
+
+	//鼠标隐藏计数
+	QPoint m_PrePoint;//移动、缩放、WC等,需要鼠标移动控制效果
+
+	HSRECT m_fImgRc;//精确的图像区域
+
+protected:
+	QPixmap *m_pPixmap;
+	QImage *m_pQImage;
+
+	void paintEvent(QPaintEvent *event);
+	void mousePressEvent(QMouseEvent *event);
+	void mouseMoveEvent(QMouseEvent *event);
+	void mouseReleaseEvent(QMouseEvent *event);
+public:
+	CHsImage *m_pImg;
+	unsigned int m_nLeftButtonInteractionStyle;
+	unsigned int m_nRightButtonInteractionStyle;
+public:
+	//设置本窗体是否为聚焦窗口
+	void SetFocuse(bool bFocused){ m_bFocused = bFocused; } 
+
+	//获得本窗口是否为聚焦窗口
+	bool IsFocused(){ return m_bFocused; }	
+
+	//判断本窗口内是否有图像显示
+	bool IsImgEmpty();
+
+	//设置本窗口内显示图像
+	int SetImage(CHsImage *pImg);
+
+	void ConvertCoord(long *x1, long *y1, long *x2, long *y2, bool bFromHwdToImg);
+
+	//设置操作
+	void setOperate(QString operate);
+	//窗口左边转图像坐标
+	POINT ConvertWndToImg(RECT ImgRcOnWnd, long nImgW, long nImgH, QPoint &pt);
+
+	long m_nCurW, m_nCurC;
+};
+
+#endif // IMAGEWND_H
