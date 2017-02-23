@@ -56,6 +56,15 @@ private:
 	WaitDlg *m_pWaitDlg;
 	void ShowWaitDlg();
 
+	//界面管理
+	void InitUIConfig();
+
+	//管理按钮
+	QButtonGroup *m_pVrLeftBG;
+	QButtonGroup *m_pVrRightBG;
+	QButtonGroup *m_pImgLeftBG;
+	QButtonGroup *m_pImgRightBG;
+
 signals:
 	void SetWaitProgress(int);
 
@@ -63,7 +72,8 @@ private slots:
 	void on_actionOpen_File_triggered();
 	void on_actionTest_triggered();
 	void StartProcessImage();
-
+	void Btn_VrOperateClick(int nButtonID);
+	void Btn_ImgOperateClick(int nButtonID);
 public:
 	//在指定文件夹中筛选出指定seriesUID的图像并排序
 	void ExtractImage(QString sFilePath, QString sSeriesUID, vector<string> &vImagePathList);

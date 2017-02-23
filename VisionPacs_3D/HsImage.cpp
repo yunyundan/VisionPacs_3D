@@ -8,6 +8,7 @@ extern void** ArrayCopy(void** pSrcArr, unsigned long nSrcRow, unsigned long nSr
 
 CHsImage::CHsImage()
 : m_pDs(NULL)
+, m_bOriImg(false)
 {
 	SetRect(&m_WndRc, 0, 0, 0, 0);
 }
@@ -15,7 +16,7 @@ CHsImage::CHsImage()
 
 CHsImage::~CHsImage()
 {
-	Hs_FreeMem();
+
 }
 
 void CHsImage::SetDs(CHsFile *pDS)
@@ -32,15 +33,13 @@ int CHsImage::Hs_Reload(int islicenum, bool bApplyCurImgState/*=true*/)
 {
 	int nRet = Ret_Success;
 
-
 	CHsFile *pDs = (CHsFile*)(m_pDs);
 
 	nRet = pDs->Hs_GetImage(m_ImgInfo.pEle, *this, m_ImgInfo.iFrame);
 
 	////应用一下各种效果
 	if (bApplyCurImgState)
-		Hs_ApplyCurImgState();
-	
+		Hs_ApplyCurImgState();	
 
 	return nRet;
 }
@@ -105,19 +104,6 @@ int CHsImage::Hs_WinLevel(long w, long c, bool bChangeValue/*=false*/, long *pRe
 {
 	int nRet = CHsBaseImg::Hs_WinLevel(w, c, bChangeValue, pRetW, pRetC);
 
-	return nRet;
-}
-
-int CHsImage::Hs_FreeMem()
-{
-	if (m_pOriData)
-	{
-		long *pOriData = (long*)m_pOriData;
-		delete[]pOriData;
-		m_pOriData = NULL;
-	}
-
-	int	nRet = CHsBaseImg::Hs_FreeMem();
 	return nRet;
 }
 

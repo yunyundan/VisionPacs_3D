@@ -41,7 +41,7 @@ public:
     vtkSmartPointer<vtkColorTransferFunction>	 m_pClrTrans;
 
     void Setup3DVR();//设置共享属性，方位方块等
-    void Set3DVRmode(int nMode);//透明度等设置
+    void Set3DVRmode(QString sMode);//透明度等设置
     void SetupCamera(QString sOrientationName);//设置观看角度
 
 	void SetImageDate(vtkSmartPointer<vtkImageData> pImageData);

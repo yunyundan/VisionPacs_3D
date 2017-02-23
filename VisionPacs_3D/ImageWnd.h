@@ -3,7 +3,9 @@
 
 #include <QWidget>
 
+
 class CHsImage;
+class CHsNormalMprMaker;
 
 namespace Ui {
 class ImageWnd;
@@ -32,6 +34,11 @@ private:
 
 	HSRECT m_fImgRc;//精确的图像区域
 
+	//确定窗口图像类型
+	int m_nImgWndType;
+
+	//普通MPR切割类
+	CHsNormalMprMaker *m_pNormalMaker;
 protected:
 	QPixmap *m_pPixmap;
 	QImage *m_pQImage;
@@ -40,6 +47,7 @@ protected:
 	void mousePressEvent(QMouseEvent *event);
 	void mouseMoveEvent(QMouseEvent *event);
 	void mouseReleaseEvent(QMouseEvent *event);
+
 public:
 	CHsImage *m_pImg;
 	unsigned int m_nLeftButtonInteractionStyle;
@@ -61,10 +69,24 @@ public:
 
 	//设置操作
 	void setOperate(QString operate);
+
 	//窗口左边转图像坐标
 	POINT ConvertWndToImg(RECT ImgRcOnWnd, long nImgW, long nImgH, QPoint &pt);
 
 	long m_nCurW, m_nCurC;
+
+	void ***m_p3DArray;
+	vtkSmartPointer<vtkImageData> m_p3DImgData;
+	vector<CHsImage*> m_vOriImg;
+
+	void GetImgNumAndWndType(QString sWndName, int nOriImgType);
+
+	//计算本窗口显示图像
+	int CalcAndShowNormalImg(QString sWndName, int nOriImgType, int iImgIndex,int iSlice);
+
+
+signals:
+	void SendImageNum(int);
 };
 
 #endif // IMAGEWND_H

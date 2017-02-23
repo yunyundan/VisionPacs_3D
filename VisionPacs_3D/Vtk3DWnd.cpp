@@ -123,38 +123,96 @@ void Vtk3DWnd::Setup3DVR()
     m_p3DRenderer->AddVolume(m_pVolume);
 }
 
-void Vtk3DWnd::Set3DVRmode(int nMode)
+void Vtk3DWnd::Set3DVRmode(QString sMode)
 {
-    // 创建标量到不透明度的转移函数
-    m_pPieceFun->RemoveAllPoints();
-    m_pClrTrans->RemoveAllPoints();
+	if (sMode.compare("Bone") == 0)
+	{
+		// 创建标量到不透明度的转移函数
+		m_pPieceFun->RemoveAllPoints();
+		m_pClrTrans->RemoveAllPoints();
 
-    m_pPieceFun->AddPoint(-2048, 0, 0.5, 0.0);
-    m_pPieceFun->AddPoint(130, 0, 0.5, 0.0);
-    m_pPieceFun->AddPoint(680, 1, 0.5, 0.0);
-    m_pPieceFun->AddPoint(3071, 1, 0.5, 0.0);
+		m_pPieceFun->AddPoint(-2048, 0, 0.5, 0.0);
+		m_pPieceFun->AddPoint(130, 0, 0.5, 0.0);
+		m_pPieceFun->AddPoint(680, 1, 0.5, 0.0);
+		m_pPieceFun->AddPoint(3071, 1, 0.5, 0.0);
 
-    //创建标量到颜色的转移函数
+		//创建标量到颜色的转移函数
 
-    m_pClrTrans->AddRGBPoint(-2048, 1, 1, 1);
-    m_pClrTrans->AddRGBPoint(-140, 1, 0.54, 0.27);
-    m_pClrTrans->AddRGBPoint(2, 0.96, 0.48, 0.16);
-    m_pClrTrans->AddRGBPoint(99, 0.95, 0.19, 0.25);
-    m_pClrTrans->AddRGBPoint(230, 1, 0.71, 0.25);
-    m_pClrTrans->AddRGBPoint(330, 1, 0.96, 0.85);
-    m_pClrTrans->AddRGBPoint(515, 1, 1, 1);
-    m_pClrTrans->AddRGBPoint(3071, 1, 1, 1);
+		m_pClrTrans->AddRGBPoint(-2048, 1, 1, 1);
+		m_pClrTrans->AddRGBPoint(-140, 1, 0.54, 0.27);
+		m_pClrTrans->AddRGBPoint(2, 0.96, 0.48, 0.16);
+		m_pClrTrans->AddRGBPoint(99, 0.95, 0.19, 0.25);
+		m_pClrTrans->AddRGBPoint(230, 1, 0.71, 0.25);
+		m_pClrTrans->AddRGBPoint(330, 1, 0.96, 0.85);
+		m_pClrTrans->AddRGBPoint(515, 1, 1, 1);
+		m_pClrTrans->AddRGBPoint(3071, 1, 1, 1);
 
 
-    m_pSlicerMapper->SetBlendModeToComposite();//m_pSmartMapper
+		m_pSlicerMapper->SetBlendModeToComposite();//m_pSmartMapper
 
-    m_pVolProperty->ShadeOn();
-    m_pVolProperty->SetInterpolationTypeToLinear();
-    m_pVolProperty->SetAmbient(0.3);
-    m_pVolProperty->SetDiffuse(0.6);
-    m_pVolProperty->SetSpecular(0.5);
-    m_pVolProperty->SetSpecularPower(40.0);
-    m_pVolProperty->SetScalarOpacityUnitDistance(0.8919);
+		m_pVolProperty->ShadeOn();
+		m_pVolProperty->SetInterpolationTypeToLinear();
+		m_pVolProperty->SetAmbient(0.3);
+		m_pVolProperty->SetDiffuse(0.6);
+		m_pVolProperty->SetSpecular(0.5);
+		m_pVolProperty->SetSpecularPower(40.0);
+		m_pVolProperty->SetScalarOpacityUnitDistance(0.8919);
+	}
+	else if (sMode.compare("Heart") == 0)
+	{
+		m_pPieceFun->RemoveAllPoints();
+		m_pClrTrans->RemoveAllPoints();
+
+		m_pPieceFun->AddPoint(-2048, 0, 0.5, 0.0);
+		m_pPieceFun->AddPoint(-61.16, 0, 0.5, 0.15);
+		m_pPieceFun->AddPoint(488, 1, 0.0, 0.0);
+		m_pPieceFun->AddPoint(1063, 0, 0.5, 0.0);
+
+		m_pClrTrans->AddRGBPoint(-2048, 1, 1, 1);
+		m_pClrTrans->AddRGBPoint(-140, 1, 0.54, 0.27);
+		m_pClrTrans->AddRGBPoint(2, 0.96, 0.48, 0.16);
+		m_pClrTrans->AddRGBPoint(69, .90, .23, .20);
+		m_pClrTrans->AddRGBPoint(238, .93, .93, .7);
+		m_pClrTrans->AddRGBPoint(238, .90, .78, .42);
+		m_pClrTrans->AddRGBPoint(275, 1, 1, 1);
+
+		m_pSlicerMapper->SetBlendModeToComposite();
+		m_pVolProperty->ShadeOn();
+		m_pVolProperty->SetAmbient(0.3);
+		m_pVolProperty->SetDiffuse(0.6);
+		m_pVolProperty->SetSpecular(0.5);
+		m_pVolProperty->SetSpecularPower(40.0);
+		m_pVolProperty->SetScalarOpacityUnitDistance(0.8919);
+	}
+	else if (sMode.compare("Kidney") == 0)
+	{
+		m_pPieceFun->RemoveAllPoints();
+		m_pClrTrans->RemoveAllPoints();
+
+		m_pPieceFun->AddPoint(-2048, 0, 0.5, 0.0);
+		m_pPieceFun->AddPoint(96, 0, .2, .0);
+		m_pPieceFun->AddPoint(684, 1, .5, 0.0);
+		m_pPieceFun->AddPoint(3071, 0, 0.5, 0.0);
+
+		m_pClrTrans->AddRGBPoint(-2048, 1, 1, 1);
+		m_pClrTrans->AddRGBPoint(-140, 1, 0.54, 0.27);
+		m_pClrTrans->AddRGBPoint(2, 0.96, 0.48, 0.16);
+		m_pClrTrans->AddRGBPoint(30, .41, .52, .51);
+		m_pClrTrans->AddRGBPoint(110, 1, 1, 1);
+		m_pClrTrans->AddRGBPoint(120, .95, .19, .2);
+		m_pClrTrans->AddRGBPoint(200, 1, 0.71, 0.25);
+		m_pClrTrans->AddRGBPoint(250, 1, 1, 1);
+		m_pClrTrans->AddRGBPoint(330, 0.98, 0.89, 0.78);
+		m_pClrTrans->AddRGBPoint(1770, 1, 1, 1);
+
+		m_pSlicerMapper->SetBlendModeToComposite();
+		m_pVolProperty->ShadeOn();
+		m_pVolProperty->SetAmbient(0.3);
+		m_pVolProperty->SetDiffuse(0.6);
+		m_pVolProperty->SetSpecular(0.5);
+		m_pVolProperty->SetSpecularPower(40.0);
+		m_pVolProperty->SetScalarOpacityUnitDistance(0.8919);
+	}    
 }
 
 void Vtk3DWnd::SetupCamera(QString sOrientationName)
@@ -193,24 +251,24 @@ void Vtk3DWnd::SetupCamera(QString sOrientationName)
 	m_p3DRenderer->GetActiveCamera()->SetFocalPoint(0, 0, 0);
 	m_p3DRenderer->GetActiveCamera()->ComputeViewPlaneNormal();
 
-	double bons[6];
- 	m_pImgResample->GetOutput()->GetBounds(bons);
+	//double bons[6];
+ //	m_pImgResample->GetOutput()->GetBounds(bons);
 
-	double xs = (bons[1] - bons[0]);
-	double ys = (bons[3] - bons[2]);
-	double zs = (bons[5] - bons[4]);
+	//double xs = (bons[1] - bons[0]);
+	//double ys = (bons[3] - bons[2]);
+	//double zs = (bons[5] - bons[4]);
 
-	double bnds_x = xs / 2.0;
-	double bnds_y = ys / 2.0;
-	double bnds_z = zs / 2.0;
+	//double bnds_x = xs / 2.0;
+	//double bnds_y = ys / 2.0;
+	//double bnds_z = zs / 2.0;
 
-	double temp = bnds_x > bnds_y ? bnds_x : bnds_y;
-	double ParaScale = temp > bnds_z ? temp : bnds_z;
+	//double temp = bnds_x > bnds_y ? bnds_x : bnds_y;
+	//double ParaScale = temp > bnds_z ? temp : bnds_z;
 
 	//Update渲染
 	m_p3DRenderer->ResetCamera();
-	m_p3DRenderer->GetActiveCamera()->ParallelProjectionOn();
-	m_p3DRenderer->GetActiveCamera()->SetParallelScale(ParaScale*2/3);
+	//m_p3DRenderer->GetActiveCamera()->ParallelProjectionOn();
+	//m_p3DRenderer->GetActiveCamera()->SetParallelScale(ParaScale*2/3);
 }
 
 void Vtk3DWnd::SetImageDate(vtkSmartPointer<vtkImageData> pImageData)
@@ -219,7 +277,7 @@ void Vtk3DWnd::SetImageDate(vtkSmartPointer<vtkImageData> pImageData)
 	m_pImgResample->Update();
 
 	Setup3DVR();
-	Set3DVRmode(0);	
+	Set3DVRmode("Bone");	
 
 	SetupCamera("Orientation_A");
 

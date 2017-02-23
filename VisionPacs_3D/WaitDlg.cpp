@@ -7,7 +7,7 @@ WaitDlg::WaitDlg(QWidget *parent)
 	, m_bShow(false)
 {
 	ui->setupUi(this);
-	setStyleSheet("QDialog{border:2px solid #1B89CA;background-color: rgb(160, 185, 205);} ");
+	setStyleSheet("QDialog{border:2px solid grey;background-color: #323232;} ");
 }
 
 WaitDlg::~WaitDlg()

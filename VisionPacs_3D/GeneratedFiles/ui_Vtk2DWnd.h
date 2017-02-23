@@ -52,6 +52,7 @@ public:
 
 
         retranslateUi(Vtk2DWnd);
+        QObject::connect(ScrollBar, SIGNAL(valueChanged(int)), Vtk2DWnd, SLOT(OnScrollBarMoved(int)));
 
         QMetaObject::connectSlotsByName(Vtk2DWnd);
     } // setupUi

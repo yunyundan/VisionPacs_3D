@@ -22,18 +22,16 @@ private:
     Ui::Vtk2DWnd *ui;
 
 	int m_nOriImgType;
-	int m_nWndType;
 	int m_nImageNum;
 
 public:
-	vector<CHsImage*> m_vImg;
-
-public:
-	void showImage(CHsImage *pImg);
 	void InitShowImage(int nOriImgType);
-
-
 	void ChangeOperate(QString operate);
+	void SetImageData(void ***pImgArray, vtkSmartPointer<vtkImageData> p3Ddata, vector<CHsImage*> vOriImg);
+
+private slots:
+	void OnScrollBarMoved(int nValue);
+	void RecieveImageNum(int nImgNum);
 
 };
 

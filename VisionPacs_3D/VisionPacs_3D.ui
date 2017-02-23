@@ -23,7 +23,7 @@
    <property name="styleSheet">
     <string notr="true"/>
    </property>
-   <layout class="QGridLayout" name="MainGLayout">
+   <layout class="QGridLayout" name="gridLayout">
     <property name="leftMargin">
      <number>0</number>
     </property>
@@ -39,13 +39,32 @@
     <property name="spacing">
      <number>0</number>
     </property>
-    <item row="0" column="0" colspan="2">
+    <item row="0" column="0">
      <widget class="QWidget" name="MainBar" native="true">
       <property name="minimumSize">
        <size>
         <width>0</width>
-        <height>20</height>
+        <height>40</height>
        </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>16777215</height>
+       </size>
+      </property>
+      <property name="contextMenuPolicy">
+       <enum>Qt::DefaultContextMenu</enum>
+      </property>
+      <property name="styleSheet">
+       <string notr="true"/>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1" rowspan="2">
+     <widget class="WorkZone" name="Workzone" native="true">
+      <property name="styleSheet">
+       <string notr="true"/>
       </property>
      </widget>
     </item>
@@ -95,14 +114,14 @@
         <string notr="true"/>
        </property>
        <attribute name="title">
-        <string>Viewer</string>
+        <string>常规</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_2">
         <property name="leftMargin">
          <number>0</number>
         </property>
         <property name="topMargin">
-         <number>5</number>
+         <number>0</number>
         </property>
         <property name="rightMargin">
          <number>0</number>
@@ -112,12 +131,9 @@
         </property>
         <item>
          <layout class="QVBoxLayout" name="verticalLayout">
-          <property name="spacing">
-           <number>10</number>
-          </property>
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout">
-            <item>
+           <layout class="QGridLayout" name="VROperateGLayout">
+            <item row="0" column="0">
              <widget class="QPushButton" name="VR_location">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -145,20 +161,29 @@
               </property>
               <property name="icon">
                <iconset>
-                <normaloff>Image/1.png</normaloff>Image/1.png</iconset>
+                <normaloff>Image/appbar.cursor.default.png</normaloff>Image/appbar.cursor.default.png</iconset>
               </property>
               <property name="iconSize">
                <size>
-                <width>40</width>
-                <height>40</height>
+                <width>60</width>
+                <height>60</height>
                </size>
+              </property>
+              <property name="checkable">
+               <bool>true</bool>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+              <property name="autoExclusive">
+               <bool>false</bool>
               </property>
               <property name="ToolButton" stdset="0">
                <bool>true</bool>
               </property>
              </widget>
             </item>
-            <item>
+            <item row="0" column="1">
              <widget class="QPushButton" name="VR_rotate">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -186,20 +211,26 @@
               </property>
               <property name="icon">
                <iconset>
-                <normaloff>Image/2.png</normaloff>Image/2.png</iconset>
+                <normaloff>Image/appbar.transform.rotate.clockwise.png</normaloff>Image/appbar.transform.rotate.clockwise.png</iconset>
               </property>
               <property name="iconSize">
                <size>
-                <width>40</width>
-                <height>40</height>
+                <width>60</width>
+                <height>60</height>
                </size>
+              </property>
+              <property name="checkable">
+               <bool>true</bool>
+              </property>
+              <property name="autoExclusive">
+               <bool>false</bool>
               </property>
               <property name="ToolButton" stdset="0">
                <bool>true</bool>
               </property>
              </widget>
             </item>
-            <item>
+            <item row="0" column="3">
              <widget class="QPushButton" name="VR_zoom">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -227,20 +258,29 @@
               </property>
               <property name="icon">
                <iconset>
-                <normaloff>Image/3.png</normaloff>Image/3.png</iconset>
+                <normaloff>Image/appbar.magnify.png</normaloff>Image/appbar.magnify.png</iconset>
               </property>
               <property name="iconSize">
                <size>
-                <width>40</width>
-                <height>40</height>
+                <width>60</width>
+                <height>60</height>
                </size>
+              </property>
+              <property name="checkable">
+               <bool>true</bool>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+              <property name="autoExclusive">
+               <bool>false</bool>
               </property>
               <property name="ToolButton" stdset="0">
                <bool>true</bool>
               </property>
              </widget>
             </item>
-            <item>
+            <item row="0" column="4">
              <widget class="QPushButton" name="VR_pan">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -268,23 +308,36 @@
               </property>
               <property name="icon">
                <iconset>
-                <normaloff>Image/4.png</normaloff>Image/4.png</iconset>
+                <normaloff>Image/appbar.cursor.move.png</normaloff>Image/appbar.cursor.move.png</iconset>
               </property>
               <property name="iconSize">
                <size>
-                <width>40</width>
-                <height>40</height>
+                <width>60</width>
+                <height>60</height>
                </size>
+              </property>
+              <property name="checkable">
+               <bool>true</bool>
+              </property>
+              <property name="autoExclusive">
+               <bool>false</bool>
               </property>
               <property name="ToolButton" stdset="0">
                <bool>true</bool>
               </property>
              </widget>
             </item>
+            <item row="0" column="2">
+             <widget class="Line" name="line">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+             </widget>
+            </item>
            </layout>
           </item>
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_2">
+           <layout class="QHBoxLayout" name="VROrientionHLayout">
             <item>
              <widget class="QPushButton" name="Orientation_S">
               <property name="minimumSize">
@@ -304,7 +357,7 @@
               </property>
               <property name="icon">
                <iconset>
-                <normaloff>Image/5.png</normaloff>Image/5.png</iconset>
+                <normaloff>Image/100.png</normaloff>Image/100.png</iconset>
               </property>
               <property name="iconSize">
                <size>
@@ -336,7 +389,7 @@
               </property>
               <property name="icon">
                <iconset>
-                <normaloff>Image/6.png</normaloff>Image/6.png</iconset>
+                <normaloff>Image/101.png</normaloff>Image/101.png</iconset>
               </property>
               <property name="iconSize">
                <size>
@@ -368,12 +421,12 @@
               </property>
               <property name="icon">
                <iconset>
-                <normaloff>Image/10.png</normaloff>Image/10.png</iconset>
+                <normaloff>Image/102.png</normaloff>Image/102.png</iconset>
               </property>
               <property name="iconSize">
                <size>
-                <width>40</width>
-                <height>40</height>
+                <width>60</width>
+                <height>60</height>
                </size>
               </property>
               <property name="ToolButton" stdset="0">
@@ -400,7 +453,7 @@
               </property>
               <property name="icon">
                <iconset>
-                <normaloff>Image/8.png</normaloff>Image/8.png</iconset>
+                <normaloff>Image/103.png</normaloff>Image/103.png</iconset>
               </property>
               <property name="iconSize">
                <size>
@@ -432,7 +485,7 @@
               </property>
               <property name="icon">
                <iconset>
-                <normaloff>Image/9.png</normaloff>Image/9.png</iconset>
+                <normaloff>Image/104.png</normaloff>Image/104.png</iconset>
               </property>
               <property name="iconSize">
                <size>
@@ -464,7 +517,7 @@
               </property>
               <property name="icon">
                <iconset>
-                <normaloff>Image/7.png</normaloff>Image/7.png</iconset>
+                <normaloff>Image/105.png</normaloff>Image/105.png</iconset>
               </property>
               <property name="iconSize">
                <size>
@@ -479,10 +532,40 @@
             </item>
            </layout>
           </item>
+          <item>
+           <layout class="QHBoxLayout" name="VRModeHLayout" stretch="2,8">
+            <item>
+             <widget class="QLabel" name="VRMode">
+              <property name="styleSheet">
+               <string notr="true">color: rgb(177, 177, 177);</string>
+              </property>
+              <property name="text">
+               <string>渲染方案：</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QComboBox" name="VRModeCBox"/>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <spacer name="verticalSpacer">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
          </layout>
         </item>
         <item>
-         <layout class="QHBoxLayout" name="ImgOperateLayout">
+         <layout class="QHBoxLayout" name="ImgOperateHLayout">
           <item>
            <widget class="QPushButton" name="Img_location">
             <property name="sizePolicy">
@@ -505,6 +588,22 @@
             </property>
             <property name="text">
              <string/>
+            </property>
+            <property name="icon">
+             <iconset>
+              <normaloff>Image/appbar.cursor.default.png</normaloff>Image/appbar.cursor.default.png</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>60</width>
+              <height>60</height>
+             </size>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
             </property>
             <property name="ToolButton" stdset="0">
              <bool>true</bool>
@@ -534,8 +633,28 @@
             <property name="text">
              <string/>
             </property>
+            <property name="icon">
+             <iconset>
+              <normaloff>Image/appbar.layer.png</normaloff>Image/appbar.layer.png</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>60</width>
+              <height>60</height>
+             </size>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
             <property name="ToolButton" stdset="0">
              <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="Line" name="line_2">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
             </property>
            </widget>
           </item>
@@ -561,6 +680,22 @@
             </property>
             <property name="text">
              <string/>
+            </property>
+            <property name="icon">
+             <iconset>
+              <normaloff>Image/appbar.contrast.png</normaloff>Image/appbar.contrast.png</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>60</width>
+              <height>60</height>
+             </size>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
             </property>
             <property name="ToolButton" stdset="0">
              <bool>true</bool>
@@ -590,6 +725,19 @@
             <property name="text">
              <string/>
             </property>
+            <property name="icon">
+             <iconset>
+              <normaloff>Image/appbar.magnify.png</normaloff>Image/appbar.magnify.png</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>60</width>
+              <height>60</height>
+             </size>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
             <property name="ToolButton" stdset="0">
              <bool>true</bool>
             </property>
@@ -618,6 +766,19 @@
             <property name="text">
              <string/>
             </property>
+            <property name="icon">
+             <iconset>
+              <normaloff>Image/appbar.cursor.move.png</normaloff>Image/appbar.cursor.move.png</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>60</width>
+              <height>60</height>
+             </size>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
             <property name="ToolButton" stdset="0">
              <bool>true</bool>
             </property>
@@ -632,13 +793,6 @@
         <string>Tab 2</string>
        </attribute>
       </widget>
-     </widget>
-    </item>
-    <item row="1" column="1">
-     <widget class="WorkZone" name="Workzone" native="true">
-      <property name="styleSheet">
-       <string notr="true"/>
-      </property>
      </widget>
     </item>
    </layout>
@@ -681,158 +835,13 @@
    <header>WorkZone.h</header>
    <container>1</container>
    <slots>
-    <slot>Btn_ImgOperateClick()</slot>
-    <slot>Btn_VrOperateClick()</slot>
     <slot>Btn_VrOrientationClick()</slot>
+    <slot>CB_VrModeChanged(QString)</slot>
    </slots>
   </customwidget>
  </customwidgets>
  <resources/>
  <connections>
-  <connection>
-   <sender>Img_location</sender>
-   <signal>clicked()</signal>
-   <receiver>Workzone</receiver>
-   <slot>Btn_ImgOperateClick()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>69</x>
-     <y>358</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>337</x>
-     <y>295</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>Img_browser</sender>
-   <signal>clicked()</signal>
-   <receiver>Workzone</receiver>
-   <slot>Btn_ImgOperateClick()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>134</x>
-     <y>358</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>311</x>
-     <y>332</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>Img_wl</sender>
-   <signal>clicked()</signal>
-   <receiver>Workzone</receiver>
-   <slot>Btn_ImgOperateClick()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>190</x>
-     <y>358</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>357</x>
-     <y>355</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>Img_zoom</sender>
-   <signal>clicked()</signal>
-   <receiver>Workzone</receiver>
-   <slot>Btn_ImgOperateClick()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>246</x>
-     <y>358</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>352</x>
-     <y>438</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>Img_pan</sender>
-   <signal>clicked()</signal>
-   <receiver>Workzone</receiver>
-   <slot>Btn_ImgOperateClick()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>302</x>
-     <y>358</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>596</x>
-     <y>487</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>VR_location</sender>
-   <signal>clicked()</signal>
-   <receiver>Workzone</receiver>
-   <slot>Btn_VrOperateClick()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>48</x>
-     <y>71</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>375</x>
-     <y>184</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>VR_rotate</sender>
-   <signal>clicked()</signal>
-   <receiver>Workzone</receiver>
-   <slot>Btn_VrOperateClick()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>107</x>
-     <y>73</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>320</x>
-     <y>165</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>VR_zoom</sender>
-   <signal>clicked()</signal>
-   <receiver>Workzone</receiver>
-   <slot>Btn_VrOperateClick()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>173</x>
-     <y>87</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>327</x>
-     <y>42</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>VR_pan</sender>
-   <signal>clicked()</signal>
-   <receiver>Workzone</receiver>
-   <slot>Btn_VrOperateClick()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>267</x>
-     <y>76</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>329</x>
-     <y>101</y>
-    </hint>
-   </hints>
-  </connection>
   <connection>
    <sender>Orientation_S</sender>
    <signal>clicked()</signal>
@@ -840,8 +849,8 @@
    <slot>Btn_VrOrientationClick()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>30</x>
-     <y>125</y>
+     <x>34</x>
+     <y>179</y>
     </hint>
     <hint type="destinationlabel">
      <x>347</x>
@@ -856,8 +865,8 @@
    <slot>Btn_VrOrientationClick()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>76</x>
-     <y>129</y>
+     <x>93</x>
+     <y>179</y>
     </hint>
     <hint type="destinationlabel">
      <x>309</x>
@@ -872,28 +881,12 @@
    <slot>Btn_VrOrientationClick()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>124</x>
-     <y>128</y>
+     <x>141</x>
+     <y>179</y>
     </hint>
     <hint type="destinationlabel">
      <x>323</x>
      <y>217</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>Orientation_A</sender>
-   <signal>clicked()</signal>
-   <receiver>Workzone</receiver>
-   <slot>Btn_VrOrientationClick()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>147</x>
-     <y>137</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>435</x>
-     <y>201</y>
     </hint>
    </hints>
   </connection>
@@ -904,8 +897,8 @@
    <slot>Btn_VrOrientationClick()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>188</x>
-     <y>129</y>
+     <x>189</x>
+     <y>179</y>
     </hint>
     <hint type="destinationlabel">
      <x>422</x>
@@ -920,8 +913,8 @@
    <slot>Btn_VrOrientationClick()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>222</x>
-     <y>133</y>
+     <x>237</x>
+     <y>179</y>
     </hint>
     <hint type="destinationlabel">
      <x>428</x>
@@ -942,6 +935,22 @@
     <hint type="destinationlabel">
      <x>477</x>
      <y>167</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>VRModeCBox</sender>
+   <signal>currentIndexChanged(QString)</signal>
+   <receiver>Workzone</receiver>
+   <slot>CB_VrModeChanged(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>112</x>
+     <y>202</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>351</x>
+     <y>353</y>
     </hint>
    </hints>
   </connection>

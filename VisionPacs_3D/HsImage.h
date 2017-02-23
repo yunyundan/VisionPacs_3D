@@ -37,9 +37,6 @@ public:
 
 	int Hs_Reload(int islicenum, bool bApplyCurImgState = true);
 
-	//删除图像
-	int Hs_FreeMem();
-
 	//窗口左边转图像坐标
 	POINT ConvertWndToImg(RECT ImgRcOnWnd, long nImgW, long nImgH, POINT &pt);
 
@@ -50,5 +47,8 @@ public:
 
 	//因为QT现实图像颠倒，需将原始数据翻转
 	int Hs_FilpOridata();
+
+
+	bool m_bOriImg;
 };
 

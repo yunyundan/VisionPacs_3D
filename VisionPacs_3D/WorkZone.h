@@ -26,9 +26,9 @@ private:
 
 	int m_nOriImageType;			//原始图像类型
 
-public:
-	void showImg(CHsImage *pImg);
+	int m_nDataX, m_nDataY, m_nDataZ;
 
+public:
 	void ClearImg(bool bIncludeVR);
 
 	void SetImageVector(vector<CHsImage*> vImage){ m_vImage = vImage; }
@@ -37,14 +37,17 @@ public:
 
 	void InitDisplayWnd();
 
-	vtkSmartPointer<vtkImageData> m_pImageData;
-
 	void ReRenderVrWnd();
 
+	void VrOperteChange(QString sOperateName);
+	void ImgOperteChange(QString sOperateName);
+
+	vtkSmartPointer<vtkImageData> m_pImageData;
+	void ***m_pImageArray;
+
 private slots:
-	void Btn_ImgOperateClick();
-	void Btn_VrOperateClick();
 	void Btn_VrOrientationClick();
+	void CB_VrModeChanged(QString sModeName);
 
 signals:
 	void SetWaitProgress(int);

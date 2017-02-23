@@ -142,6 +142,9 @@
     <ClCompile Include="Slicer\vtkSlicerGPUVolumeMapper.cxx">
       <Filter>Slicer</Filter>
     </ClCompile>
+    <ClCompile Include="HsNormalMprMaker.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="VisionPacs_3D.h">
@@ -259,6 +262,9 @@
     </ClInclude>
     <ClInclude Include="Slicer\vtkVolumeRenderingReplacements.h">
       <Filter>Slicer</Filter>
+    </ClInclude>
+    <ClInclude Include="HsNormalMprMaker.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

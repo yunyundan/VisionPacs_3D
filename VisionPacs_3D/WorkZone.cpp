@@ -102,6 +102,10 @@ WorkZone::WorkZone(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::WorkZone)
 	, m_pImageData(NULL)
+	,m_pImageArray(NULL)
+	,m_nDataX(0)
+	,m_nDataY(0)
+	,m_nDataZ(0)
 {
     ui->setupUi(this);
 
@@ -113,11 +117,18 @@ WorkZone::WorkZone(QWidget *parent) :
 WorkZone::~WorkZone()
 {
     delete ui;
-}
 
-void WorkZone::showImg(CHsImage *pImg)
-{
-	ui->Axial_Wnd->showImage(pImg);
+	if (m_pImageArray)
+	{
+		for (int z = 0; z < m_nDataZ; z++)
+		{
+			BYTE *pSlice = (BYTE *)m_pImageArray[z];
+			delete[]pSlice;
+		}
+		BYTE *pImgArray = (BYTE *)m_pImageArray;
+		delete[]pImgArray;
+		m_pImageArray = NULL;
+	}
 }
 
 void WorkZone::ClearImg(bool bIncludeVR)
@@ -146,7 +157,7 @@ void WorkZone::ProcessImageData()
 	}
 
 	if (abs(dMaxSpacingDiff - dTotalSpacingX) < 0.00001)
-		m_nOriImageType = ORIIMG_SAGGITAL;
+		m_nOriImageType = ORIIMG_SAGITTAL;
 	else if (abs(dMaxSpacingDiff - dTotalSpacingY) < 0.00001)
 		m_nOriImageType = ORIIMG_CORONAL;
 	else
@@ -171,48 +182,39 @@ void WorkZone::ProcessImageData()
 	}
 	else
 		std::sort(m_vImage.begin(), m_vImage.end(), SortImgByImgPos);
-	
-	int nDataX,nDataY,nDataZ;
+
 	double dSpacingX,dSpacingY, dSpacingZ;
 
-	nDataX = m_vImage[0]->m_ImgInfo.nCols;
-	nDataY = m_vImage[0]->m_ImgInfo.nRows;
-	nDataZ = m_vImage.size();
-
-	dSpacingX = m_vImage[0]->m_ImgInfo.fPixelSpaceX;
-	dSpacingY = m_vImage[0]->m_ImgInfo.fPixelSpaceY;
-	dSpacingZ = dMaxSpacingDiff/nImageNum;
-
-	/*if (m_nOriImageType == ORIIMG_AXIAL)
+	if (m_nOriImageType == ORIIMG_AXIAL)
 	{
-		nDataX = m_vImage[0]->m_ImgInfo.nCols;
-		nDataY = m_vImage[0]->m_ImgInfo.nRows; 
-		nDataZ = m_vImage.size();
+		m_nDataX = m_vImage[0]->m_ImgInfo.nCols;
+		m_nDataY = m_vImage[0]->m_ImgInfo.nRows;
+		m_nDataZ = m_vImage.size();
 
 		dSpacingX = m_vImage[0]->m_ImgInfo.fPixelSpaceX;
 		dSpacingY = m_vImage[0]->m_ImgInfo.fPixelSpaceY;
-		dSpacingZ = dMaxSpacingDiff;
+		dSpacingZ = dMaxSpacingDiff / nImageNum;
 	}
 	else if (m_nOriImageType == ORIIMG_CORONAL)
 	{
-		nDataZ = m_vImage[0]->m_ImgInfo.nRows;
-		nDataX = m_vImage[0]->m_ImgInfo.nCols;
-		nDataY = m_vImage.size();
+		m_nDataZ = m_vImage[0]->m_ImgInfo.nRows;
+		m_nDataX = m_vImage[0]->m_ImgInfo.nCols;
+		m_nDataY = m_vImage.size();
 
 		dSpacingX = m_vImage[0]->m_ImgInfo.fPixelSpaceX;
 		dSpacingZ = m_vImage[0]->m_ImgInfo.fPixelSpaceY;
-		dSpacingY = dMaxSpacingDiff;
+		dSpacingY = dMaxSpacingDiff / nImageNum;
 	}
-	else if (m_nOriImageType == ORIIMG_SAGGITAL)
+	else if (m_nOriImageType == ORIIMG_SAGITTAL)
 	{
-		nDataZ = m_vImage[0]->m_ImgInfo.nRows;
-		nDataY = m_vImage[0]->m_ImgInfo.nCols;
-		nDataX = m_vImage.size();
+		m_nDataZ = m_vImage[0]->m_ImgInfo.nRows;
+		m_nDataY = m_vImage[0]->m_ImgInfo.nCols;
+		m_nDataX = m_vImage.size();
 
 		dSpacingY = m_vImage[0]->m_ImgInfo.fPixelSpaceX;
 		dSpacingZ = m_vImage[0]->m_ImgInfo.fPixelSpaceY;
-		dSpacingX = dMaxSpacingDiff;
-	}*/
+		dSpacingX = dMaxSpacingDiff / nImageNum;
+	}
 
 	if (m_pImageData == NULL)
 		m_pImageData = vtkSmartPointer<vtkImageData>::New();
@@ -222,7 +224,7 @@ void WorkZone::ProcessImageData()
 	double fRescaleIntercept = m_vImage[0]->m_ImgInfo.fRescaleIntercept;
 	double fRescaleSlope = m_vImage[0]->m_ImgInfo.fRescaleSlope;
 
-	m_pImageData->SetDimensions(nDataX,nDataY,nDataZ);
+	m_pImageData->SetDimensions(m_nDataX,m_nDataY,m_nDataZ);
 	m_pImageData->SetSpacing(dSpacingX,dSpacingY,dSpacingZ);
 
 	int nSize = m_vImage[0]->m_ImgInfo.nBitsAllocated/8;
@@ -254,35 +256,26 @@ void WorkZone::ProcessImageData()
 				{
 					nPixelValue = pOriData[r][c];
 
-					*ptr++ = fRescaleSlope * nPixelValue + fRescaleIntercept;
+					//*ptr++ = fRescaleSlope * nPixelValue + fRescaleIntercept;
 
-					/*if (m_nOriImageType == ORIIMG_AXIAL)
+					if (m_nOriImageType == ORIIMG_AXIAL)
 					{
-					*ptr++ = fRescaleSlope * nPixelValue + fRescaleIntercept;
+						*ptr++ = fRescaleSlope * nPixelValue + fRescaleIntercept;
 					}
 					else if (m_nOriImageType == ORIIMG_CORONAL)
 					{
-					*(ptr + (nDataX*nDataY)*r + (nDataX*z) + c) = fRescaleSlope * nPixelValue + fRescaleIntercept;
+						*(ptr + (m_nDataX*m_nDataY)*r + (m_nDataX*z) + c) = fRescaleSlope * nPixelValue + fRescaleIntercept;
 					}
-					else if (m_nOriImageType == ORIIMG_SAGGITAL)
+					else if (m_nOriImageType == ORIIMG_SAGITTAL)
 					{
-					*(ptr + (nDataX*nDataY)*r + (nDataX*c) + z) = fRescaleSlope * nPixelValue + fRescaleIntercept;
-					}*/
+						*(ptr + (m_nDataX*m_nDataY)*r + (m_nDataX*c) + z) = fRescaleSlope * nPixelValue + fRescaleIntercept;
+					}
 				}
 			}
 
 			if (pImg->m_pOriData)
 				ArrayFree((void **)pImg->m_pOriData);
 			pImg->m_pOriData = NULL;
-
-			BYTE *pData = (BYTE *)m_pImageData->GetScalarPointer();
-			LONG *pAdd = new LONG[nRows];
-
-			for (int i = 0; i < nRows; i++)
-				pAdd[i] = long(&(pData[nRows*nCols*z*nSize + i*nCols*nSize]));
-
-			pImg->m_pOriData = (BYTE**)pAdd;
-			pImg->m_ImgInfo.nPixelRepresentation = 1;
 
 			emit SetWaitProgress(35 + z*iStep);
 		}
@@ -320,20 +313,20 @@ void WorkZone::ProcessImageData()
 					else
 						nPixelValue = pUSOriData[r][c];
 
-					*ptr++ = fRescaleSlope * nPixelValue + fRescaleIntercept;
+					//*ptr++ = fRescaleSlope * nPixelValue + fRescaleIntercept;
 
-					/*if (m_nOriImageType == ORIIMG_AXIAL)
+					if (m_nOriImageType == ORIIMG_AXIAL)
 					{
 						*ptr++ = fRescaleSlope * nPixelValue + fRescaleIntercept;
 					}
 					else if (m_nOriImageType == ORIIMG_CORONAL)
 					{
-						*(ptr + (nDataX*nDataY)*r + (nDataX*z) + c) = fRescaleSlope * nPixelValue + fRescaleIntercept;
+						*(ptr + (m_nDataX*m_nDataY)*r + (m_nDataX*z) + c) = fRescaleSlope * nPixelValue + fRescaleIntercept;
 					}
-					else if (m_nOriImageType == ORIIMG_SAGGITAL)
+					else if (m_nOriImageType == ORIIMG_SAGITTAL)
 					{
-						*(ptr + (nDataX*nDataY)*r + (nDataX*c) + z) = fRescaleSlope * nPixelValue + fRescaleIntercept;
-					}*/
+						*(ptr + (m_nDataX*m_nDataY)*r + (m_nDataX*c) + z) = fRescaleSlope * nPixelValue + fRescaleIntercept;
+					}
 				}
 			}
 
@@ -341,17 +334,41 @@ void WorkZone::ProcessImageData()
 				ArrayFree((void **)pImg->m_pOriData);
 			pImg->m_pOriData = NULL;
 
-			BYTE *pData = (BYTE *)m_pImageData->GetScalarPointer();
-			LONG *pAdd = new LONG[nRows];
-
-			for (int i = 0; i < nRows; i++)
-				pAdd[i] = long(&(pData[nRows*nCols*z*nSize + i*nCols*nSize]));
-
-			pImg->m_pOriData = (BYTE**)pAdd;
-			pImg->m_ImgInfo.nPixelRepresentation = 1;
-
 			emit SetWaitProgress(35 + z*iStep);
 		}		
+	}
+
+	//转成三维数组，如果存在先删除
+	if (m_pImageArray)
+	{
+		for (int z=0; z<m_nDataZ;z++)
+		{
+			for (int y=0; y<m_nDataY; y++)
+			{
+				long *pRows = (long *)m_pImageArray[z][y];
+				delete[]pRows;
+			}
+			long *pSlice = (long *)m_pImageArray[z];
+			delete[]pSlice;
+		}
+		m_pImageArray = NULL;
+	}
+
+	if (m_pImageArray == NULL)
+	{
+		BYTE *ptr = (BYTE *)m_pImageData->GetScalarPointer();
+		long *pArray = new long[m_nDataZ];
+		for (int z =0; z<m_nDataZ; z++ )
+		{
+			int nStartPoint = m_nDataX*m_nDataY*nSize*z;
+			long *pRows = new long[m_nDataY];
+			for (int y=0; y<m_nDataY; y++)
+			{
+				pRows[y] = long(&(ptr[nStartPoint + m_nDataX*nSize*y]));
+			}
+			pArray[z] = long(pRows);
+		}
+		m_pImageArray = (void***)pArray;
 	}
 	InitDisplayWnd();
 }
@@ -359,27 +376,12 @@ void WorkZone::ProcessImageData()
 void WorkZone::InitDisplayWnd()
 {
 	ui->VR_Wnd->SetImageDate(m_pImageData);
-	for (int i=0; i<m_v2DWnd.size();i++)
+	for (int i = 0; i < m_v2DWnd.size(); i++)
 	{
-		m_v2DWnd[i]->m_vImg = m_vImage;
+		m_v2DWnd[i]->SetImageData(m_pImageArray,m_pImageData,m_vImage);
 		m_v2DWnd[i]->InitShowImage(m_nOriImageType);
 	}
 	emit SetWaitProgress(100);
-}
-
-void WorkZone::Btn_ImgOperateClick()
-{
-	QString sOperateName = sender()->objectName();
-	for (int i = 0; i < m_v2DWnd.size(); i++)
-	{
-		m_v2DWnd[i]->ChangeOperate(sOperateName);
-	}
-}
-
-void WorkZone::Btn_VrOperateClick()
-{
-	QString sOperateName = sender()->objectName();
-	ui->VR_Wnd->ChangeOperate(sOperateName);
 }
 
 void WorkZone::Btn_VrOrientationClick()
@@ -389,9 +391,27 @@ void WorkZone::Btn_VrOrientationClick()
 	ReRenderVrWnd();
 }
 
+void WorkZone::CB_VrModeChanged(QString sModeName)
+{
+	ui->VR_Wnd->Set3DVRmode(sModeName);
+	ReRenderVrWnd();
+}
 
 void WorkZone::ReRenderVrWnd()
 {
 	ui->VR_Wnd->ReRender();
+}
+
+void WorkZone::VrOperteChange(QString sOperateName)
+{
+	ui->VR_Wnd->ChangeOperate(sOperateName);
+}
+
+void WorkZone::ImgOperteChange(QString sOperateName)
+{
+	for (int i = 0; i < m_v2DWnd.size(); i++)
+	{
+		m_v2DWnd[i]->ChangeOperate(sOperateName);
+	}
 }
 

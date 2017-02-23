@@ -75,7 +75,7 @@ CHsBaseImg::CHsBaseImg(void)
 
 CHsBaseImg::~CHsBaseImg(void)
 {
-	//Hs_FreeMem();
+	Hs_FreeMem();
 
     if (m_pPreSizeRc)
 		delete m_pPreSizeRc;

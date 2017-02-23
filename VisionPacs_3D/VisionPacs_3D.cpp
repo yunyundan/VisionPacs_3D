@@ -15,11 +15,17 @@ VisionPacs_3D::VisionPacs_3D(QWidget *parent)
 	, m_sSeriesUID("")
 {
 	ui->setupUi(this);
+	setStyleSheet("#MainWidget{background-color:#323232;}");
 	setWindowState(Qt::WindowMaximized);
+
 	//设置窗体标题栏隐藏
 	setWindowFlags(Qt::FramelessWindowHint);
 	//可获取鼠标跟踪效果
 	setMouseTracking(true);
+
+	//界面管理
+	InitUIConfig();
+
 }
 
 VisionPacs_3D::~VisionPacs_3D()	
@@ -43,6 +49,11 @@ VisionPacs_3D::~VisionPacs_3D()
 		delete m_pWaitDlg;
 		m_pWaitDlg = NULL;
 	}
+
+	delete m_pImgLeftBG;
+	delete m_pImgRightBG;	
+	delete m_pVrLeftBG;
+	delete m_pVrRightBG;
 }
 
 void VisionPacs_3D::on_actionOpen_File_triggered()
@@ -64,7 +75,6 @@ void VisionPacs_3D::on_actionOpen_File_triggered()
 	hf->Hs_GetImageInfo(pPixEle, pImg->m_ImgInfo, 0);
 	pImg->Hs_InitImgState();
 	pImg->SetDs(hf);
-	ui->Workzone->showImg(pImg);
 }
 
 void VisionPacs_3D::on_actionTest_triggered()
@@ -95,6 +105,52 @@ void VisionPacs_3D::StartProcessImage()
 	ui->Workzone->ProcessImageData();
 }
 
+void VisionPacs_3D::Btn_VrOperateClick(int nButtonID)
+{
+	QString sOperateName = "";
+	switch (nButtonID)
+	{
+	case 0:
+		sOperateName = "VR_location";
+		break;
+	case 1:
+		sOperateName = "VR_rotate";
+		break;
+	case 2:
+		sOperateName = "VR_zoom";
+		break;
+	case 3:
+		sOperateName = "VR_pan";
+		break;
+	}
+
+	ui->Workzone->VrOperteChange(sOperateName);
+}
+
+void VisionPacs_3D::Btn_ImgOperateClick(int nButtonID)
+{
+	QString sOperateName = "";
+	switch (nButtonID)
+	{
+	case 0:
+		sOperateName = "Img_location";
+		break;
+	case 1:
+		sOperateName = "Img_browser";
+		break;
+	case 2:
+		sOperateName = "Img_wl";
+		break;
+	case 3:
+		sOperateName = "Img_zoom";
+		break;
+	case 4:
+		sOperateName = "Img_pan";
+		break;
+	}
+	ui->Workzone->ImgOperteChange(sOperateName);
+}
+
 void VisionPacs_3D::ShowWaitDlg()
 {
 	//弹出进度条窗口
@@ -107,6 +163,53 @@ void VisionPacs_3D::ShowWaitDlg()
 		QObject::connect(ui->Workzone, SIGNAL(SetWaitProgress(int)), m_pWaitDlg, SLOT(SetProgress(int)));
 		QObject::connect(m_pWaitDlg, SIGNAL(StartProcess()), this, SLOT(StartProcessImage()), Qt::QueuedConnection);		
 		m_pWaitDlg->show();
+	}
+}
+
+void VisionPacs_3D::InitUIConfig()
+{
+	//操作按钮管理
+	m_pVrLeftBG = new QButtonGroup();
+	m_pVrLeftBG->setExclusive(true);
+	m_pVrLeftBG->addButton(ui->VR_location, 0);
+	m_pVrLeftBG->addButton(ui->VR_rotate, 1);
+	connect(m_pVrLeftBG, SIGNAL(buttonClicked(int)), this, SLOT(Btn_VrOperateClick(int)));
+	m_pVrRightBG = new QButtonGroup();
+	m_pVrRightBG->setExclusive(true);
+	m_pVrRightBG->addButton(ui->VR_zoom, 2);
+	m_pVrRightBG->addButton(ui->VR_pan, 3);
+	connect(m_pVrRightBG, SIGNAL(buttonClicked(int)), this, SLOT(Btn_VrOperateClick(int)));
+	m_pImgLeftBG = new QButtonGroup();
+	m_pImgLeftBG->setExclusive(true);
+	m_pImgLeftBG->addButton(ui->Img_location, 0);
+	m_pImgLeftBG->addButton(ui->Img_browser, 1);
+	connect(m_pImgLeftBG, SIGNAL(buttonClicked(int)), this, SLOT(Btn_ImgOperateClick(int)));
+	m_pImgRightBG = new QButtonGroup();
+	m_pImgRightBG->setExclusive(true);
+	m_pImgRightBG->addButton(ui->Img_wl, 2);
+	m_pImgRightBG->addButton(ui->Img_zoom, 3);
+	m_pImgRightBG->addButton(ui->Img_pan, 4);
+	connect(m_pImgRightBG, SIGNAL(buttonClicked(int)), this, SLOT(Btn_ImgOperateClick(int)));
+
+	//VRmode下拉框设置
+	QVector<QString> vModeNames;
+	vModeNames.push_back("Bone");
+	vModeNames.push_back("Heart");
+	vModeNames.push_back("Kidney");
+
+	ui->VRModeCBox->setIconSize(QSize(45, 45));
+	QListWidget *pVRModeListWidget = new QListWidget(this);
+	pVRModeListWidget->setIconSize(QSize(45, 45));
+	ui->VRModeCBox->setModel(pVRModeListWidget->model());
+	ui->VRModeCBox->setView(pVRModeListWidget);
+
+	for (int i = 0; i < vModeNames.size(); i++)
+	{
+		QListWidgetItem  *item = new QListWidgetItem(pVRModeListWidget);
+		QString sIconPath = QString("Image/%1.png").arg(vModeNames[i]);
+		item->setIcon(QIcon(sIconPath));
+		item->setText(vModeNames[i]);
+		pVRModeListWidget->addItem(item);
 	}
 }
 

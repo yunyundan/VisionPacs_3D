@@ -3,6 +3,7 @@
 #include "ui_ImageWnd.h"
 
 #include "HsImage.h"
+#include "HsNormalMprMaker.h"
 
 
 extern RECT GetShowRcByImgSize(RECT rc, double ImgWidth, double ImgHeight);
@@ -16,6 +17,8 @@ ImageWnd::ImageWnd(QWidget *parent) :
 	, m_pPixmap(NULL)
 	, m_nLeftButtonInteractionStyle(LOCTION_INTERACTION)
 	, m_nRightButtonInteractionStyle(WINDOW_LEVEL_INTERACTION)
+	,m_nImgWndType(ORIIMG_AXIAL)
+	,m_pNormalMaker(NULL)
 {
     ui->setupUi(this);
 }
@@ -27,16 +30,22 @@ ImageWnd::~ImageWnd()
 	if (m_pPixmap)
 		delete m_pPixmap;
 
-	//if (m_pImg)
-	//{
-	//	delete m_pImg;
-	//	m_pImg = NULL;
-	//}
+	if (m_pImg)
+	{
+		delete m_pImg;
+		m_pImg = NULL;
+	}
 
 	if (m_pQImage)
 	{
 		delete m_pQImage;
 		m_pQImage = NULL;
+	}
+
+	if (m_pNormalMaker)
+	{
+		delete m_pNormalMaker;
+		m_pNormalMaker = NULL;
 	}
 }
 
@@ -57,7 +66,6 @@ void ImageWnd::paintEvent(QPaintEvent *event)
 		QRect rc(ImgRc.left, ImgRc.top, ImgRc.right - ImgRc.left, ImgRc.bottom - ImgRc.top);
 		painter.drawImage(rc, qImg);
 	}
-
 }
 
 void ImageWnd::mousePressEvent(QMouseEvent *event)
@@ -138,8 +146,8 @@ void ImageWnd::mouseMoveEvent(QMouseEvent *event)
 	}
 	else if (m_nInteractionState == IMGSTSTEM_WL)
 	{
-		long w = pt.x() - m_PrePoint.x();
-		long c = pt.y() - m_PrePoint.y();
+		long w = (pt.x() - m_PrePoint.x())/2;
+		long c = (pt.y() - m_PrePoint.y())/2;
 
 		m_pImg->Hs_WinLevel(w, c, true, &m_nCurW, &m_nCurC);
 
@@ -459,5 +467,68 @@ POINT ImageWnd::ConvertWndToImg(RECT ImgRcOnWnd, long nImgW, long nImgH, QPoint 
 	ImgPt.y = fy * (pt.y() - ImgRcOnWnd.top);
 
 	return ImgPt;
+}
+
+void ImageWnd::GetImgNumAndWndType(QString sWndName, int nOriImgType)
+{
+	if (sWndName.compare("Axial_Wnd") == 0)
+		m_nImgWndType = ORIIMG_AXIAL;
+	else if (sWndName.compare("Coronal_Wnd") == 0)
+		m_nImgWndType = ORIIMG_CORONAL;
+	else
+		m_nImgWndType = ORIIMG_SAGITTAL;
+
+	int nImagNum = 0;
+	if (m_nImgWndType == nOriImgType)
+	{
+		nImagNum = m_vOriImg.size();
+	}
+	else
+	{
+		if (nOriImgType == ORIIMG_AXIAL)
+		{
+			if (sWndName.compare("Coronal_Wnd") == 0)
+				nImagNum = m_vOriImg[0]->m_ImgInfo.nOriRows;
+			else
+				nImagNum = m_vOriImg[0]->m_ImgInfo.nOriCols;
+		}
+		else if (nOriImgType == ORIIMG_SAGITTAL)
+		{
+			if (sWndName.compare("Coronal_Wnd") == 0)
+				nImagNum = m_vOriImg[0]->m_ImgInfo.nOriCols;
+			else
+				nImagNum = m_vOriImg[0]->m_ImgInfo.nOriRows;
+		}
+		else
+		{
+			if (sWndName.compare("Axial_Wnd") == 0)
+				nImagNum = m_vOriImg[0]->m_ImgInfo.nOriCols;
+			else
+				nImagNum = m_vOriImg[0]->m_ImgInfo.nOriRows;
+		}
+	}
+
+	emit SendImageNum(nImagNum);
+}
+
+int ImageWnd::CalcAndShowNormalImg(QString sWndName, int nOriImgType, int iImgIndex,int iSlice)
+{
+	if (m_pImg)
+		m_pImg->Hs_FreeMem();
+
+
+	if (m_pImg == NULL)
+		m_pImg = new CHsImage;
+
+
+	if (m_pNormalMaker == NULL)
+	{
+		m_pNormalMaker = new CHsNormalMprMaker();
+		m_pNormalMaker->InitParaAndData(m_vOriImg, m_p3DArray, m_p3DImgData, m_nImgWndType, nOriImgType);
+	}
+
+	m_pNormalMaker->GetShowImage(m_pImg, iImgIndex, iSlice);		
+	SetImage(m_pImg);
+	return 0;
 }
 

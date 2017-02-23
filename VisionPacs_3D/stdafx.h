@@ -15,6 +15,9 @@
 #include <QRgb>
 #include <QDialog>
 #include <QApplication>
+#include <QButtonGroup>
+#include <QListWidget>
+#include <QListWidgetItem>
 
 #include <stdio.h>
 #include <windows.h>

@@ -977,7 +977,7 @@ typedef enum Enum_ImgInteractionStyleIds {
 //MPR 图像方位
 #define  ORIIMG_AXIAL					1
 #define  ORIIMG_CORONAL					2
-#define  ORIIMG_SAGGITAL				3
+#define  ORIIMG_SAGITTAL				3
 
 //#define  ORIIMG_AXIAL_R					0		//横断位，X方向是由右到左
 //#define  ORIIMG_AXIAL_L					1		//横断位，X方向是由左到右

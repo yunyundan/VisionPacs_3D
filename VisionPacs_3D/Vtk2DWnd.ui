@@ -57,5 +57,25 @@
   </customwidget>
  </customwidgets>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>ScrollBar</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>Vtk2DWnd</receiver>
+   <slot>OnScrollBarMoved(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>390</x>
+     <y>221</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>406</x>
+     <y>238</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>OnScrollBarMoved(int)</slot>
+ </slots>
 </ui>
