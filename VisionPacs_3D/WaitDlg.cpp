@@ -32,6 +32,8 @@ void WaitDlg::SetProgress(int nValue)
 	{ 
 		done(0);
 		ui->LoadProgressBar->setValue(0);
-		m_bShow = false;		
+		m_bShow = false;
+		emit ProcessEnd();
 	}
 }
+

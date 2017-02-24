@@ -25,6 +25,7 @@ private slots:
 
 signals:
 	void StartProcess();
+	void ProcessEnd();
 };
 
 #endif // WAITDLG_H

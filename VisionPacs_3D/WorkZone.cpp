@@ -415,3 +415,8 @@ void WorkZone::ImgOperteChange(QString sOperateName)
 	}
 }
 
+void WorkZone::InitVolumePropertyWidget(ctkVTKVolumePropertyWidget *pCtkVPwidget)
+{
+	ui->VR_Wnd->ConnectVolumeToWidget(pCtkVPwidget);
+}
+

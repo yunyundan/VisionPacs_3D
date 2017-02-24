@@ -48,6 +48,8 @@ public:
 
 	void ReRender();
 
+	void ConnectVolumeToWidget(ctkVTKVolumePropertyWidget *pCtkVPwidget);
+
     double ReductionFactor;
     double FrameRate;
 

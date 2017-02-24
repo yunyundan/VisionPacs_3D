@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ctkVTKVolumePropertyWidget</class>
+ <widget class="QWidget" name="ctkVTKVolumePropertyWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>391</width>
+    <height>699</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Volume property</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_3">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <item>
+    <widget class="ctkCollapsibleGroupBox" name="ScalarOpacityGroupBox">
+     <property name="title">
+      <string>Scalar Opacity Mapping</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>15</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="ctkVTKThresholdWidget" name="ScalarOpacityThresholdWidget" native="true"/>
+      </item>
+      <item>
+       <widget class="ctkVTKScalarsToColorsWidget" name="ScalarOpacityWidget" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>120</height>
+         </size>
+        </property>
+        <property name="editColors" stdset="0">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="ctkCollapsibleGroupBox" name="ScalarColorGroupBox">
+     <property name="title">
+      <string>Scalar Color Mapping</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_4">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>15</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="ctkVTKScalarsToColorsWidget" name="ScalarColorWidget" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>120</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="ctkCollapsibleGroupBox" name="GradientGroupBox">
+     <property name="title">
+      <string>Gradient Opacity</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>15</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="ctkVTKScalarsToColorsWidget" name="GradientWidget" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>120</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="ctkCollapsibleGroupBox" name="AdvancedGroupBox">
+     <property name="title">
+      <string>Advanced</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="0">
+       <widget class="QLabel" name="InterpolationLabel">
+        <property name="text">
+         <string>Interpolation:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QComboBox" name="InterpolationComboBox">
+        <item>
+         <property name="text">
+          <string>Nearest Neighbor</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Linear</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="ShadeLabel">
+        <property name="text">
+         <string>Shade:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QCheckBox" name="ShadeCheckBox"/>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="MaterialLabel">
+        <property name="text">
+         <string>Material:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0" colspan="2">
+       <widget class="ctkMaterialPropertyWidget" name="MaterialPropertyWidget" native="true">
+        <property name="colorVisible" stdset="0">
+         <bool>false</bool>
+        </property>
+        <property name="opacityVisible" stdset="0">
+         <bool>false</bool>
+        </property>
+        <property name="backfaceCullingVisible" stdset="0">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>ctkVTKThresholdWidget</class>
+   <extends>QWidget</extends>
+   <header>ctkVTKThresholdWidget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>ctkVTKScalarsToColorsWidget</class>
+   <extends>QWidget</extends>
+   <header>ctkVTKScalarsToColorsWidget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>ctkCollapsibleGroupBox</class>
+   <extends>QGroupBox</extends>
+   <header>ctkCollapsibleGroupBox.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ctkMaterialPropertyWidget</class>
+   <extends>QWidget</extends>
+   <header>ctkMaterialPropertyWidget.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

@@ -99,6 +99,10 @@ QComboBox
     border-style: solid;
     border: 1px solid #1e1e1e;
     border-radius: 5px;
+}
+
+QComboBox[Type = "VRmode"]
+{
     height:50px;
 }
 
@@ -109,7 +113,6 @@ QComboBox:hover
 
 QComboBox:on
 {
-    height:50px;
     padding-top: 3px;
     padding-left: 4px;
     background-color: QLinearGradient( x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #2d2d2d, stop: 0.1 #2b2b2b, stop: 0.5 #292929, stop: 0.9 #282828, stop: 1 #252525);
@@ -200,4 +203,38 @@ QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical
 QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical
 {
       background: none;
+}
+
+QGroupBox
+{
+    color: #b1b1b1;
+    border: 1px solid #4c4c4c;
+}
+
+QGroupBox::focus
+{
+    border: 2px solid QLinearGradient( x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #007acc, stop: 1 #007ad8);
+}
+
+QLabel
+{
+    color: #b1b1b1;
+}
+
+QCheckBox::indicator{
+    color: #b1b1b1;
+    background-color: #323232;
+    border: 1px solid #b1b1b1;
+    width: 9px;
+    height: 9px;
+}
+
+QCheckBox::indicator:checked
+{
+    image:url(Image/checkbox.png);
+}
+
+QCheckBox::indicator:disabled, QRadioButton::indicator:disabled
+{
+    border: 1px solid #444;
 }

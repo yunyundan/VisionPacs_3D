@@ -13,6 +13,7 @@ VisionPacs_3D::VisionPacs_3D(QWidget *parent)
 	, m_pWaitDlg(NULL)
 	, m_sFilePath("")
 	, m_sSeriesUID("")
+	, m_pVolumePropertywidget(NULL)
 {
 	ui->setupUi(this);
 	setStyleSheet("#MainWidget{background-color:#323232;}");
@@ -25,7 +26,6 @@ VisionPacs_3D::VisionPacs_3D(QWidget *parent)
 
 	//界面管理
 	InitUIConfig();
-
 }
 
 VisionPacs_3D::~VisionPacs_3D()	
@@ -54,6 +54,12 @@ VisionPacs_3D::~VisionPacs_3D()
 	delete m_pImgRightBG;	
 	delete m_pVrLeftBG;
 	delete m_pVrRightBG;
+
+	if (m_pVolumePropertywidget)
+	{
+		delete m_pVolumePropertywidget;
+		m_pVolumePropertywidget = NULL;
+	}
 }
 
 void VisionPacs_3D::on_actionOpen_File_triggered()
@@ -79,8 +85,8 @@ void VisionPacs_3D::on_actionOpen_File_triggered()
 
 void VisionPacs_3D::on_actionTest_triggered()
 {
-	QString sFilePath = "E:\\ctdata\\DJ201310B\\DJ20131022B0256";
-	QString sSeriesUID = "1.2.392.200036.9116.2.5.1.37.2420749095.1382489636.301658";
+	QString sFilePath = "E:\\TestData\\Heart";
+	QString sSeriesUID = "1.3.12.2.1107.5.1.4.73275.30000013050523545628100002562";
 
 	m_sFilePath = sFilePath;
 	m_sSeriesUID = sSeriesUID;
@@ -103,6 +109,15 @@ void VisionPacs_3D::StartProcessImage()
 	ChoosePeriod(0);
 
 	ui->Workzone->ProcessImageData();
+}
+
+void VisionPacs_3D::ReceiveProcessEnd()
+{
+	//渲染方案控件初始化
+	if (m_pVolumePropertywidget)
+	{
+		ui->Workzone->InitVolumePropertyWidget(m_pVolumePropertywidget);
+	}	
 }
 
 void VisionPacs_3D::Btn_VrOperateClick(int nButtonID)
@@ -161,7 +176,8 @@ void VisionPacs_3D::ShowWaitDlg()
 		m_pWaitDlg->setWindowFlags(Qt::Dialog | Qt::FramelessWindowHint);
 		QObject::connect(this, SIGNAL(SetWaitProgress(int)), m_pWaitDlg, SLOT(SetProgress(int)));
 		QObject::connect(ui->Workzone, SIGNAL(SetWaitProgress(int)), m_pWaitDlg, SLOT(SetProgress(int)));
-		QObject::connect(m_pWaitDlg, SIGNAL(StartProcess()), this, SLOT(StartProcessImage()), Qt::QueuedConnection);		
+		QObject::connect(m_pWaitDlg, SIGNAL(StartProcess()), this, SLOT(StartProcessImage()), Qt::QueuedConnection);	
+		QObject::connect(m_pWaitDlg, SIGNAL(ProcessEnd()), this, SLOT(ReceiveProcessEnd()), Qt::QueuedConnection);
 		m_pWaitDlg->show();
 	}
 }
@@ -210,6 +226,12 @@ void VisionPacs_3D::InitUIConfig()
 		item->setIcon(QIcon(sIconPath));
 		item->setText(vModeNames[i]);
 		pVRModeListWidget->addItem(item);
+	}
+
+	if (m_pVolumePropertywidget == NULL)
+	{
+		m_pVolumePropertywidget = new ctkVTKVolumePropertyWidget;
+		ui->RenderVLayout->addWidget(m_pVolumePropertywidget);
 	}
 }
 

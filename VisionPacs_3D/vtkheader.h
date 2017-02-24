@@ -7,6 +7,8 @@
 VTK_MODULE_INIT(vtkRenderingOpenGL)
 VTK_MODULE_INIT(vtkInteractionStyle)
 VTK_MODULE_INIT(vtkRenderingVolumeOpenGL)
+VTK_MODULE_INIT(vtkRenderingContextOpenGL)
+VTK_MODULE_INIT(vtkRenderingFreeType)
 #endif
 
 #include "QVTKWidget.h"
@@ -42,3 +44,11 @@ VTK_MODULE_INIT(vtkRenderingVolumeOpenGL)
 #include "gdcmDataSet.h"
 #include "gdcmAttribute.h"
 #include "gdcmTesting.h"
+
+//CTK Header
+#include "CTK/ctkTransferFunction.h"
+#include "CTK/ctkVTKColorTransferFunction.h"
+#include "CTK/ctkTransferFunctionView.h"
+#include "CTK/ctkTransferFunctionGradientItem.h"
+#include "CTK/ctkTransferFunctionControlPointsItem.h"
+#include "CTK/ctkVTKVolumePropertyWidget.h"

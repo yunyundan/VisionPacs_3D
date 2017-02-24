@@ -44,6 +44,12 @@
     <Filter Include="Image">
       <UniqueIdentifier>{8121342e-4985-41c6-9d17-86775d2ea729}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Form Files\CTK">
+      <UniqueIdentifier>{dac27319-8aa4-4a95-a287-aeb9828fb2f1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CTK">
+      <UniqueIdentifier>{a9e2241a-09d5-4b2b-9fb4-15a50c37013f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -145,6 +151,444 @@
     <ClCompile Include="HsNormalMprMaker.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CTK\ctkBasePopupWidget.cpp">
+      <Filter>CTK</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ctkBasePopupWidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ctkBasePopupWidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ctkBasePopupWidget_p.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ctkBasePopupWidget_p.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="CTK\ctkCollapsibleGroupBox.cpp">
+      <Filter>CTK</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ctkCollapsibleGroupBox.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ctkCollapsibleGroupBox.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="CTK\ctkColorDialog.cpp">
+      <Filter>CTK</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ctkColorDialog.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ctkColorDialog.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="CTK\ctkColorPickerButton.cpp">
+      <Filter>CTK</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ctkColorPickerButton.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ctkColorPickerButton.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="CTK\ctkDoubleRangeSlider.cpp">
+      <Filter>CTK</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ctkDoubleRangeSlider.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ctkDoubleRangeSlider.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="CTK\ctkDoubleSlider.cpp">
+      <Filter>CTK</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ctkDoubleSlider.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ctkDoubleSlider.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="CTK\ctkDoubleSpinBox.cpp">
+      <Filter>CTK</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ctkDoubleSpinBox.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ctkDoubleSpinBox.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ctkDoubleSpinBox_p.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ctkDoubleSpinBox_p.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="CTK\ctkExpandButton.cpp">
+      <Filter>CTK</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ctkExpandButton.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ctkExpandButton.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="CTK\ctkHistogram.cpp">
+      <Filter>CTK</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ctkHistogram.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ctkHistogram.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="CTK\ctkLogger.cpp">
+      <Filter>CTK</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ctkLogger.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ctkLogger.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="CTK\ctkMaterialPropertyPreviewLabel.cpp">
+      <Filter>CTK</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ctkMaterialPropertyPreviewLabel.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ctkMaterialPropertyPreviewLabel.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="CTK\ctkMaterialPropertyWidget.cpp">
+      <Filter>CTK</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ctkMaterialPropertyWidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ctkMaterialPropertyWidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="CTK\ctkMatrixWidget.cpp">
+      <Filter>CTK</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ctkMatrixWidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ctkMatrixWidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="CTK\ctkPopupWidget.cpp">
+      <Filter>CTK</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ctkPopupWidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ctkPopupWidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ctkPopupWidget_p.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ctkPopupWidget_p.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="CTK\ctkProxyStyle.cpp">
+      <Filter>CTK</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ctkProxyStyle.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ctkProxyStyle.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="CTK\ctkRangeSlider.cpp">
+      <Filter>CTK</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ctkRangeSlider.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ctkRangeSlider.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="CTK\ctkRangeWidget.cpp">
+      <Filter>CTK</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ctkRangeWidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ctkRangeWidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="CTK\ctkSliderWidget.cpp">
+      <Filter>CTK</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ctkSliderWidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ctkSliderWidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="CTK\ctkTransferFunction.cpp">
+      <Filter>CTK</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ctkTransferFunction.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ctkTransferFunction.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="CTK\ctkTransferFunctionBarsItem.cpp">
+      <Filter>CTK</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ctkTransferFunctionBarsItem.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ctkTransferFunctionBarsItem.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="CTK\ctkTransferFunctionControlPointsItem.cpp">
+      <Filter>CTK</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ctkTransferFunctionControlPointsItem.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ctkTransferFunctionControlPointsItem.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="CTK\ctkTransferFunctionGradientItem.cpp">
+      <Filter>CTK</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ctkTransferFunctionGradientItem.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ctkTransferFunctionGradientItem.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="CTK\ctkTransferFunctionItem.cpp">
+      <Filter>CTK</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ctkTransferFunctionItem.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ctkTransferFunctionItem.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="CTK\ctkTransferFunctionNativeItem.cpp">
+      <Filter>CTK</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ctkTransferFunctionNativeItem.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ctkTransferFunctionNativeItem.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="CTK\ctkTransferFunctionRepresentation.cpp">
+      <Filter>CTK</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ctkTransferFunctionRepresentation.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ctkTransferFunctionRepresentation.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="CTK\ctkTransferFunctionScene.cpp">
+      <Filter>CTK</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ctkTransferFunctionScene.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ctkTransferFunctionScene.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="CTK\ctkTransferFunctionView.cpp">
+      <Filter>CTK</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ctkTransferFunctionView.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ctkTransferFunctionView.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="CTK\ctkUtils.cpp">
+      <Filter>CTK</Filter>
+    </ClCompile>
+    <ClCompile Include="CTK\ctkValueProxy.cpp">
+      <Filter>CTK</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ctkValueProxy.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ctkValueProxy.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="CTK\ctkVTKAbstractMatrixWidget.cpp">
+      <Filter>CTK</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ctkVTKAbstractMatrixWidget_p.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ctkVTKAbstractMatrixWidget_p.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="CTK\ctkVTKChartView.cpp">
+      <Filter>CTK</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ctkVTKChartView.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ctkVTKChartView.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="CTK\ctkVTKColorTransferFunction.cpp">
+      <Filter>CTK</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ctkVTKColorTransferFunction.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ctkVTKColorTransferFunction.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="CTK\ctkVTKCompositeFunction.cpp">
+      <Filter>CTK</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ctkVTKCompositeFunction.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ctkVTKCompositeFunction.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="CTK\ctkVTKConnection.cpp">
+      <Filter>CTK</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ctkVTKConnection.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ctkVTKConnection.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="CTK\ctkVTKHistogram.cpp">
+      <Filter>CTK</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ctkVTKHistogram.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ctkVTKHistogram.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="CTK\ctkVTKLookupTable.cpp">
+      <Filter>CTK</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ctkVTKLookupTable.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ctkVTKLookupTable.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="CTK\ctkVTKMatrixWidget.cpp">
+      <Filter>CTK</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ctkVTKMatrixWidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ctkVTKMatrixWidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="CTK\ctkVTKObjectEventsObserver.cpp">
+      <Filter>CTK</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ctkVTKObjectEventsObserver.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ctkVTKObjectEventsObserver.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="CTK\ctkVTKPiecewiseFunction.cpp">
+      <Filter>CTK</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ctkVTKPiecewiseFunction.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ctkVTKPiecewiseFunction.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="CTK\ctkVTKPropertyWidget.cpp">
+      <Filter>CTK</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ctkVTKPropertyWidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ctkVTKPropertyWidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="CTK\ctkVTKScalarBarWidget.cpp">
+      <Filter>CTK</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ctkVTKScalarBarWidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ctkVTKScalarBarWidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="CTK\ctkVTKScalarsToColorsUtils.cpp">
+      <Filter>CTK</Filter>
+    </ClCompile>
+    <ClCompile Include="CTK\ctkVTKScalarsToColorsView.cpp">
+      <Filter>CTK</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ctkVTKScalarsToColorsView.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ctkVTKScalarsToColorsView.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="CTK\ctkVTKScalarsToColorsWidget.cpp">
+      <Filter>CTK</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ctkVTKScalarsToColorsWidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ctkVTKScalarsToColorsWidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="CTK\ctkVTKSurfaceMaterialPropertyWidget.cpp">
+      <Filter>CTK</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ctkVTKSurfaceMaterialPropertyWidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ctkVTKSurfaceMaterialPropertyWidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="CTK\ctkVTKTextPropertyWidget.cpp">
+      <Filter>CTK</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ctkVTKTextPropertyWidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ctkVTKTextPropertyWidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="CTK\ctkVTKThresholdWidget.cpp">
+      <Filter>CTK</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ctkVTKThresholdWidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ctkVTKThresholdWidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="CTK\ctkVTKVolumePropertyWidget.cpp">
+      <Filter>CTK</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ctkVTKVolumePropertyWidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ctkVTKVolumePropertyWidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="VisionPacs_3D.h">
@@ -185,6 +629,180 @@
     </CustomBuild>
     <CustomBuild Include="WorkZone.ui">
       <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="CTK_ui\ctkMaterialPropertyWidget.ui">
+      <Filter>Form Files\CTK</Filter>
+    </CustomBuild>
+    <CustomBuild Include="CTK_ui\ctkRangeWidget.ui">
+      <Filter>Form Files\CTK</Filter>
+    </CustomBuild>
+    <CustomBuild Include="CTK_ui\ctkSliderWidget.ui">
+      <Filter>Form Files\CTK</Filter>
+    </CustomBuild>
+    <CustomBuild Include="CTK_ui\ctkVTKPropertyWidget.ui">
+      <Filter>Form Files\CTK</Filter>
+    </CustomBuild>
+    <CustomBuild Include="CTK_ui\ctkVTKScalarBarWidget.ui">
+      <Filter>Form Files\CTK</Filter>
+    </CustomBuild>
+    <CustomBuild Include="CTK_ui\ctkVTKScalarsToColorsWidget.ui">
+      <Filter>Form Files\CTK</Filter>
+    </CustomBuild>
+    <CustomBuild Include="CTK_ui\ctkVTKTextPropertyWidget.ui">
+      <Filter>Form Files\CTK</Filter>
+    </CustomBuild>
+    <CustomBuild Include="CTK_ui\ctkVTKThresholdWidget.ui">
+      <Filter>Form Files\CTK</Filter>
+    </CustomBuild>
+    <CustomBuild Include="CTK_ui\ctkVTKVolumePropertyWidget.ui">
+      <Filter>Form Files\CTK</Filter>
+    </CustomBuild>
+    <CustomBuild Include="CTK\ctkBasePopupWidget.h">
+      <Filter>CTK</Filter>
+    </CustomBuild>
+    <CustomBuild Include="CTK\ctkBasePopupWidget_p.h">
+      <Filter>CTK</Filter>
+    </CustomBuild>
+    <CustomBuild Include="CTK\ctkCollapsibleGroupBox.h">
+      <Filter>CTK</Filter>
+    </CustomBuild>
+    <CustomBuild Include="CTK\ctkColorDialog.h">
+      <Filter>CTK</Filter>
+    </CustomBuild>
+    <CustomBuild Include="CTK\ctkColorPickerButton.h">
+      <Filter>CTK</Filter>
+    </CustomBuild>
+    <CustomBuild Include="CTK\ctkDoubleRangeSlider.h">
+      <Filter>CTK</Filter>
+    </CustomBuild>
+    <CustomBuild Include="CTK\ctkDoubleSlider.h">
+      <Filter>CTK</Filter>
+    </CustomBuild>
+    <CustomBuild Include="CTK\ctkDoubleSpinBox.h">
+      <Filter>CTK</Filter>
+    </CustomBuild>
+    <CustomBuild Include="CTK\ctkDoubleSpinBox_p.h">
+      <Filter>CTK</Filter>
+    </CustomBuild>
+    <CustomBuild Include="CTK\ctkExpandButton.h">
+      <Filter>CTK</Filter>
+    </CustomBuild>
+    <CustomBuild Include="CTK\ctkHistogram.h">
+      <Filter>CTK</Filter>
+    </CustomBuild>
+    <CustomBuild Include="CTK\ctkLogger.h">
+      <Filter>CTK</Filter>
+    </CustomBuild>
+    <CustomBuild Include="CTK\ctkMaterialPropertyPreviewLabel.h">
+      <Filter>CTK</Filter>
+    </CustomBuild>
+    <CustomBuild Include="CTK\ctkMaterialPropertyWidget.h">
+      <Filter>CTK</Filter>
+    </CustomBuild>
+    <CustomBuild Include="CTK\ctkMatrixWidget.h">
+      <Filter>CTK</Filter>
+    </CustomBuild>
+    <CustomBuild Include="CTK\ctkPopupWidget.h">
+      <Filter>CTK</Filter>
+    </CustomBuild>
+    <CustomBuild Include="CTK\ctkPopupWidget_p.h">
+      <Filter>CTK</Filter>
+    </CustomBuild>
+    <CustomBuild Include="CTK\ctkProxyStyle.h">
+      <Filter>CTK</Filter>
+    </CustomBuild>
+    <CustomBuild Include="CTK\ctkRangeSlider.h">
+      <Filter>CTK</Filter>
+    </CustomBuild>
+    <CustomBuild Include="CTK\ctkRangeWidget.h">
+      <Filter>CTK</Filter>
+    </CustomBuild>
+    <CustomBuild Include="CTK\ctkSliderWidget.h">
+      <Filter>CTK</Filter>
+    </CustomBuild>
+    <CustomBuild Include="CTK\ctkTransferFunction.h">
+      <Filter>CTK</Filter>
+    </CustomBuild>
+    <CustomBuild Include="CTK\ctkTransferFunctionBarsItem.h">
+      <Filter>CTK</Filter>
+    </CustomBuild>
+    <CustomBuild Include="CTK\ctkTransferFunctionControlPointsItem.h">
+      <Filter>CTK</Filter>
+    </CustomBuild>
+    <CustomBuild Include="CTK\ctkTransferFunctionGradientItem.h">
+      <Filter>CTK</Filter>
+    </CustomBuild>
+    <CustomBuild Include="CTK\ctkTransferFunctionItem.h">
+      <Filter>CTK</Filter>
+    </CustomBuild>
+    <CustomBuild Include="CTK\ctkTransferFunctionNativeItem.h">
+      <Filter>CTK</Filter>
+    </CustomBuild>
+    <CustomBuild Include="CTK\ctkTransferFunctionRepresentation.h">
+      <Filter>CTK</Filter>
+    </CustomBuild>
+    <CustomBuild Include="CTK\ctkTransferFunctionScene.h">
+      <Filter>CTK</Filter>
+    </CustomBuild>
+    <CustomBuild Include="CTK\ctkTransferFunctionView.h">
+      <Filter>CTK</Filter>
+    </CustomBuild>
+    <CustomBuild Include="CTK\ctkValueProxy.h">
+      <Filter>CTK</Filter>
+    </CustomBuild>
+    <CustomBuild Include="CTK\ctkVTKAbstractMatrixWidget_p.h">
+      <Filter>CTK</Filter>
+    </CustomBuild>
+    <CustomBuild Include="CTK\ctkVTKChartView.h">
+      <Filter>CTK</Filter>
+    </CustomBuild>
+    <CustomBuild Include="CTK\ctkVTKColorTransferFunction.h">
+      <Filter>CTK</Filter>
+    </CustomBuild>
+    <CustomBuild Include="CTK\ctkVTKCompositeFunction.h">
+      <Filter>CTK</Filter>
+    </CustomBuild>
+    <CustomBuild Include="CTK\ctkVTKConnection.h">
+      <Filter>CTK</Filter>
+    </CustomBuild>
+    <CustomBuild Include="CTK\ctkVTKHistogram.h">
+      <Filter>CTK</Filter>
+    </CustomBuild>
+    <CustomBuild Include="CTK\ctkVTKLookupTable.h">
+      <Filter>CTK</Filter>
+    </CustomBuild>
+    <CustomBuild Include="CTK\ctkVTKMatrixWidget.h">
+      <Filter>CTK</Filter>
+    </CustomBuild>
+    <CustomBuild Include="CTK\ctkVTKObjectEventsObserver.h">
+      <Filter>CTK</Filter>
+    </CustomBuild>
+    <CustomBuild Include="CTK\ctkVTKPiecewiseFunction.h">
+      <Filter>CTK</Filter>
+    </CustomBuild>
+    <CustomBuild Include="CTK\ctkVTKPropertyWidget.h">
+      <Filter>CTK</Filter>
+    </CustomBuild>
+    <CustomBuild Include="CTK\ctkVTKScalarBarWidget.h">
+      <Filter>CTK</Filter>
+    </CustomBuild>
+    <CustomBuild Include="CTK\ctkVTKScalarsToColorsView.h">
+      <Filter>CTK</Filter>
+    </CustomBuild>
+    <CustomBuild Include="CTK\ctkVTKScalarsToColorsWidget.h">
+      <Filter>CTK</Filter>
+    </CustomBuild>
+    <CustomBuild Include="CTK\ctkVTKSurfaceMaterialPropertyWidget.h">
+      <Filter>CTK</Filter>
+    </CustomBuild>
+    <CustomBuild Include="CTK\ctkVTKTextPropertyWidget.h">
+      <Filter>CTK</Filter>
+    </CustomBuild>
+    <CustomBuild Include="CTK\ctkVTKThresholdWidget.h">
+      <Filter>CTK</Filter>
+    </CustomBuild>
+    <CustomBuild Include="CTK\ctkVTKVolumePropertyWidget.h">
+      <Filter>CTK</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
@@ -265,6 +883,66 @@
     </ClInclude>
     <ClInclude Include="HsNormalMprMaker.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_ctkMaterialPropertyWidget.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_ctkRangeWidget.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_ctkSliderWidget.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_ctkVTKPropertyWidget.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_ctkVTKScalarBarWidget.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_ctkVTKScalarsToColorsWidget.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_ctkVTKTextPropertyWidget.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_ctkVTKThresholdWidget.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_ctkVTKVolumePropertyWidget.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CTK\ctkCoreExport.h">
+      <Filter>CTK</Filter>
+    </ClInclude>
+    <ClInclude Include="CTK\ctkPimpl.h">
+      <Filter>CTK</Filter>
+    </ClInclude>
+    <ClInclude Include="CTK\ctkSingleton.h">
+      <Filter>CTK</Filter>
+    </ClInclude>
+    <ClInclude Include="CTK\ctkUtils.h">
+      <Filter>CTK</Filter>
+    </ClInclude>
+    <ClInclude Include="CTK\ctkVisualizationVTKCoreExport.h">
+      <Filter>CTK</Filter>
+    </ClInclude>
+    <ClInclude Include="CTK\ctkVisualizationVTKWidgetsExport.h">
+      <Filter>CTK</Filter>
+    </ClInclude>
+    <ClInclude Include="CTK\ctkVTKAbstractMatrixWidget.h">
+      <Filter>CTK</Filter>
+    </ClInclude>
+    <ClInclude Include="CTK\ctkVTKConnection_p.h">
+      <Filter>CTK</Filter>
+    </ClInclude>
+    <ClInclude Include="CTK\ctkVTKObject.h">
+      <Filter>CTK</Filter>
+    </ClInclude>
+    <ClInclude Include="CTK\ctkVTKScalarsToColorsUtils.h">
+      <Filter>CTK</Filter>
+    </ClInclude>
+    <ClInclude Include="CTK\ctkWidgetsExport.h">
+      <Filter>CTK</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

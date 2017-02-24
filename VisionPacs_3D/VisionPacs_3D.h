@@ -65,6 +65,8 @@ private:
 	QButtonGroup *m_pImgLeftBG;
 	QButtonGroup *m_pImgRightBG;
 
+	//调节渲染方案widget
+	ctkVTKVolumePropertyWidget *m_pVolumePropertywidget;
 signals:
 	void SetWaitProgress(int);
 
@@ -72,6 +74,7 @@ private slots:
 	void on_actionOpen_File_triggered();
 	void on_actionTest_triggered();
 	void StartProcessImage();
+	void ReceiveProcessEnd();
 	void Btn_VrOperateClick(int nButtonID);
 	void Btn_ImgOperateClick(int nButtonID);
 public:

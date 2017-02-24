@@ -42,6 +42,8 @@ public:
 	void VrOperteChange(QString sOperateName);
 	void ImgOperteChange(QString sOperateName);
 
+	void InitVolumePropertyWidget(ctkVTKVolumePropertyWidget *pCtkVPwidget);
+
 	vtkSmartPointer<vtkImageData> m_pImageData;
 	void ***m_pImageArray;
 

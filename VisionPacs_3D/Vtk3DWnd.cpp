@@ -290,6 +290,11 @@ void Vtk3DWnd::ReRender()
 	ui->VtkWidget->GetRenderWindow()->Render();
 }
 
+void Vtk3DWnd::ConnectVolumeToWidget(ctkVTKVolumePropertyWidget *pCtkVPwidget)
+{
+	pCtkVPwidget->setVolumeProperty(m_pVolProperty);
+}
+
 void Vtk3DWnd::ChangeOperate(QString sOperate)
 {
 	if (sOperate.compare("VR_location") == 0)

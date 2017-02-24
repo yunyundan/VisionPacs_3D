@@ -39,6 +39,13 @@
     <property name="spacing">
      <number>0</number>
     </property>
+    <item row="0" column="1" rowspan="2">
+     <widget class="WorkZone" name="Workzone" native="true">
+      <property name="styleSheet">
+       <string notr="true"/>
+      </property>
+     </widget>
+    </item>
     <item row="0" column="0">
      <widget class="QWidget" name="MainBar" native="true">
       <property name="minimumSize">
@@ -61,13 +68,6 @@
       </property>
      </widget>
     </item>
-    <item row="0" column="1" rowspan="2">
-     <widget class="WorkZone" name="Workzone" native="true">
-      <property name="styleSheet">
-       <string notr="true"/>
-      </property>
-     </widget>
-    </item>
     <item row="1" column="0">
      <widget class="QTabWidget" name="OperateTab">
       <property name="sizePolicy">
@@ -78,8 +78,14 @@
       </property>
       <property name="minimumSize">
        <size>
-        <width>280</width>
+        <width>290</width>
         <height>0</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>290</width>
+        <height>16777215</height>
        </size>
       </property>
       <property name="autoFillBackground">
@@ -93,6 +99,12 @@
       </property>
       <property name="currentIndex">
        <number>0</number>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>16</width>
+        <height>16</height>
+       </size>
       </property>
       <property name="elideMode">
        <enum>Qt::ElideNone</enum>
@@ -131,9 +143,15 @@
         </property>
         <item>
          <layout class="QVBoxLayout" name="verticalLayout">
+          <property name="spacing">
+           <number>10</number>
+          </property>
+          <property name="topMargin">
+           <number>10</number>
+          </property>
           <item>
-           <layout class="QGridLayout" name="VROperateGLayout">
-            <item row="0" column="0">
+           <layout class="QHBoxLayout" name="horizontalLayout">
+            <item>
              <widget class="QPushButton" name="VR_location">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -183,7 +201,7 @@
               </property>
              </widget>
             </item>
-            <item row="0" column="1">
+            <item>
              <widget class="QPushButton" name="VR_rotate">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -230,7 +248,20 @@
               </property>
              </widget>
             </item>
-            <item row="0" column="3">
+            <item>
+             <widget class="Line" name="VR_line">
+              <property name="styleSheet">
+               <string notr="true">background-color: rgb(177, 177, 177);</string>
+              </property>
+              <property name="frameShadow">
+               <enum>QFrame::Sunken</enum>
+              </property>
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+             </widget>
+            </item>
+            <item>
              <widget class="QPushButton" name="VR_zoom">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -280,7 +311,7 @@
               </property>
              </widget>
             </item>
-            <item row="0" column="4">
+            <item>
              <widget class="QPushButton" name="VR_pan">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -324,13 +355,6 @@
               </property>
               <property name="ToolButton" stdset="0">
                <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="2">
-             <widget class="Line" name="line">
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
               </property>
              </widget>
             </item>
@@ -534,6 +558,12 @@
           </item>
           <item>
            <layout class="QHBoxLayout" name="VRModeHLayout" stretch="2,8">
+            <property name="leftMargin">
+             <number>3</number>
+            </property>
+            <property name="rightMargin">
+             <number>3</number>
+            </property>
             <item>
              <widget class="QLabel" name="VRMode">
               <property name="styleSheet">
@@ -545,24 +575,31 @@
              </widget>
             </item>
             <item>
-             <widget class="QComboBox" name="VRModeCBox"/>
+             <widget class="QComboBox" name="VRModeCBox">
+              <property name="Type" stdset="0">
+               <string>VRmode</string>
+              </property>
+             </widget>
             </item>
            </layout>
           </item>
-          <item>
-           <spacer name="verticalSpacer">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>20</width>
-              <height>40</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
          </layout>
+        </item>
+        <item>
+         <spacer name="verticalSpacer">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Expanding</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
         </item>
         <item>
          <layout class="QHBoxLayout" name="ImgOperateHLayout">
@@ -652,7 +689,13 @@
            </widget>
           </item>
           <item>
-           <widget class="Line" name="line_2">
+           <widget class="Line" name="Img_line">
+            <property name="styleSheet">
+             <string notr="true">background-color: rgb(177, 177, 177);</string>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Sunken</enum>
+            </property>
             <property name="orientation">
              <enum>Qt::Vertical</enum>
             </property>
@@ -788,10 +831,15 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tab_2">
+      <widget class="QWidget" name="RenderWidget">
        <attribute name="title">
-        <string>Tab 2</string>
+        <string>渲染方案</string>
        </attribute>
+       <layout class="QHBoxLayout" name="RenderWHLayout">
+        <item>
+         <layout class="QVBoxLayout" name="RenderVLayout"/>
+        </item>
+       </layout>
       </widget>
      </widget>
     </item>

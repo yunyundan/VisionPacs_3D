@@ -38,18 +38,18 @@ public:
     QAction *actionTest;
     QWidget *MainWidget;
     QGridLayout *gridLayout;
-    QWidget *MainBar;
     WorkZone *Workzone;
+    QWidget *MainBar;
     QTabWidget *OperateTab;
     QWidget *Viewer;
     QVBoxLayout *verticalLayout_2;
     QVBoxLayout *verticalLayout;
-    QGridLayout *VROperateGLayout;
+    QHBoxLayout *horizontalLayout;
     QPushButton *VR_location;
     QPushButton *VR_rotate;
+    QFrame *VR_line;
     QPushButton *VR_zoom;
     QPushButton *VR_pan;
-    QFrame *line;
     QHBoxLayout *VROrientionHLayout;
     QPushButton *Orientation_S;
     QPushButton *Orientation_I;
@@ -64,11 +64,13 @@ public:
     QHBoxLayout *ImgOperateHLayout;
     QPushButton *Img_location;
     QPushButton *Img_browser;
-    QFrame *line_2;
+    QFrame *Img_line;
     QPushButton *Img_wl;
     QPushButton *Img_zoom;
     QPushButton *Img_pan;
-    QWidget *tab_2;
+    QWidget *RenderWidget;
+    QHBoxLayout *RenderWHLayout;
+    QVBoxLayout *RenderVLayout;
     QMenuBar *menuBar;
     QMenu *menuDICOM;
 
@@ -91,6 +93,12 @@ public:
         gridLayout->setContentsMargins(11, 11, 11, 11);
         gridLayout->setObjectName(QStringLiteral("gridLayout"));
         gridLayout->setContentsMargins(0, 0, 0, 0);
+        Workzone = new WorkZone(MainWidget);
+        Workzone->setObjectName(QStringLiteral("Workzone"));
+        Workzone->setStyleSheet(QStringLiteral(""));
+
+        gridLayout->addWidget(Workzone, 0, 1, 2, 1);
+
         MainBar = new QWidget(MainWidget);
         MainBar->setObjectName(QStringLiteral("MainBar"));
         MainBar->setMinimumSize(QSize(0, 40));
@@ -100,12 +108,6 @@ public:
 
         gridLayout->addWidget(MainBar, 0, 0, 1, 1);
 
-        Workzone = new WorkZone(MainWidget);
-        Workzone->setObjectName(QStringLiteral("Workzone"));
-        Workzone->setStyleSheet(QStringLiteral(""));
-
-        gridLayout->addWidget(Workzone, 0, 1, 2, 1);
-
         OperateTab = new QTabWidget(MainWidget);
         OperateTab->setObjectName(QStringLiteral("OperateTab"));
         QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
@@ -113,10 +115,12 @@ public:
         sizePolicy.setVerticalStretch(0);
         sizePolicy.setHeightForWidth(OperateTab->sizePolicy().hasHeightForWidth());
         OperateTab->setSizePolicy(sizePolicy);
-        OperateTab->setMinimumSize(QSize(280, 0));
+        OperateTab->setMinimumSize(QSize(290, 0));
+        OperateTab->setMaximumSize(QSize(290, 16777215));
         OperateTab->setAutoFillBackground(false);
         OperateTab->setStyleSheet(QStringLiteral(""));
         OperateTab->setTabShape(QTabWidget::Triangular);
+        OperateTab->setIconSize(QSize(16, 16));
         OperateTab->setElideMode(Qt::ElideNone);
         OperateTab->setDocumentMode(false);
         OperateTab->setTabsClosable(false);
@@ -131,11 +135,12 @@ public:
         verticalLayout_2->setObjectName(QStringLiteral("verticalLayout_2"));
         verticalLayout_2->setContentsMargins(0, 0, 0, 0);
         verticalLayout = new QVBoxLayout();
-        verticalLayout->setSpacing(6);
+        verticalLayout->setSpacing(10);
         verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
-        VROperateGLayout = new QGridLayout();
-        VROperateGLayout->setSpacing(6);
-        VROperateGLayout->setObjectName(QStringLiteral("VROperateGLayout"));
+        verticalLayout->setContentsMargins(-1, 10, -1, -1);
+        horizontalLayout = new QHBoxLayout();
+        horizontalLayout->setSpacing(6);
+        horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
         VR_location = new QPushButton(Viewer);
         VR_location->setObjectName(QStringLiteral("VR_location"));
         QSizePolicy sizePolicy1(QSizePolicy::Fixed, QSizePolicy::Fixed);
@@ -154,7 +159,7 @@ public:
         VR_location->setAutoExclusive(false);
         VR_location->setProperty("ToolButton", QVariant(true));
 
-        VROperateGLayout->addWidget(VR_location, 0, 0, 1, 1);
+        horizontalLayout->addWidget(VR_location);
 
         VR_rotate = new QPushButton(Viewer);
         VR_rotate->setObjectName(QStringLiteral("VR_rotate"));
@@ -170,7 +175,15 @@ public:
         VR_rotate->setAutoExclusive(false);
         VR_rotate->setProperty("ToolButton", QVariant(true));
 
-        VROperateGLayout->addWidget(VR_rotate, 0, 1, 1, 1);
+        horizontalLayout->addWidget(VR_rotate);
+
+        VR_line = new QFrame(Viewer);
+        VR_line->setObjectName(QStringLiteral("VR_line"));
+        VR_line->setStyleSheet(QStringLiteral("background-color: rgb(177, 177, 177);"));
+        VR_line->setFrameShadow(QFrame::Sunken);
+        VR_line->setFrameShape(QFrame::VLine);
+
+        horizontalLayout->addWidget(VR_line);
 
         VR_zoom = new QPushButton(Viewer);
         VR_zoom->setObjectName(QStringLiteral("VR_zoom"));
@@ -187,7 +200,7 @@ public:
         VR_zoom->setAutoExclusive(false);
         VR_zoom->setProperty("ToolButton", QVariant(true));
 
-        VROperateGLayout->addWidget(VR_zoom, 0, 3, 1, 1);
+        horizontalLayout->addWidget(VR_zoom);
 
         VR_pan = new QPushButton(Viewer);
         VR_pan->setObjectName(QStringLiteral("VR_pan"));
@@ -203,17 +216,10 @@ public:
         VR_pan->setAutoExclusive(false);
         VR_pan->setProperty("ToolButton", QVariant(true));
 
-        VROperateGLayout->addWidget(VR_pan, 0, 4, 1, 1);
-
-        line = new QFrame(Viewer);
-        line->setObjectName(QStringLiteral("line"));
-        line->setFrameShape(QFrame::VLine);
-        line->setFrameShadow(QFrame::Sunken);
-
-        VROperateGLayout->addWidget(line, 0, 2, 1, 1);
+        horizontalLayout->addWidget(VR_pan);
 
 
-        verticalLayout->addLayout(VROperateGLayout);
+        verticalLayout->addLayout(horizontalLayout);
 
         VROrientionHLayout = new QHBoxLayout();
         VROrientionHLayout->setSpacing(6);
@@ -296,6 +302,7 @@ public:
         VRModeHLayout = new QHBoxLayout();
         VRModeHLayout->setSpacing(6);
         VRModeHLayout->setObjectName(QStringLiteral("VRModeHLayout"));
+        VRModeHLayout->setContentsMargins(3, -1, 3, -1);
         VRMode = new QLabel(Viewer);
         VRMode->setObjectName(QStringLiteral("VRMode"));
         VRMode->setStyleSheet(QStringLiteral("color: rgb(177, 177, 177);"));
@@ -312,12 +319,12 @@ public:
 
         verticalLayout->addLayout(VRModeHLayout);
 
-        verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
-
-        verticalLayout->addItem(verticalSpacer);
-
 
         verticalLayout_2->addLayout(verticalLayout);
+
+        verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+        verticalLayout_2->addItem(verticalSpacer);
 
         ImgOperateHLayout = new QHBoxLayout();
         ImgOperateHLayout->setSpacing(6);
@@ -351,12 +358,13 @@ public:
 
         ImgOperateHLayout->addWidget(Img_browser);
 
-        line_2 = new QFrame(Viewer);
-        line_2->setObjectName(QStringLiteral("line_2"));
-        line_2->setFrameShape(QFrame::VLine);
-        line_2->setFrameShadow(QFrame::Sunken);
+        Img_line = new QFrame(Viewer);
+        Img_line->setObjectName(QStringLiteral("Img_line"));
+        Img_line->setStyleSheet(QStringLiteral("background-color: rgb(177, 177, 177);"));
+        Img_line->setFrameShadow(QFrame::Sunken);
+        Img_line->setFrameShape(QFrame::VLine);
 
-        ImgOperateHLayout->addWidget(line_2);
+        ImgOperateHLayout->addWidget(Img_line);
 
         Img_wl = new QPushButton(Viewer);
         Img_wl->setObjectName(QStringLiteral("Img_wl"));
@@ -404,9 +412,19 @@ public:
         verticalLayout_2->addLayout(ImgOperateHLayout);
 
         OperateTab->addTab(Viewer, QString());
-        tab_2 = new QWidget();
-        tab_2->setObjectName(QStringLiteral("tab_2"));
-        OperateTab->addTab(tab_2, QString());
+        RenderWidget = new QWidget();
+        RenderWidget->setObjectName(QStringLiteral("RenderWidget"));
+        RenderWHLayout = new QHBoxLayout(RenderWidget);
+        RenderWHLayout->setSpacing(6);
+        RenderWHLayout->setContentsMargins(11, 11, 11, 11);
+        RenderWHLayout->setObjectName(QStringLiteral("RenderWHLayout"));
+        RenderVLayout = new QVBoxLayout();
+        RenderVLayout->setSpacing(6);
+        RenderVLayout->setObjectName(QStringLiteral("RenderVLayout"));
+
+        RenderWHLayout->addLayout(RenderVLayout);
+
+        OperateTab->addTab(RenderWidget, QString());
 
         gridLayout->addWidget(OperateTab, 1, 0, 1, 1);
 
@@ -466,13 +484,14 @@ public:
         Orientation_L->setText(QString());
         Orientation_R->setText(QString());
         VRMode->setText(QApplication::translate("VisionPacs_3D", "\346\270\262\346\237\223\346\226\271\346\241\210\357\274\232", Q_NULLPTR));
+        VRModeCBox->setProperty("Type", QVariant(QApplication::translate("VisionPacs_3D", "VRmode", Q_NULLPTR)));
         Img_location->setText(QString());
         Img_browser->setText(QString());
         Img_wl->setText(QString());
         Img_zoom->setText(QString());
         Img_pan->setText(QString());
         OperateTab->setTabText(OperateTab->indexOf(Viewer), QApplication::translate("VisionPacs_3D", "\345\270\270\350\247\204", Q_NULLPTR));
-        OperateTab->setTabText(OperateTab->indexOf(tab_2), QApplication::translate("VisionPacs_3D", "Tab 2", Q_NULLPTR));
+        OperateTab->setTabText(OperateTab->indexOf(RenderWidget), QApplication::translate("VisionPacs_3D", "\346\270\262\346\237\223\346\226\271\346\241\210", Q_NULLPTR));
         menuDICOM->setTitle(QApplication::translate("VisionPacs_3D", "DICOM\346\226\207\344\273\266", Q_NULLPTR));
     } // retranslateUi
 
