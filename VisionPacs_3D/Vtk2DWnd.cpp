@@ -13,6 +13,7 @@ Vtk2DWnd::Vtk2DWnd(QWidget *parent) :
     ui->setupUi(this);
 
 	QObject::connect(ui->ImgWnd, SIGNAL(SendImageNum(int)), this, SLOT(RecieveImageNum(int)));
+	QObject::connect(ui->ImgWnd, SIGNAL(ImageIndexChange(int)), this, SLOT(RecieveImageIndexChange(int)));
 }
 
 Vtk2DWnd::~Vtk2DWnd()
@@ -45,6 +46,7 @@ void Vtk2DWnd::OnScrollBarMoved(int nValue)
 {
 	QString sWndName = sender()->parent()->objectName();
 	ui->ImgWnd->CalcAndShowNormalImg(sWndName, m_nOriImgType, nValue, 1);
+	ui->ImgWnd->setCurImageIndex(nValue);
 }
 
 void Vtk2DWnd::RecieveImageNum(int nImgNum)
@@ -52,4 +54,11 @@ void Vtk2DWnd::RecieveImageNum(int nImgNum)
 	m_nImageNum = nImgNum;
 	ui->ScrollBar->setRange(0, m_nImageNum - 1);
 	ui->ScrollBar->setValue(m_nImageNum / 2);
+}
+
+void Vtk2DWnd::RecieveImageIndexChange(int nChange)
+{
+	int nCurIndex = ui->ScrollBar->value() + nChange;
+	ui->ScrollBar->setValue(nCurIndex);
+	ui->ImgWnd->setCurImageIndex(nCurIndex);
 }

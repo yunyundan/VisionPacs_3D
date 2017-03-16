@@ -7,6 +7,7 @@
 
 class CHsFile;
 class CHsImage;
+class CAppConfig;
 
 //多期MAP
 typedef struct _DuoQiVector
@@ -87,6 +88,7 @@ public:
 
 	//选择特定的分期进行处理（无分期也要处理）
 	bool ChoosePeriod(int iPeriod);
+
 
 };
 

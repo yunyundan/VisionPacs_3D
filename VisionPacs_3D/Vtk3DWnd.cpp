@@ -2,6 +2,8 @@
 #include "Vtk3DWnd.h"
 #include "ui_Vtk3DWnd.h"
 #include "VtkHeader.h"
+#include "HsFile.h"
+#include "AppConfig.h"
 
 Vtk3DWnd::Vtk3DWnd(QWidget *parent) :
     QWidget(parent),
@@ -281,8 +283,87 @@ void Vtk3DWnd::SetImageDate(vtkSmartPointer<vtkImageData> pImageData)
 
 	SetupCamera("Orientation_A");
 
+	SetupCornorInfo();
+
 	m_pIrener->Initialize();
 	ui->VtkWidget->GetRenderWindow()->Render();	
+}
+
+void Vtk3DWnd::SetupCornorInfo()
+{
+	if (m_pSourceDs == NULL)
+		return;
+
+	int nRet = 0;
+
+	if (1)
+	{
+		vtkSmartPointer<vtkCornerAnnotation> annoLT = vtkSmartPointer<vtkCornerAnnotation>::New();
+		annoLT->GetTextProperty()->SetColor(1.0, 1.0, 1.0);
+		annoLT->GetTextProperty()->SetFontSize(1);
+		QString sLtValue = "";
+		pHsElement pEle = m_pSourceDs->Hs_FindFirstEle(NULL, TAG_MANUFACTURER, false);
+		if (pEle)
+		{
+			sLtValue = m_pSourceDs->Hs_GetConvertValue(pEle, 0, nRet);
+		}
+		pEle = m_pSourceDs->Hs_FindFirstEle(NULL, TAG_STUDY_ID, false);
+		if (pEle)
+		{
+			sLtValue = sLtValue +"\nEx:"+ m_pSourceDs->Hs_GetConvertValue(pEle, 0, nRet);
+		}
+
+		annoLT->SetText(vtkCornerAnnotation::UpperLeft, sLtValue.toLatin1().data());
+		m_p3DRenderer->AddViewProp(annoLT);
+	}
+
+	if (1)
+	{
+		vtkSmartPointer<vtkCornerAnnotation> annoRT = vtkSmartPointer<vtkCornerAnnotation>::New();
+		annoRT->GetTextProperty()->SetColor(1.0, 1.0, 1.0);
+		annoRT->GetTextProperty()->SetFontSize(1);
+		QString sLtValue = "";
+		pHsElement pEle = m_pSourceDs->Hs_FindFirstEle(NULL, TAG_INSTITUTION_NAME, false);
+		if (pEle)
+		{
+			sLtValue = m_pSourceDs->Hs_GetConvertValue(pEle, 0, nRet);
+		}
+		pEle = m_pSourceDs->Hs_FindFirstEle(NULL, TAG_PATIENT_NAME, false);
+		if (pEle)
+		{
+			sLtValue = sLtValue + "\n" + m_pSourceDs->Hs_GetConvertValue(pEle, 0, nRet);
+		}
+		pEle = m_pSourceDs->Hs_FindFirstEle(NULL, TAG_PATIENT_SEX, false);
+		if (pEle)
+		{
+			sLtValue = sLtValue + "\n" + m_pSourceDs->Hs_GetConvertValue(pEle, 0, nRet);
+		}
+		pEle = m_pSourceDs->Hs_FindFirstEle(NULL, TAG_PATIENT_AGE, false);
+		if (pEle)
+		{
+			sLtValue = sLtValue + "\n" + m_pSourceDs->Hs_GetConvertValue(pEle, 0, nRet);
+		}
+		annoRT->SetText(vtkCornerAnnotation::UpperRight, sLtValue.toLatin1().data());
+		m_p3DRenderer->AddViewProp(annoRT);
+	}
+
+
+	if (1)
+	{
+		vtkSmartPointer<vtkCornerAnnotation> annoRB = vtkSmartPointer<vtkCornerAnnotation>::New();
+		annoRB->GetTextProperty()->SetColor(1.0, 1.0, 1.0);
+		annoRB->GetTextProperty()->SetFontSize(1);
+		QString fontFamily = annoRB->GetTextProperty()->GetFontFamilyAsString();
+		QString sLtValue = "";
+		pHsElement pEle = m_pSourceDs->Hs_FindFirstEle(NULL, TAG_MODALITY, false);
+		if (pEle)
+		{
+			sLtValue = m_pSourceDs->Hs_GetConvertValue(pEle, 0, nRet);
+		}
+		sLtValue = sLtValue + "\n" + "VR";
+		annoRB->SetText(vtkCornerAnnotation::LowerRight, sLtValue.toLatin1().data());
+		m_p3DRenderer->AddViewProp(annoRB);
+	}
 }
 
 void Vtk3DWnd::ReRender()

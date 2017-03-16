@@ -306,6 +306,7 @@ public:
         VRMode = new QLabel(Viewer);
         VRMode->setObjectName(QStringLiteral("VRMode"));
         VRMode->setStyleSheet(QStringLiteral("color: rgb(177, 177, 177);"));
+        VRMode->setProperty("uiLable", QVariant(true));
 
         VRModeHLayout->addWidget(VRMode);
 

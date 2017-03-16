@@ -986,3 +986,92 @@ typedef enum Enum_ImgInteractionStyleIds {
 //#define  ORIIMG_SAGGITAL_A				4		//矢状位，X方向是由前到后
 //#define  ORIIMG_SAGGITAL_P				4		//矢状位，X方向是由后到前
 
+
+typedef struct _INFOITEM
+{
+	QString sItemName;//项目名称	(1:0x.....为DicomTag,2:[Txt]为常量,3:{字段名}为数据字段)
+	QString sTag;//Tag
+	QString sFormat;//“%s%d”之类的格式化字符串
+	int iRow;//在第几行
+	int iOrder;//行中顺序号
+
+	QString sValue;//填充值之后
+	_INFOITEM()
+	{
+		sItemName = "";
+		sTag = "";
+		sFormat = "";
+		iRow = 1;
+		iOrder = 1;
+		sValue = "";
+	}
+}INFOITEM;
+
+typedef struct _CORNORINFO
+{
+	QString sPos;					//位置号
+	vector <INFOITEM> infoV;
+
+	_CORNORINFO  &operator = (_CORNORINFO const &info)
+	{
+		sPos = info.sPos;
+
+		this->infoV = info.infoV;
+
+		return *this;
+	}
+
+}CORNORINFO;
+
+typedef struct _MODINFO
+{
+	QString sModality;
+
+	QString sFaceName;	//字体名称
+	int nSize;		//字体大小
+	QColor clor;	//字体颜色;
+
+	vector<CORNORINFO> coInfoV;
+
+	_MODINFO()
+	{
+		sModality = "";
+		sFaceName = "黑体";
+		nSize = 10;
+
+		clor = qRgb(255, 255, 255);
+	}
+
+	void AddCornerInfo(QString sPos, INFOITEM InfoItem)
+	{
+		int n = int(coInfoV.size());
+		for (int i = 0; i < n; i++)
+		{
+			if (coInfoV[i].sPos == sPos)
+			{
+				coInfoV[i].infoV.push_back(InfoItem);
+				return;
+			}
+		}
+
+		CORNORINFO coInfo;
+		coInfo.sPos = sPos;
+		coInfo.infoV.push_back(InfoItem);
+
+		coInfoV.push_back(coInfo);
+	}
+
+	_MODINFO  &operator = (_MODINFO const &info)
+	{
+		sModality = info.sModality;
+
+		sFaceName = info.sFaceName;
+		nSize = info.nSize;
+		clor = info.clor;
+
+		this->coInfoV = info.coInfoV;
+
+		return *this;
+	}
+
+}MODINFO;

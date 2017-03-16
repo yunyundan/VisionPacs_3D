@@ -68,6 +68,7 @@ CHsBaseImg::CHsBaseImg(void)
 ,m_bSharpOri(false)
 ,m_bMpr(false)
 ,m_sImgMprMode("MIP")
+,m_bOriPixelRepresentation(false)
 {
 	m_ImgState.nDispalyRow = 0;
 	m_ImgState.nDispalyCol = 0;
@@ -171,7 +172,7 @@ int CHsBaseImg::WinLevelNormal(long w,long c,bool bUpdateBits)
 
 	if(w<1) w = 1;
 	if(w>m_ImgInfo.nWcLutLen)	w = m_ImgInfo.nWcLutLen;
-	//if(c>m_ImgInfo.iLutEnd)		c = m_ImgInfo.iLutEnd ;
+	//if(c>m_ImgInfo.iLutEnd)	c = m_ImgInfo.iLutEnd ;
 	//if(c<m_ImgInfo.iLutStart)	c = m_ImgInfo.iLutStart;
 
 
@@ -179,16 +180,16 @@ int CHsBaseImg::WinLevelNormal(long w,long c,bool bUpdateBits)
     m_ImgState.CurWc.y = c;
 
 
-	if(m_ImgInfo.fRescaleSlope!=0.00 && m_ImgInfo.fRescaleIntercept!=0.00 && m_ImgState.bUseSlope)
-	{//如果有斜率截距,那么:
-		//1.标准认为此时我们的像素值已经用斜率加工过了.
-		//2.此处传来的wc也是斜率加工过的.
-		//3.我们的WcLut(0到nWcLutLen)的下标也是应该用斜率加工,变成(0*fRescaleSlope+fRescaleIntercept 到 (nWcLutLen*fRescaleSlope+fRescaleIntercept)
-		//但是,我并没有加工过像素,也不打算加工Lut的下标.所以,此处传来的wc要恢复加工前的原身.
+	//if(m_ImgInfo.fRescaleSlope!=0.00 && m_ImgInfo.fRescaleIntercept!=0.00 && m_ImgState.bUseSlope)
+	//{//如果有斜率截距,那么:
+	//	//1.标准认为此时我们的像素值已经用斜率加工过了.
+	//	//2.此处传来的wc也是斜率加工过的.
+	//	//3.我们的WcLut(0到nWcLutLen)的下标也是应该用斜率加工,变成(0*fRescaleSlope+fRescaleIntercept 到 (nWcLutLen*fRescaleSlope+fRescaleIntercept)
+	//	//但是,我并没有加工过像素,也不打算加工Lut的下标.所以,此处传来的wc要恢复加工前的原身.
 
-		c = long((c-m_ImgInfo.fRescaleIntercept)/m_ImgInfo.fRescaleSlope);
-		w = long(w/m_ImgInfo.fRescaleSlope);
-	}
+	//	c = long((c-m_ImgInfo.fRescaleIntercept)/m_ImgInfo.fRescaleSlope);
+	//	w = long(w/m_ImgInfo.fRescaleSlope);
+	//}
 
 
 	if(m_pWcLut == NULL)
@@ -199,8 +200,18 @@ int CHsBaseImg::WinLevelNormal(long w,long c,bool bUpdateBits)
 	long iStart = m_ImgInfo.iLutStart;
 	long iEnd = m_ImgInfo.iLutEnd;
 
-	if (m_ImgInfo.nPixelRepresentation==1)//高位补码(像素值内有负数)
-		pLut = &(m_pWcLut[m_ImgInfo.nWcLutLen/2]);//想用负下标
+	if (m_ImgInfo.nPixelRepresentation == 1)//高位补码(像素值内有负数)
+	{
+		if (m_bOriPixelRepresentation == true)
+		{
+			pLut = &(m_pWcLut[-long(m_ImgInfo.fRescaleIntercept)]);//想用负下标
+			iStart = long(m_ImgInfo.fRescaleIntercept);
+			iEnd = long(m_ImgInfo.nWcLutLen*m_ImgInfo.fRescaleSlope + m_ImgInfo.fRescaleIntercept);
+		}
+		else
+			pLut = &(m_pWcLut[m_ImgInfo.nWcLutLen / 2]);//想用负下标
+	}
+		
 
 	int nMin = c - w/2;
 	int nMax = c + w/2;
@@ -430,8 +441,15 @@ int CHsBaseImg::UpdateBitsNormal(unsigned long nRow,unsigned long nCol,BYTE** pD
 
 	//通过临时指针变量pLut指向的位置不同,可实现负下标
 	long *pLut = m_pWcLut;
-	if (m_ImgInfo.nPixelRepresentation==1)//高位补码(像素值内有负数)
-		pLut = &(m_pWcLut[m_ImgInfo.nWcLutLen/2]);//如此可用负下标
+	if (m_ImgInfo.nPixelRepresentation == 1)//高位补码(像素值内有负数)
+	{
+		if (m_bOriPixelRepresentation == true)
+		{
+			pLut = &(m_pWcLut[-long(m_ImgInfo.fRescaleIntercept)]);//想用负下标
+		}
+		else
+			pLut = &(m_pWcLut[m_ImgInfo.nWcLutLen / 2]);//想用负下标
+	}
 
 	bool bUseSlope = false;
 	if(m_ImgInfo.fRescaleIntercept!=0.00 && m_ImgInfo.fRescaleSlope!=0.00)
@@ -3179,9 +3197,9 @@ int CHsBaseImg::Hs_GetCtValuePoint( POINT ImgPt,QString &sTxt )
 	double fPixValue = Hs_GetPixelValue(ImgPt.y,ImgPt.x);
 
 	if(m_ImgInfo.fPixelSpaceX > 0.000001 && m_ImgInfo.fPixelSpaceY > 0.000001)
-        sTxt = QString("[%.2fmm,	%.2fmm] = %.2f").arg(ImgPt.x*m_ImgInfo.fPixelSpaceX).arg(ImgPt.y*m_ImgInfo.fPixelSpaceY).arg(fPixValue);
+        sTxt = QString("[%1mm,	%2mm] = %3").arg(QString::number(ImgPt.x*m_ImgInfo.fPixelSpaceX, 'g', 2)).arg(QString::number(ImgPt.y*m_ImgInfo.fPixelSpaceY, 'g', 2)).arg(QString::number(fPixValue, 'g', 2));
 	else
-        sTxt = QString("[%d,	%d] = %.2f").arg(ImgPt.x).arg(ImgPt.y).arg(fPixValue);
+        sTxt = QString("[%1,	%2] = %3f").arg(ImgPt.x).arg(ImgPt.y).arg(QString::number(fPixValue, 'g', 2));
 
 	return Ret_Success;
 }
@@ -3259,7 +3277,7 @@ int CHsBaseImg::Hs_GetCtValueEllipse( RECT ImgRc ,QString &sTxt)
 	fSubPowAll /= nPixCount;//再求平均值
 	fSubPowAll = sqrt(fSubPowAll);//再开方
 
-    sTxt = QString("Min = %.2f;\r\nMax = %.2f;\r\nAve = %.2f;\r\nStd dev = %.2f").arg(fMin).arg(fMax).arg(fAverage).arg(fSubPowAll);
+    sTxt = QString("Min = %1;\r\nMax = %2;\r\nAve = %3;\r\nStd dev = %4").arg(QString::number(fMin, 'g', 2)).arg(QString::number(fMax, 'g', 2)).arg(QString::number(fAverage, 'g', 2)).arg(QString::number(fSubPowAll, 'g', 2));
 
 	::DeleteObject(hGn);
 

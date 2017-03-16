@@ -2,6 +2,7 @@
 #include "VisionPacs_3D.h"
 #include "HsFile.h"
 #include "HsImage.h"
+#include "AppConfig.h"
 
 
 VisionPacs_3D::VisionPacs_3D(QWidget *parent)
@@ -23,9 +24,16 @@ VisionPacs_3D::VisionPacs_3D(QWidget *parent)
 	setWindowFlags(Qt::FramelessWindowHint);
 	//可获取鼠标跟踪效果
 	setMouseTracking(true);
-
 	//界面管理
 	InitUIConfig();
+	//读取配置参数
+	CAppConfig configApp;
+	bool bRet = configApp.GetBaseConfig();
+	if (bRet == false)
+	{
+		QMessageBox::information(NULL, QString("错误"), QString("配置文件未打开"));
+		close();
+	}
 }
 
 VisionPacs_3D::~VisionPacs_3D()	
@@ -85,8 +93,8 @@ void VisionPacs_3D::on_actionOpen_File_triggered()
 
 void VisionPacs_3D::on_actionTest_triggered()
 {
-	QString sFilePath = "E:\\TestData\\Heart";
-	QString sSeriesUID = "1.3.12.2.1107.5.1.4.73275.30000013050523545628100002562";
+	QString sFilePath = "E:\\TestData\\67";
+	QString sSeriesUID = "1.2.840.113619.2.55.3.12624128.2910.1151313604.894";
 
 	m_sFilePath = sFilePath;
 	m_sSeriesUID = sSeriesUID;
@@ -265,6 +273,22 @@ void VisionPacs_3D::ExtractImage(QString sFilePath, QString sSeriesUID, vector<s
 
 		b = spSeries->Scan(ftAllFilenames);
 		vImagePathList = spSeries->GetAllFilenamesFromTagToValue(t1, sSeriesUID.toLatin1().data());//指定序列图像路径
+
+		if (vImagePathList.size() != 0)
+		{
+			CHsFile *hf = new CHsFile;
+
+			hf->Hs_LoadFile(vImagePathList[0].c_str());
+
+			if (hf->m_sModality.compare("CT") != 0 && hf->m_sModality.compare("MR") != 0)
+			{
+				delete hf;
+				QMessageBox::information(NULL, QString("错误"), QString("不支持CT/MR以外图像"));
+				close();
+			}
+
+			delete hf;
+		}
 	}
 	emit SetWaitProgress(10);
 

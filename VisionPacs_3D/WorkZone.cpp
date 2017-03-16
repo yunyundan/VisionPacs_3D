@@ -374,13 +374,15 @@ void WorkZone::ProcessImageData()
 }
 
 void WorkZone::InitDisplayWnd()
-{
-	ui->VR_Wnd->SetImageDate(m_pImageData);
+{	
 	for (int i = 0; i < m_v2DWnd.size(); i++)
 	{
 		m_v2DWnd[i]->SetImageData(m_pImageArray,m_pImageData,m_vImage);
 		m_v2DWnd[i]->InitShowImage(m_nOriImageType);
 	}
+
+	ui->VR_Wnd->SetSourceDs(m_vImage[0]->GetDs());
+	ui->VR_Wnd->SetImageDate(m_pImageData);
 	emit SetWaitProgress(100);
 }
 

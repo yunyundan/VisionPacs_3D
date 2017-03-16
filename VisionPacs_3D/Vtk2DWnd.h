@@ -32,6 +32,7 @@ public:
 private slots:
 	void OnScrollBarMoved(int nValue);
 	void RecieveImageNum(int nImgNum);
+	void RecieveImageIndexChange(int nChange);
 
 };
 

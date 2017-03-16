@@ -39,6 +39,43 @@ private:
 
 	//普通MPR切割类
 	CHsNormalMprMaker *m_pNormalMaker;
+
+	//本窗口图像总数
+	int m_nImgNum;
+
+	//初始化角落信息
+	void RefreshCornorInfoWidget();
+	bool m_bInitCorInfo;
+	
+	//角落信息处理
+	typedef struct _ROWITEM
+	{
+		QString sValue;//填充值之后
+		QString sType;
+		_ROWITEM()
+		{
+			sValue = "";
+			sType = "Normal";
+		}
+	}ROWITEM;
+	typedef struct _QEDITITEM
+	{
+		QString sName;
+		QLineEdit *qEdit;
+		QLabel *qLabel;
+		_QEDITITEM()
+		{
+			sName = "";
+			qEdit = NULL;
+			qLabel = NULL;
+		}
+	}QEDITITEM;
+	vector<QEDITITEM> m_vCornorEdit;
+	int ArrangeCorinfo(CORNORINFO corInfo,map<int,ROWITEM> &mapRow);
+	void InitNormalCorInfo();
+	void InitPosCorInfo();
+	//当前图像序数
+	int m_nCurImgIndex;
 protected:
 	QPixmap *m_pPixmap;
 	QImage *m_pQImage;
@@ -84,9 +121,16 @@ public:
 	//计算本窗口显示图像
 	int CalcAndShowNormalImg(QString sWndName, int nOriImgType, int iImgIndex,int iSlice);
 
+	void setCurImageIndex(int nIndex) { m_nCurImgIndex = nIndex; }
 
 signals:
 	void SendImageNum(int);
+	void ImageIndexChange(int);
+
+
+private slots:
+	void OnEditTextChanged(const QString &sText);
+	void OnEditFinished();
 };
 
 #endif // IMAGEWND_H

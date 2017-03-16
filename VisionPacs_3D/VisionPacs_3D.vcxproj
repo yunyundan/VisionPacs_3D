@@ -71,6 +71,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AppConfig.cpp" />
     <ClCompile Include="CTK\ctkBasePopupWidget.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
@@ -625,6 +626,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="vector3d.cpp" />
     <ClCompile Include="VisionPacs_3D.cpp" />
     <ClCompile Include="Vtk2DWnd.cpp" />
     <ClCompile Include="Vtk3DWnd.cpp" />
@@ -707,6 +709,7 @@
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DWIN64 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtWidgets"</Command>
     </CustomBuild>
+    <ClInclude Include="AppConfig.h" />
     <ClInclude Include="CTK\ctkCoreExport.h" />
     <CustomBuild Include="CTK\ctkDoubleRangeSlider.h">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
@@ -1182,6 +1185,7 @@
     <ClInclude Include="HsImage.h" />
     <ClInclude Include="HsNormalMprMaker.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="resource1.h" />
     <ClInclude Include="Slicer\VolumeRenderingReplacementsExport.h" />
     <ClInclude Include="Slicer\vtkSlicerGPUMultiVolumeMapper.h" />
     <ClInclude Include="Slicer\vtkSlicerGPURayCastMultiVolumeMapper.h" />
@@ -1190,6 +1194,7 @@
     <ClInclude Include="Slicer\vtkVolumeRenderingReplacements.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Structure.h" />
+    <ClInclude Include="vector3d.h" />
     <ClInclude Include="vtkheader.h" />
     <ClInclude Include="VtkSelfDefineInteractorStyleExport.h" />
     <ClInclude Include="VtkVRInteractorStyle.h" />
@@ -1408,6 +1413,12 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(QTDIR)\bin\uic.exe" -o ".\GeneratedFiles\ui_%(Filename).h" "%(FullPath)"</Command>
     </CustomBuild>
     <None Include="Image\style.css" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="VisionPacs_3D.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Image\checkbox.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

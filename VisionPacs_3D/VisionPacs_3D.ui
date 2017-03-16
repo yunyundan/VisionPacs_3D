@@ -572,6 +572,9 @@
               <property name="text">
                <string>渲染方案：</string>
               </property>
+              <property name="uiLable" stdset="0">
+               <bool>true</bool>
+              </property>
              </widget>
             </item>
             <item>

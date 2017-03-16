@@ -589,6 +589,12 @@
     <ClCompile Include="GeneratedFiles\Release\moc_ctkVTKVolumePropertyWidget.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="AppConfig.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vector3d.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="VisionPacs_3D.h">
@@ -944,10 +950,27 @@
     <ClInclude Include="CTK\ctkWidgetsExport.h">
       <Filter>CTK</Filter>
     </ClInclude>
+    <ClInclude Include="resource1.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AppConfig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vector3d.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Image\style.css">
       <Filter>Image</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="VisionPacs_3D.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Image\checkbox.png">
+      <Filter>Image</Filter>
+    </Image>
   </ItemGroup>
 </Project>

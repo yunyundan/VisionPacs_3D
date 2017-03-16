@@ -858,6 +858,9 @@ public:
 	//CT，MR等图像获取病人位置
 	int Hs_GetPatientPos( double x, double y, double z,QString& sLeft, QString& sRight );
 
+	//是否手工改过nPixelRepresentation
+	bool m_bOriPixelRepresentation;
+
 private:
 
 	void IsRotateOrHorFlip(char cLft, char cTop, char cRgt, char cBtm,long &nAngle, bool &bFilp);

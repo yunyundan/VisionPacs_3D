@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "HsNormalMprMaker.h"
 #include "HsImage.h"
+#include "vector3d.h"
 
 extern void** ArrayNew(unsigned long nRow, unsigned long nCol, unsigned long nSize, unsigned long *nNewRow = NULL, unsigned long* nNewCol = NULL);
 extern void ArrayFree(void **pArr, int iflag = 0);
@@ -108,6 +109,7 @@ void CHsNormalMprMaker::GetShowImage(CHsImage *pShowImg, int iIndex, int iSliceN
 
 		dSpacingX = dSpacing[0];
 		dSpacingY = dSpacing[1];
+		pShowImg->m_fSilceThick = dSpacing[2];
 
 		if (nSize == 1)
 		{
@@ -188,6 +190,7 @@ void CHsNormalMprMaker::GetShowImage(CHsImage *pShowImg, int iIndex, int iSliceN
 
 		dSpacingX = dSpacing[0];
 		dSpacingY = dSpacing[2];
+		pShowImg->m_fSilceThick = dSpacing[1];
 
 		if (nSize == 1)
 		{
@@ -263,6 +266,7 @@ void CHsNormalMprMaker::GetShowImage(CHsImage *pShowImg, int iIndex, int iSliceN
 
 		dSpacingX = dSpacing[1];
 		dSpacingY = dSpacing[2];
+		pShowImg->m_fSilceThick = dSpacing[0];
 
 		if (nSize == 1)
 		{
@@ -329,9 +333,8 @@ void CHsNormalMprMaker::GetShowImage(CHsImage *pShowImg, int iIndex, int iSliceN
 			pShowImg->m_pOriData = (BYTE**)pRetData;
 		}
 	}
-	
-	pShowImg->m_ImgInfo.nPixelRepresentation = 1;
 	DoInterpolationToImage(pShowImg, dSpacingX, dSpacingY, nRows,nCols);	
+	CalImagePositon(pShowImg,iIndex);
 	return;
 }
 
@@ -339,8 +342,7 @@ void CHsNormalMprMaker::GetShowImage(CHsImage *pShowImg, int iIndex, int iSliceN
 
 void CHsNormalMprMaker::DoInterpolationToImage(CHsImage *pImg, double dSpacingX, double dSpacingY, int nRows, int nCols)
 {
-	double dNewSpacingY = (dSpacingX + dSpacingY) / 2;
-
+	double dNewSpacingY = dSpacingX;
 
 	long nCurW, nCurC;
 	nCurW = pImg->m_ImgState.CurWc.x;
@@ -348,6 +350,7 @@ void CHsNormalMprMaker::DoInterpolationToImage(CHsImage *pImg, double dSpacingX,
 
 	unsigned long nHeight = 0;
 	unsigned long nWidth = 0;
+
 	if (abs(dNewSpacingY - dSpacingY) > 0.000001)
 	{
 		int nNewRow = int((nRows * dSpacingY) / dNewSpacingY);
@@ -382,7 +385,13 @@ void CHsNormalMprMaker::DoInterpolationToImage(CHsImage *pImg, double dSpacingX,
 		nHeight = nRows;
 		nWidth = nCols;
 	}
-	pImg->m_ImgInfo = m_vOriImage[0]->m_ImgInfo;//先复制源图基本信息
+
+	if (pImg->m_ImgInfo.nPixelRepresentation == 0)
+	{
+		pImg->m_ImgInfo.nPixelRepresentation = 1;
+		pImg->m_bOriPixelRepresentation = true;
+	}
+	
 
 	//修改其中的具体信息：
 	pImg->m_ImgInfo.nRows = nHeight;
@@ -398,7 +407,97 @@ void CHsNormalMprMaker::DoInterpolationToImage(CHsImage *pImg, double dSpacingX,
 	pImg->m_ImgState.nDispalyCol = nWidth;
 
 	pImg->m_ImgState.CurWc.x = nCurW;
-	pImg->m_ImgState.CurWc.y = nCurC;
+	pImg->m_ImgState.CurWc.y = nCurC;	
+}
 
-	
+void CHsNormalMprMaker::CalImagePositon(CHsImage *pImg,int nIndex)
+{
+	if (m_nImgWndType == m_nOriImgType)
+	{
+		pImg->m_ImgInfo.ImgLocPara = m_vOriImage[nIndex]->m_ImgInfo.ImgLocPara;
+		return;
+	}
+
+	ImageInfo ImgInfoOri = m_vOriImage[0]->m_ImgInfo;
+	v3D::Vector3D oriLeftTop(ImgInfoOri.ImgLocPara.fOriLeftTopPixX, ImgInfoOri.ImgLocPara.fOriLeftTopPixY, ImgInfoOri.ImgLocPara.fOriLeftTopPixZ);
+	v3D::Vector3D colvector(ImgInfoOri.ImgLocPara.fOriFirstColCosX, ImgInfoOri.ImgLocPara.fOriFirstColCosY, ImgInfoOri.ImgLocPara.fOriFirstColCosZ);
+	v3D::Vector3D rowvector(ImgInfoOri.ImgLocPara.fOriFirstRowCosX, ImgInfoOri.ImgLocPara.fOriFirstRowCosY, ImgInfoOri.ImgLocPara.fOriFirstRowCosZ);
+	v3D::Vector3D zDirVector = v3D::exProd(colvector, rowvector);
+
+
+	if ((m_nImgWndType == ORIIMG_AXIAL&&m_nOriImgType == ORIIMG_CORONAL) || (m_nImgWndType == ORIIMG_CORONAL&&m_nOriImgType == ORIIMG_AXIAL))
+	{
+		double len = nIndex  * ImgInfoOri.fPixelSpaceY;
+		v3D::Vector3D newLeftTop = v3D::Get3DPoint(oriLeftTop, colvector, len);
+
+		pImg->m_ImgInfo.ImgLocPara.fOriLeftTopPixX = pImg->m_ImgInfo.ImgLocPara.fLeftTopPixX = newLeftTop.x();
+		pImg->m_ImgInfo.ImgLocPara.fOriLeftTopPixY = pImg->m_ImgInfo.ImgLocPara.fLeftTopPixY = newLeftTop.y();
+		pImg->m_ImgInfo.ImgLocPara.fOriLeftTopPixZ = pImg->m_ImgInfo.ImgLocPara.fLeftTopPixZ = newLeftTop.z();
+
+		pImg->m_ImgInfo.ImgLocPara.fOriFirstRowCosX = pImg->m_ImgInfo.ImgLocPara.fFirstRowCosX = rowvector.x();
+		pImg->m_ImgInfo.ImgLocPara.fOriFirstRowCosY = pImg->m_ImgInfo.ImgLocPara.fFirstRowCosY = rowvector.y();
+		pImg->m_ImgInfo.ImgLocPara.fOriFirstRowCosZ = pImg->m_ImgInfo.ImgLocPara.fFirstRowCosZ = rowvector.z();
+
+		pImg->m_ImgInfo.ImgLocPara.fOriFirstColCosX = pImg->m_ImgInfo.ImgLocPara.fFirstColCosX = zDirVector.x();
+		pImg->m_ImgInfo.ImgLocPara.fOriFirstColCosY = pImg->m_ImgInfo.ImgLocPara.fFirstColCosY = zDirVector.y();
+		pImg->m_ImgInfo.ImgLocPara.fOriFirstColCosZ = pImg->m_ImgInfo.ImgLocPara.fFirstColCosZ = zDirVector.z();
+		return;
+	}
+
+	if (m_nImgWndType == ORIIMG_AXIAL&&m_nOriImgType == ORIIMG_SAGITTAL)
+	{
+		double len = nIndex * ImgInfoOri.fPixelSpaceY;
+		v3D::Vector3D newLeftTop = v3D::Get3DPoint(oriLeftTop, colvector, len);
+
+		pImg->m_ImgInfo.ImgLocPara.fOriLeftTopPixX = pImg->m_ImgInfo.ImgLocPara.fLeftTopPixX = newLeftTop.x();
+		pImg->m_ImgInfo.ImgLocPara.fOriLeftTopPixY = pImg->m_ImgInfo.ImgLocPara.fLeftTopPixY = newLeftTop.y();
+		pImg->m_ImgInfo.ImgLocPara.fOriLeftTopPixZ = pImg->m_ImgInfo.ImgLocPara.fLeftTopPixZ = newLeftTop.z();
+
+		pImg->m_ImgInfo.ImgLocPara.fOriFirstRowCosX = pImg->m_ImgInfo.ImgLocPara.fFirstRowCosX = zDirVector.x();
+		pImg->m_ImgInfo.ImgLocPara.fOriFirstRowCosY = pImg->m_ImgInfo.ImgLocPara.fFirstRowCosY = zDirVector.y();
+		pImg->m_ImgInfo.ImgLocPara.fOriFirstRowCosZ = pImg->m_ImgInfo.ImgLocPara.fFirstRowCosZ = zDirVector.z();
+
+		pImg->m_ImgInfo.ImgLocPara.fOriFirstColCosX = pImg->m_ImgInfo.ImgLocPara.fFirstColCosX = rowvector.x();
+		pImg->m_ImgInfo.ImgLocPara.fOriFirstColCosY = pImg->m_ImgInfo.ImgLocPara.fFirstColCosY = rowvector.y();
+		pImg->m_ImgInfo.ImgLocPara.fOriFirstColCosZ = pImg->m_ImgInfo.ImgLocPara.fFirstColCosZ = rowvector.z();
+		return;
+	}
+
+	if ((m_nImgWndType == ORIIMG_CORONAL&&m_nOriImgType == ORIIMG_SAGITTAL) || (m_nImgWndType == ORIIMG_SAGITTAL&&m_nOriImgType == ORIIMG_CORONAL))
+	{
+		double len = nIndex  * ImgInfoOri.fPixelSpaceX;
+		v3D::Vector3D newLeftTop = v3D::Get3DPoint(oriLeftTop, rowvector, len);
+
+		pImg->m_ImgInfo.ImgLocPara.fOriLeftTopPixX = pImg->m_ImgInfo.ImgLocPara.fLeftTopPixX = newLeftTop.x();
+		pImg->m_ImgInfo.ImgLocPara.fOriLeftTopPixY = pImg->m_ImgInfo.ImgLocPara.fLeftTopPixY = newLeftTop.y();
+		pImg->m_ImgInfo.ImgLocPara.fOriLeftTopPixZ = pImg->m_ImgInfo.ImgLocPara.fLeftTopPixZ = newLeftTop.z();
+
+		pImg->m_ImgInfo.ImgLocPara.fOriFirstRowCosX = pImg->m_ImgInfo.ImgLocPara.fFirstRowCosX = zDirVector.x();
+		pImg->m_ImgInfo.ImgLocPara.fOriFirstRowCosY = pImg->m_ImgInfo.ImgLocPara.fFirstRowCosY = zDirVector.y();
+		pImg->m_ImgInfo.ImgLocPara.fOriFirstRowCosZ = pImg->m_ImgInfo.ImgLocPara.fFirstRowCosZ = zDirVector.z();
+
+		pImg->m_ImgInfo.ImgLocPara.fOriFirstColCosX = pImg->m_ImgInfo.ImgLocPara.fFirstColCosX = colvector.x();
+		pImg->m_ImgInfo.ImgLocPara.fOriFirstColCosY = pImg->m_ImgInfo.ImgLocPara.fFirstColCosY = colvector.y();
+		pImg->m_ImgInfo.ImgLocPara.fOriFirstColCosZ = pImg->m_ImgInfo.ImgLocPara.fFirstColCosZ = colvector.z();
+		return;
+	}
+
+	if (m_nImgWndType == ORIIMG_SAGITTAL && m_nOriImgType == ORIIMG_AXIAL)
+	{
+		double len = nIndex  * ImgInfoOri.fPixelSpaceX;
+		v3D::Vector3D newLeftTop = v3D::Get3DPoint(oriLeftTop, rowvector, len);
+
+		pImg->m_ImgInfo.ImgLocPara.fOriLeftTopPixX = pImg->m_ImgInfo.ImgLocPara.fLeftTopPixX = newLeftTop.x();
+		pImg->m_ImgInfo.ImgLocPara.fOriLeftTopPixY = pImg->m_ImgInfo.ImgLocPara.fLeftTopPixY = newLeftTop.y();
+		pImg->m_ImgInfo.ImgLocPara.fOriLeftTopPixZ = pImg->m_ImgInfo.ImgLocPara.fLeftTopPixZ = newLeftTop.z();
+
+		pImg->m_ImgInfo.ImgLocPara.fOriFirstRowCosX = pImg->m_ImgInfo.ImgLocPara.fFirstRowCosX = colvector.x();
+		pImg->m_ImgInfo.ImgLocPara.fOriFirstRowCosY = pImg->m_ImgInfo.ImgLocPara.fFirstRowCosY = colvector.y();
+		pImg->m_ImgInfo.ImgLocPara.fOriFirstRowCosZ = pImg->m_ImgInfo.ImgLocPara.fFirstRowCosZ = colvector.z();
+
+		pImg->m_ImgInfo.ImgLocPara.fOriFirstColCosX = pImg->m_ImgInfo.ImgLocPara.fFirstColCosX = zDirVector.x();
+		pImg->m_ImgInfo.ImgLocPara.fOriFirstColCosY = pImg->m_ImgInfo.ImgLocPara.fFirstColCosY = zDirVector.y();
+		pImg->m_ImgInfo.ImgLocPara.fOriFirstColCosZ = pImg->m_ImgInfo.ImgLocPara.fFirstColCosZ = zDirVector.z();
+		return;
+	}
 }

@@ -4365,14 +4365,14 @@ int CHsBaseFile::Hs_SetAgeValue(pHsElement pEle,int nAge,char cAgeType,bool bCov
 		return Ret_InvalidPara;
 
 	QString sAgeType;
-	sAgeType = QString("%c").arg(cAgeType);
+	sAgeType = QString("%1").arg(cAgeType);
 	if (!(sAgeType.compare("D") || sAgeType.compare("M") || sAgeType.compare("Y")))
 		return Ret_InvalidPara;
 
 	char Temp[100];
 	memset(Temp,0,100);
 
-	sprintf(Temp,"%03d%c",nAge,cAgeType);	
+	sprintf(Temp,"%1%2",nAge,cAgeType);	
 
 
 	this->ValueToEle((void*)&Temp,pEle,4,bCover,nValueIndex);

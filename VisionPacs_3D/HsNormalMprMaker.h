@@ -22,5 +22,6 @@ public:
 	void GetShowImage(CHsImage *pShowImg, int iIndex, int iSliceNum);
 	void GetStartAndEndSlice(int iIndex, int &iSliceNum,int &iStartS, int &iEndS);
 	void DoInterpolationToImage(CHsImage *pImg, double dSpacingX, double dSpacingY,int nRows,int nCols);
+	void CalImagePositon(CHsImage *pImg,int nIndex);
 };
 

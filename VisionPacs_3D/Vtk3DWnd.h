@@ -5,6 +5,8 @@
 #include "stdafx.h"
 #include "VtkVRInteractorStyle.h"
 
+class CHsFile;
+
 namespace Ui {
 class Vtk3DWnd;
 }
@@ -34,6 +36,8 @@ private:
 
 	vtkSmartPointer<VtkVRInteractorStyle>		 m_pStyle;
 
+	CHsFile *m_pSourceDs;
+
 public:
 
     vtkSmartPointer<vtkRenderer>				 m_p3DRenderer;
@@ -46,9 +50,13 @@ public:
 
 	void SetImageDate(vtkSmartPointer<vtkImageData> pImageData);
 
+	void SetupCornorInfo();
+
 	void ReRender();
 
 	void ConnectVolumeToWidget(ctkVTKVolumePropertyWidget *pCtkVPwidget);
+
+	void SetSourceDs(CHsFile *pFile) { m_pSourceDs = pFile; }
 
     double ReductionFactor;
     double FrameRate;

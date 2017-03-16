@@ -32,6 +32,8 @@ VTK_MODULE_INIT(vtkRenderingFreeType)
 #include "vtkCamera.h"
 #include "Slicer\vtkSlicerGPURayCastVolumeMapper.h"
 #include "vtkImageData.h"
+#include "vtkCornerAnnotation.h"
+#include "vtkTextProperty.h"
 
 
 #endif // VTKHEADER_H
