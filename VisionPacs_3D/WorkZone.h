@@ -25,7 +25,6 @@ private:
 	vector<CHsImage*> m_vImage;		//显示图像
 
 	int m_nOriImageType;			//原始图像类型
-
 	int m_nDataX, m_nDataY, m_nDataZ;
 
 public:
@@ -47,12 +46,17 @@ public:
 	vtkSmartPointer<vtkImageData> m_pImageData;
 	void ***m_pImageArray;
 
+private:
+	void InitSignalsAndSlots();
+
 private slots:
 	void Btn_VrOrientationClick();
 	void CB_VrModeChanged(QString sModeName);
+	void Btn_IsMprLineShow();
 
 signals:
 	void SetWaitProgress(int);
+	void MprLinesShowChange(bool);
 };
 
 #endif // WORKZONE_H

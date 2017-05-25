@@ -112,6 +112,8 @@ WorkZone::WorkZone(QWidget *parent) :
 	m_v2DWnd.push_back(ui->Axial_Wnd);
 	m_v2DWnd.push_back(ui->Coronal_Wnd);
 	m_v2DWnd.push_back(ui->Sagittal_Wnd);
+
+	InitSignalsAndSlots();
 }
 
 WorkZone::~WorkZone()
@@ -167,7 +169,8 @@ void WorkZone::ProcessImageData()
 	QString sManufactor = "";
 	CHsFile *pFile = m_vImage[0]->GetDs();
 	pHsElement pManufactor = pFile->Hs_FindFirstEle(m_vImage[0]->m_ImgInfo.pEle, TAG_MANUFACTURER, true);
-	pFile->Hs_GetStringValue(pManufactor, sManufactor, 0);
+	if(pManufactor)
+		pFile->Hs_GetStringValue(pManufactor, sManufactor, 0);
 
 	if (sManufactor.indexOf("Philips") != -1 && m_vImage[0]->m_ImgInfo.sModality.compare("MR") == 0)
 	{
@@ -222,7 +225,9 @@ void WorkZone::ProcessImageData()
 		m_pImageData->Initialize();
 
 	double fRescaleIntercept = m_vImage[0]->m_ImgInfo.fRescaleIntercept;
-	double fRescaleSlope = m_vImage[0]->m_ImgInfo.fRescaleSlope;
+	double fRescaleSlope = 1;
+	if (m_vImage[0]->m_ImgInfo.fRescaleSlope != 0.00)
+		fRescaleSlope = m_vImage[0]->m_ImgInfo.fRescaleSlope;
 
 	m_pImageData->SetDimensions(m_nDataX,m_nDataY,m_nDataZ);
 	m_pImageData->SetSpacing(dSpacingX,dSpacingY,dSpacingZ);
@@ -268,7 +273,7 @@ void WorkZone::ProcessImageData()
 					}
 					else if (m_nOriImageType == ORIIMG_SAGITTAL)
 					{
-						*(ptr + (m_nDataX*m_nDataY)*r + (m_nDataX*c) + z) = fRescaleSlope * nPixelValue + fRescaleIntercept;
+						*(ptr + (m_nDataX*m_nDataY)*r + (m_nDataX*c) +(m_nDataX - z - 1)) = fRescaleSlope * nPixelValue + fRescaleIntercept;
 					}
 				}
 			}
@@ -325,7 +330,7 @@ void WorkZone::ProcessImageData()
 					}
 					else if (m_nOriImageType == ORIIMG_SAGITTAL)
 					{
-						*(ptr + (m_nDataX*m_nDataY)*r + (m_nDataX*c) + z) = fRescaleSlope * nPixelValue + fRescaleIntercept;
+						*(ptr + (m_nDataX*m_nDataY)*(m_nDataZ - 1 - r) + (m_nDataX*(m_nDataY - 1 -c)) + (m_nDataX - 1 - z )) = fRescaleSlope * nPixelValue + fRescaleIntercept;
 					}
 				}
 			}
@@ -386,6 +391,14 @@ void WorkZone::InitDisplayWnd()
 	emit SetWaitProgress(100);
 }
 
+void WorkZone::InitSignalsAndSlots()
+{
+	for (int i=0; i<m_v2DWnd.size();i++)
+	{
+		QObject::connect(this, SIGNAL(MprLinesShowChange(bool)), m_v2DWnd[i]->GetImageWnd(), SLOT(OnMprLinesShow(bool)));
+	}
+}
+
 void WorkZone::Btn_VrOrientationClick()
 {
 	QString sOreientationName = sender()->objectName();
@@ -397,6 +410,13 @@ void WorkZone::CB_VrModeChanged(QString sModeName)
 {
 	ui->VR_Wnd->Set3DVRmode(sModeName);
 	ReRenderVrWnd();
+}
+
+void WorkZone::Btn_IsMprLineShow()
+{	
+	QPushButton *btn = (QPushButton *)sender();
+	bool isDown = btn->isChecked();
+	emit MprLinesShowChange(isDown);
 }
 
 void WorkZone::ReRenderVrWnd()

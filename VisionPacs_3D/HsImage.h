@@ -2,6 +2,7 @@
 #include "HsBaseImg.h"
 
 class CHsFile;
+class ImageWnd;
 
 class CHsImage :
 	public CHsBaseImg
@@ -19,6 +20,8 @@ private:
 	int RefreshInfoItem(CHsFile* pDs, INFOITEM &infoItem);
 	//获取格式化字符串的类型0=不确定，1=字符串格式化，2=整数格式化，3=小数格式化
 	int GetFormatType(QString &sFormat);
+	//所属窗体
+	ImageWnd *m_pBelongWnd;
 
 protected:
 	//在窗体上占有的区域
@@ -61,5 +64,9 @@ public:
 
 	//层厚
 	float m_fSilceThick;
+
+	//设置、获取所属窗体
+	void SetBelongWnd(ImageWnd *pWnd) { m_pBelongWnd = pWnd; }
+	ImageWnd *GetBelongWnd() { return m_pBelongWnd; }
 };
 

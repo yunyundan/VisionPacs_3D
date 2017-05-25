@@ -220,6 +220,7 @@ void VisionPacs_3D::InitUIConfig()
 	vModeNames.push_back("Bone");
 	vModeNames.push_back("Heart");
 	vModeNames.push_back("Kidney");
+	vModeNames.push_back("MIP");
 
 	ui->VRModeCBox->setIconSize(QSize(45, 45));
 	QListWidget *pVRModeListWidget = new QListWidget(this);
@@ -241,6 +242,7 @@ void VisionPacs_3D::InitUIConfig()
 		m_pVolumePropertywidget = new ctkVTKVolumePropertyWidget;
 		ui->RenderVLayout->addWidget(m_pVolumePropertywidget);
 	}
+
 }
 
 void VisionPacs_3D::ExtractImage(QString sFilePath, QString sSeriesUID, vector<string> &vImagePathList)

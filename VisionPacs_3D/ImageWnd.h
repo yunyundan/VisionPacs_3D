@@ -6,6 +6,8 @@
 
 class CHsImage;
 class CHsNormalMprMaker;
+class WorkZone;
+class OperateMprLines;
 
 namespace Ui {
 class ImageWnd;
@@ -24,6 +26,7 @@ private:
 
 	//聚焦标记
 	bool m_bFocused; 
+
 	//计算图像在窗口内显示的rc
 	RECT CalDisplayRect(CHsImage*pImg);//RECT DlgRc,
 
@@ -74,8 +77,10 @@ private:
 	int ArrangeCorinfo(CORNORINFO corInfo,map<int,ROWITEM> &mapRow);
 	void InitNormalCorInfo();
 	void InitPosCorInfo();
+
 	//当前图像序数
 	int m_nCurImgIndex;
+
 protected:
 	QPixmap *m_pPixmap;
 	QImage *m_pQImage;
@@ -89,6 +94,7 @@ public:
 	CHsImage *m_pImg;
 	unsigned int m_nLeftButtonInteractionStyle;
 	unsigned int m_nRightButtonInteractionStyle;
+
 public:
 	//设置本窗体是否为聚焦窗口
 	void SetFocuse(bool bFocused){ m_bFocused = bFocused; } 
@@ -123,14 +129,17 @@ public:
 
 	void setCurImageIndex(int nIndex) { m_nCurImgIndex = nIndex; }
 
+	//操作线
+	OperateMprLines *m_pOperateLines;
+
 signals:
 	void SendImageNum(int);
 	void ImageIndexChange(int);
 
-
 private slots:
 	void OnEditTextChanged(const QString &sText);
 	void OnEditFinished();
+	void OnMprLinesShow(bool isShow);
 };
 
 #endif // IMAGEWND_H

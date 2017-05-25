@@ -4,15 +4,17 @@
 
 #include "HsImage.h"
 #include "HsNormalMprMaker.h"
+#include "WorkZone.h"
+#include "OperateMprLines.h"
 
 #include "AppConfig.h"
 
 
 extern RECT GetShowRcByImgSize(RECT rc, double ImgWidth, double ImgHeight);
 
-ImageWnd::ImageWnd(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::ImageWnd)
+ImageWnd::ImageWnd(QWidget *parent):
+    QWidget(parent)
+	,ui(new Ui::ImageWnd)
 	, m_bFocused(false)
 	, m_pImg(NULL)
 	, m_pQImage(NULL)
@@ -23,8 +25,10 @@ ImageWnd::ImageWnd(QWidget *parent) :
 	,m_pNormalMaker(NULL)
 	,m_nImgNum(0)
 	,m_bInitCorInfo(false)
+	,m_pOperateLines(NULL)
 {
     ui->setupUi(this);
+	setMouseTracking(true);
 }
 
 ImageWnd::~ImageWnd()
@@ -50,6 +54,12 @@ ImageWnd::~ImageWnd()
 	{
 		delete m_pNormalMaker;
 		m_pNormalMaker = NULL;
+	}
+
+	if (m_pOperateLines)
+	{
+		delete m_pOperateLines;
+		m_pOperateLines = NULL;
 	}
 }
 
@@ -92,8 +102,14 @@ void ImageWnd::paintEvent(QPaintEvent *event)
 				painter.drawImage(rc, qImg);
 			}
 		}
-	}
+	
 
+		//MPR定位线
+		if (m_pOperateLines)
+		{
+			m_pOperateLines->OnMprLinesPaint(&painter);
+		}
+	}
 }
 
 void ImageWnd::mousePressEvent(QMouseEvent *event)
@@ -112,6 +128,11 @@ void ImageWnd::mousePressEvent(QMouseEvent *event)
 			m_PrePoint = event->pos();
 			m_nInteractionState = IMGSTSTEM_BROWSER;
 			break;
+		}
+
+		if (m_pOperateLines && m_pOperateLines->IsMprLineShow())
+		{
+			m_pOperateLines->OnMprLinesMousePress(event);
 		}
 	}
 	else if (event->button() == Qt::RightButton)
@@ -183,7 +204,6 @@ void ImageWnd::mouseMoveEvent(QMouseEvent *event)
 		m_PrePoint.setX(pt.x());
 		m_PrePoint.setY(pt.y());
 	}
-
 	else if (m_nInteractionState == IMGSTSTEM_BROWSER)
 	{
 		int n = (pt.y() - m_PrePoint.y()) / 6;//6个像素换一幅图像
@@ -234,6 +254,14 @@ void ImageWnd::mouseMoveEvent(QMouseEvent *event)
 			ImgRc.right = max(int(m_fImgRc.left), int(m_fImgRc.right));
 			ImgRc.bottom = max(int(m_fImgRc.top), int(m_fImgRc.bottom));
 			m_pImg->SetWndRc(ImgRc);
+			RECT rcCom;//ImgRc与rcWnd的交集
+			if (::IntersectRect(&rcCom, &ImgRc, &rcWnd) == TRUE)
+			{
+				RECT rcImg = rcCom;
+				ConvertCoord(&rcImg.left, &rcImg.top, &rcImg.right, &rcImg.bottom, TRUE);//rcCom是用户看到的图像区域--以屏幕坐标为单位的,这是转换到m_pImg像素坐标上
+
+				m_pImg->Hs_Size(&rcImg, rcCom.right - rcCom.left, rcCom.bottom - rcCom.top, HSIZE_RESAMPLE, true);
+			}
 		}
 
 		bNeedRefresh = true;
@@ -241,7 +269,6 @@ void ImageWnd::mouseMoveEvent(QMouseEvent *event)
 		m_PrePoint.setX(pt.x());
 		m_PrePoint.setY(pt.y());
 	}
-
 	else if (m_nInteractionState == IMGSTSTEM_PAN)
 	{
 		RECT ImgRc = m_pImg->GetWndRc();
@@ -257,6 +284,11 @@ void ImageWnd::mouseMoveEvent(QMouseEvent *event)
 		m_pImg->SetWndRc(ImgRc);
 
 		bNeedRefresh = true;
+	}
+
+	if (m_pOperateLines && m_pOperateLines->IsMprLineShow())
+	{
+		bNeedRefresh = (m_pOperateLines->OnMprLinesMouseMove(event) || bNeedRefresh);
 	}
 
 	if (bNeedRefresh == true)
@@ -280,6 +312,11 @@ void ImageWnd::mouseReleaseEvent(QMouseEvent *event)
 		case BROWSER_INTERACTIOM:
 			this->m_nInteractionState = IMGSTSTEM_LOCTION;
 			break;
+		}
+
+		if (m_pOperateLines && m_pOperateLines->IsMprLineShow())
+		{
+			m_pOperateLines->OnMprLinesMouseRelease(event);
 		}
 	}
 	else if (event->button() == Qt::RightButton)
@@ -329,7 +366,6 @@ void ImageWnd::mouseReleaseEvent(QMouseEvent *event)
 			ImgRc.bottom = ImgRc.top + h;
 			m_pImg->SetWndRc(ImgRc);
 
-			//m_pImg->SetWndRc(CalDisplayRect(m_pImg));
 			update();
 			RefreshCornorInfoWidget();
 			break;
@@ -550,8 +586,8 @@ int ImageWnd::CalcAndShowNormalImg(QString sWndName, int nOriImgType, int iImgIn
 		m_pImg->m_ImgInfo = m_vOriImg[0]->m_ImgInfo;//先复制源图基本信息
 		m_pImg->SetDs(m_vOriImg[0]->GetDs());
 		m_pImg->Hs_GetCornerInfo(true);
+		m_pImg->SetBelongWnd(this);
 	}
-
 
 	if (m_pNormalMaker == NULL)
 	{
@@ -559,6 +595,11 @@ int ImageWnd::CalcAndShowNormalImg(QString sWndName, int nOriImgType, int iImgIn
 		m_pNormalMaker->InitParaAndData(m_vOriImg, m_p3DArray, m_p3DImgData, m_nImgWndType, nOriImgType);
 	}
 
+	if (m_pOperateLines == NULL)
+	{
+		m_pOperateLines = new OperateMprLines(this,m_nImgWndType);
+	}
+	
 	m_pNormalMaker->GetShowImage(m_pImg, iImgIndex, iSlice);		
 	SetImage(m_pImg);
 
@@ -796,7 +837,7 @@ void ImageWnd::InitNormalCorInfo()
 
 			if (iter->second.sType.compare("imageindex") == 0)
 			{
-				QString sImgIndex = QString("Index:%1").arg(m_nImgWndType);
+				QString sImgIndex = QString("Index:%1").arg(m_nCurImgIndex);
 				QLabel *indexLabel = new QLabel(this);
 				indexLabel->setFont(ft);
 				indexLabel->setAlignment(Qt::AlignLeft);
@@ -1006,6 +1047,16 @@ void ImageWnd::OnEditFinished()
 		double fZf = edit->text().toDouble();
 		m_pImg->m_ImgState.fZoomX = fZf;
 		m_pImg->SetWndRc(CalDisplayRect(m_pImg));
+	}
+	edit->clearFocus();
+	update();
+}
+
+void ImageWnd::OnMprLinesShow(bool isShow)
+{
+	if (m_pOperateLines)
+	{
+		m_pOperateLines->SetMprLineShow(isShow);
 	}
 	update();
 }

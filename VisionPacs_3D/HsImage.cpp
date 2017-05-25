@@ -2,6 +2,8 @@
 #include "HsImage.h"
 #include "HsFile.h"
 #include "AppConfig.h"
+#include "ImageWnd.h"
+#include "OperateMprLines.h"
 
 extern void** ArrayNew(unsigned long nRow, unsigned long nCol, unsigned long nSize, unsigned long *nNewRow = NULL, unsigned long* nNewCol = NULL);
 extern void ArrayFree(void **pArr, int iflag = 0);
@@ -58,6 +60,7 @@ LONG ConvertStrToLong(const char *ch)
 CHsImage::CHsImage()
 : m_pDs(NULL)
 , m_fSilceThick(0.00)
+,m_pBelongWnd(NULL)
 {
 	SetRect(&m_WndRc, 0, 0, 0, 0);
 }
@@ -122,6 +125,14 @@ void CHsImage::SetWndRc(RECT rc)
 	//显示区域发生变化,要及时通知AnnoManager们所含的注释体
 	SIZE ImgSize = Hs_GetImgSize();
 
+
+	if (m_pBelongWnd != NULL)
+	{
+		if (m_pBelongWnd->m_pOperateLines)
+		{
+			m_pBelongWnd->m_pOperateLines->RefreshMprLinesPara(m_WndRc, m_ImgState.nCurOriPixCol, m_ImgState.nCurOriPixRow);
+		}
+	}
 }
 
 RECT CHsImage::GetWndRc()

@@ -11,6 +11,7 @@ Vtk3DWnd::Vtk3DWnd(QWidget *parent) :
 {
     ui->setupUi(this);
 
+
     m_p3DRenderer = vtkSmartPointer<vtkRenderer>::New();
     ui->VtkWidget->GetRenderWindow()->AddRenderer(m_p3DRenderer);
     ui->VtkWidget->GetRenderWindow()->SetGlobalWarningDisplay(0);
@@ -151,7 +152,6 @@ void Vtk3DWnd::Set3DVRmode(QString sMode)
 
 
 		m_pSlicerMapper->SetBlendModeToComposite();//m_pSmartMapper
-
 		m_pVolProperty->ShadeOn();
 		m_pVolProperty->SetInterpolationTypeToLinear();
 		m_pVolProperty->SetAmbient(0.3);
@@ -214,7 +214,28 @@ void Vtk3DWnd::Set3DVRmode(QString sMode)
 		m_pVolProperty->SetSpecular(0.5);
 		m_pVolProperty->SetSpecularPower(40.0);
 		m_pVolProperty->SetScalarOpacityUnitDistance(0.8919);
-	}    
+	}   
+	else if (sMode.compare("MIP") == 0)
+	{
+		m_pPieceFun->RemoveAllPoints();
+		m_pClrTrans->RemoveAllPoints();
+
+		double range[2];
+		m_pImgResample->GetOutput()->GetScalarRange(range);
+
+		m_pPieceFun->AddPoint(range[0], 0.0, 0.5, 0.0);
+		m_pPieceFun->AddPoint(range[1] / 2, 1.0, 0.5, 0.0);
+		m_pClrTrans->AddRGBSegment(0.0, 1.0, 1.0, 1.0, 255.0, 1.0, 1.0, 1.0);
+		m_pSlicerMapper->SetBlendModeToMaximumIntensity();
+		m_pVolProperty->SetIndependentComponents(TRUE);
+		m_pVolProperty->ShadeOn();
+		m_pVolProperty->SetAmbient(0.3);
+		m_pVolProperty->SetDiffuse(0.6);
+		m_pVolProperty->SetSpecular(0.5);
+		m_pVolProperty->SetSpecularPower(40.0);
+		m_pVolProperty->SetScalarOpacityUnitDistance(0.8919);
+		m_pVolProperty->SetInterpolationTypeToLinear();
+	}
 }
 
 void Vtk3DWnd::SetupCamera(QString sOrientationName)
@@ -296,73 +317,150 @@ void Vtk3DWnd::SetupCornorInfo()
 
 	int nRet = 0;
 
-	if (1)
+	MODINFO modInfo;
+	pHsElement pEle = m_pSourceDs->Hs_FindFirstEle(NULL, TAG_MODALITY, false);
+	if (pEle)
 	{
-		vtkSmartPointer<vtkCornerAnnotation> annoLT = vtkSmartPointer<vtkCornerAnnotation>::New();
-		annoLT->GetTextProperty()->SetColor(1.0, 1.0, 1.0);
-		annoLT->GetTextProperty()->SetFontSize(1);
+		int nRet;
+		QString sModality = m_pSourceDs->Hs_GetConvertValue(pEle, 0, nRet);
+		bool b = CAppConfig::GetInfoSet(sModality, modInfo);
+	}
+
+	QFont ft;
+	ft.setPointSize(modInfo.nSize);
+	ft.setFamily(modInfo.sFaceName);	
+	if (1)//×óÉÏ½Ç
+	{
 		QString sLtValue = "";
 		pHsElement pEle = m_pSourceDs->Hs_FindFirstEle(NULL, TAG_MANUFACTURER, false);
 		if (pEle)
 		{
 			sLtValue = m_pSourceDs->Hs_GetConvertValue(pEle, 0, nRet);
 		}
+		QLabel *LTlabel1 = new QLabel(ui->VtkWidget);
+		LTlabel1->setFont(ft);
+		LTlabel1->setAlignment(Qt::AlignLeft);
+		LTlabel1->setText(sLtValue);
+		LTlabel1->adjustSize();
+		QRect rcLable = LTlabel1->geometry();
+		rcLable = QRect(2,2, rcLable.width(), rcLable.height());
+		LTlabel1->setGeometry(rcLable);
+		LTlabel1->show();
+
 		pEle = m_pSourceDs->Hs_FindFirstEle(NULL, TAG_STUDY_ID, false);
 		if (pEle)
 		{
-			sLtValue = sLtValue +"\nEx:"+ m_pSourceDs->Hs_GetConvertValue(pEle, 0, nRet);
+			sLtValue = "Ex:"+ m_pSourceDs->Hs_GetConvertValue(pEle, 0, nRet);
 		}
 
-		annoLT->SetText(vtkCornerAnnotation::UpperLeft, sLtValue.toLatin1().data());
-		m_p3DRenderer->AddViewProp(annoLT);
+		QLabel *LTlabel2 = new QLabel(ui->VtkWidget);
+		LTlabel2->setFont(ft);
+		LTlabel2->setAlignment(Qt::AlignLeft);
+		LTlabel2->setText(sLtValue);
+		LTlabel2->adjustSize();
+		rcLable = LTlabel2->geometry();
+		rcLable = QRect(2, 2+rcLable.height(), rcLable.width(), rcLable.height());
+		LTlabel2->setGeometry(rcLable);
+		LTlabel2->show();
 	}
 
 	if (1)
 	{
-		vtkSmartPointer<vtkCornerAnnotation> annoRT = vtkSmartPointer<vtkCornerAnnotation>::New();
-		annoRT->GetTextProperty()->SetColor(1.0, 1.0, 1.0);
-		annoRT->GetTextProperty()->SetFontSize(1);
 		QString sLtValue = "";
 		pHsElement pEle = m_pSourceDs->Hs_FindFirstEle(NULL, TAG_INSTITUTION_NAME, false);
 		if (pEle)
 		{
 			sLtValue = m_pSourceDs->Hs_GetConvertValue(pEle, 0, nRet);
 		}
+
+		QLabel *RTlabel1 = new QLabel(ui->VtkWidget);
+		RTlabel1->setFont(ft);
+		RTlabel1->setAlignment(Qt::AlignLeft);
+		RTlabel1->setText(sLtValue);
+		RTlabel1->adjustSize();
+		QRect rcLable = RTlabel1->geometry();
+		rcLable = QRect(rect().right() - rcLable.width() - 2, 2, rcLable.width(), rcLable.height());
+		RTlabel1->setGeometry(rcLable);
+		RTlabel1->show();
+
 		pEle = m_pSourceDs->Hs_FindFirstEle(NULL, TAG_PATIENT_NAME, false);
 		if (pEle)
 		{
-			sLtValue = sLtValue + "\n" + m_pSourceDs->Hs_GetConvertValue(pEle, 0, nRet);
+			sLtValue = m_pSourceDs->Hs_GetConvertValue(pEle, 0, nRet);
 		}
+
+		QLabel *RTlabel2 = new QLabel(ui->VtkWidget);
+		RTlabel2->setFont(ft);
+		RTlabel2->setAlignment(Qt::AlignLeft);
+		RTlabel2->setText(sLtValue);
+		RTlabel2->adjustSize();
+		rcLable = RTlabel2->geometry();
+		rcLable = QRect(rect().right() - rcLable.width() - 2, 2 + rcLable.height(), rcLable.width(), rcLable.height());
+		RTlabel2->setGeometry(rcLable);
+		RTlabel2->show();
+
 		pEle = m_pSourceDs->Hs_FindFirstEle(NULL, TAG_PATIENT_SEX, false);
 		if (pEle)
 		{
-			sLtValue = sLtValue + "\n" + m_pSourceDs->Hs_GetConvertValue(pEle, 0, nRet);
+			sLtValue = m_pSourceDs->Hs_GetConvertValue(pEle, 0, nRet);
 		}
+
+		QLabel *RTlabel3 = new QLabel(ui->VtkWidget);
+		RTlabel3->setFont(ft);
+		RTlabel3->setAlignment(Qt::AlignLeft);
+		RTlabel3->setText(sLtValue);
+		RTlabel3->adjustSize();
+		rcLable = RTlabel3->geometry();
+		rcLable = QRect(rect().right() - rcLable.width() - 2, 2 + rcLable.height()*2, rcLable.width(), rcLable.height());
+		RTlabel3->setGeometry(rcLable);
+		RTlabel3->show();
+		
 		pEle = m_pSourceDs->Hs_FindFirstEle(NULL, TAG_PATIENT_AGE, false);
 		if (pEle)
 		{
-			sLtValue = sLtValue + "\n" + m_pSourceDs->Hs_GetConvertValue(pEle, 0, nRet);
+			sLtValue = m_pSourceDs->Hs_GetConvertValue(pEle, 0, nRet);
 		}
-		annoRT->SetText(vtkCornerAnnotation::UpperRight, sLtValue.toLatin1().data());
-		m_p3DRenderer->AddViewProp(annoRT);
+
+		QLabel *RTlabel4 = new QLabel(ui->VtkWidget);
+		RTlabel4->setFont(ft);
+		RTlabel4->setAlignment(Qt::AlignLeft);
+		RTlabel4->setText(sLtValue);
+		RTlabel4->adjustSize();
+		rcLable = RTlabel4->geometry();
+		rcLable = QRect(rect().right() - rcLable.width() - 2, 2 + rcLable.height() * 3, rcLable.width(), rcLable.height());
+		RTlabel4->setGeometry(rcLable);
+		RTlabel4->show();
 	}
 
 
 	if (1)
 	{
-		vtkSmartPointer<vtkCornerAnnotation> annoRB = vtkSmartPointer<vtkCornerAnnotation>::New();
-		annoRB->GetTextProperty()->SetColor(1.0, 1.0, 1.0);
-		annoRB->GetTextProperty()->SetFontSize(1);
-		QString fontFamily = annoRB->GetTextProperty()->GetFontFamilyAsString();
 		QString sLtValue = "";
 		pHsElement pEle = m_pSourceDs->Hs_FindFirstEle(NULL, TAG_MODALITY, false);
 		if (pEle)
 		{
 			sLtValue = m_pSourceDs->Hs_GetConvertValue(pEle, 0, nRet);
 		}
-		sLtValue = sLtValue + "\n" + "VR";
-		annoRB->SetText(vtkCornerAnnotation::LowerRight, sLtValue.toLatin1().data());
-		m_p3DRenderer->AddViewProp(annoRB);
+
+		QLabel *RBlabel1 = new QLabel(ui->VtkWidget);
+		RBlabel1->setFont(ft);
+		RBlabel1->setAlignment(Qt::AlignLeft);
+		RBlabel1->setText(sLtValue);
+		RBlabel1->adjustSize();
+		QRect rcLable = RBlabel1->geometry();
+		rcLable = QRect(rect().right() - rcLable.width() - 2, rect().bottom()-rcLable.height()*2, rcLable.width(), rcLable.height());
+		RBlabel1->setGeometry(rcLable);
+		RBlabel1->show();
+
+		QLabel *RBlabel2 = new QLabel(ui->VtkWidget);
+		RBlabel2->setFont(ft);
+		RBlabel2->setAlignment(Qt::AlignLeft);
+		RBlabel2->setText("VR");
+		RBlabel2->adjustSize();
+		rcLable = RBlabel2->geometry();
+		rcLable = QRect(rect().right() - rcLable.width() - 2, rect().bottom() - rcLable.height(), rcLable.width(), rcLable.height());
+		RBlabel2->setGeometry(rcLable);
+		RBlabel2->show();
 	}
 }
 

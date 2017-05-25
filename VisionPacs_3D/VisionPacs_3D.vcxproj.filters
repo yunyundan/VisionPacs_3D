@@ -595,6 +595,15 @@
     <ClCompile Include="vector3d.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="OperateMprLines.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_OperateMprLines.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_OperateMprLines.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="VisionPacs_3D.h">
@@ -809,6 +818,9 @@
     </CustomBuild>
     <CustomBuild Include="CTK\ctkVTKVolumePropertyWidget.h">
       <Filter>CTK</Filter>
+    </CustomBuild>
+    <CustomBuild Include="OperateMprLines.h">
+      <Filter>Header Files</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>

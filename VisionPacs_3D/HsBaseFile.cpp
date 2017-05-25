@@ -2450,7 +2450,7 @@ int CHsBaseFile::Hs_GetImageInfo(pHsElement pPixEle, ImageInfo& ImgInfo,int iFra
 
 	p = Hs_FindFirstEle(pPixEle,TAG_RESCALE_SLOPE,true);
 	if(Hs_GetDoubleValue(p,ImgInfo.fRescaleSlope,0) != Ret_Success)
-		ImgInfo.fRescaleSlope = 0;
+		ImgInfo.fRescaleSlope = 1.00;
 
 	p = Hs_FindFirstEle(pPixEle,TAG_WINDOW_CENTER,true);
 	Hs_GetDoubleValue(p,ImgInfo.fWinCenter,0);

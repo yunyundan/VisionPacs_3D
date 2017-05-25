@@ -45,8 +45,8 @@ void Vtk2DWnd::SetImageData(void ***pImgArray, vtkSmartPointer<vtkImageData> p3D
 void Vtk2DWnd::OnScrollBarMoved(int nValue)
 {
 	QString sWndName = sender()->parent()->objectName();
-	ui->ImgWnd->CalcAndShowNormalImg(sWndName, m_nOriImgType, nValue, 1);
-	ui->ImgWnd->setCurImageIndex(nValue);
+	ui->ImgWnd->setCurImageIndex(nValue+1);
+	ui->ImgWnd->CalcAndShowNormalImg(sWndName, m_nOriImgType, nValue, 1);	
 }
 
 void Vtk2DWnd::RecieveImageNum(int nImgNum)
@@ -62,3 +62,4 @@ void Vtk2DWnd::RecieveImageIndexChange(int nChange)
 	ui->ScrollBar->setValue(nCurIndex);
 	ui->ImgWnd->setCurImageIndex(nCurIndex);
 }
+

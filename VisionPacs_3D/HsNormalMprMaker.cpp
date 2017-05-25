@@ -35,11 +35,11 @@ void CHsNormalMprMaker::GetStartAndEndSlice(int iIndex, int &iSliceNum, int &iSt
 		nMaxSlice = nExtents[5];
 	else if (m_nImgWndType == ORIIMG_CORONAL)
 	{
-		nMaxSlice = nExtents[1];
+		nMaxSlice = nExtents[3];
 		iIndex = nMaxSlice - iIndex;
 	}		
 	else
-		nMaxSlice = nExtents[3];
+		nMaxSlice = nExtents[1];
 
 	if (iSliceNum <= 1)
 	{
@@ -146,6 +146,10 @@ void CHsNormalMprMaker::GetShowImage(CHsImage *pShowImg, int iIndex, int iSliceN
 					for (int c = 0; c < nCols; c++)
 					{
 						int iValue = pRows[c];
+						if (iValue != 0)
+						{
+							int a = 0;
+						}
 						pRetData[r][c] = iValue;
 					}
 				}

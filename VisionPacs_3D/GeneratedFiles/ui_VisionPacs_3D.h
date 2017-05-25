@@ -23,7 +23,6 @@
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
 #include <QtWidgets/QPushButton>
-#include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QTabWidget>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
@@ -42,7 +41,7 @@ public:
     QWidget *MainBar;
     QTabWidget *OperateTab;
     QWidget *Viewer;
-    QVBoxLayout *verticalLayout_2;
+    QVBoxLayout *verticalLayout_4;
     QVBoxLayout *verticalLayout;
     QHBoxLayout *horizontalLayout;
     QPushButton *VR_location;
@@ -60,7 +59,7 @@ public:
     QHBoxLayout *VRModeHLayout;
     QLabel *VRMode;
     QComboBox *VRModeCBox;
-    QSpacerItem *verticalSpacer;
+    QVBoxLayout *verticalLayout_3;
     QHBoxLayout *ImgOperateHLayout;
     QPushButton *Img_location;
     QPushButton *Img_browser;
@@ -68,6 +67,15 @@ public:
     QPushButton *Img_wl;
     QPushButton *Img_zoom;
     QPushButton *Img_pan;
+    QVBoxLayout *verticalLayout_2;
+    QPushButton *Btn_MprLinesShow;
+    QHBoxLayout *horizontalLayout_4;
+    QHBoxLayout *horizontalLayout_2;
+    QLabel *label;
+    QComboBox *comboBox;
+    QHBoxLayout *horizontalLayout_3;
+    QLabel *label_2;
+    QComboBox *comboBox_2;
     QWidget *RenderWidget;
     QHBoxLayout *RenderWHLayout;
     QVBoxLayout *RenderVLayout;
@@ -129,11 +137,11 @@ public:
         Viewer = new QWidget();
         Viewer->setObjectName(QStringLiteral("Viewer"));
         Viewer->setStyleSheet(QStringLiteral(""));
-        verticalLayout_2 = new QVBoxLayout(Viewer);
-        verticalLayout_2->setSpacing(6);
-        verticalLayout_2->setContentsMargins(11, 11, 11, 11);
-        verticalLayout_2->setObjectName(QStringLiteral("verticalLayout_2"));
-        verticalLayout_2->setContentsMargins(0, 0, 0, 0);
+        verticalLayout_4 = new QVBoxLayout(Viewer);
+        verticalLayout_4->setSpacing(6);
+        verticalLayout_4->setContentsMargins(11, 11, 11, 11);
+        verticalLayout_4->setObjectName(QStringLiteral("verticalLayout_4"));
+        verticalLayout_4->setContentsMargins(0, 0, 0, 0);
         verticalLayout = new QVBoxLayout();
         verticalLayout->setSpacing(10);
         verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
@@ -321,12 +329,11 @@ public:
         verticalLayout->addLayout(VRModeHLayout);
 
 
-        verticalLayout_2->addLayout(verticalLayout);
+        verticalLayout_4->addLayout(verticalLayout);
 
-        verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
-
-        verticalLayout_2->addItem(verticalSpacer);
-
+        verticalLayout_3 = new QVBoxLayout();
+        verticalLayout_3->setSpacing(6);
+        verticalLayout_3->setObjectName(QStringLiteral("verticalLayout_3"));
         ImgOperateHLayout = new QHBoxLayout();
         ImgOperateHLayout->setSpacing(6);
         ImgOperateHLayout->setObjectName(QStringLiteral("ImgOperateHLayout"));
@@ -410,7 +417,78 @@ public:
         ImgOperateHLayout->addWidget(Img_pan);
 
 
-        verticalLayout_2->addLayout(ImgOperateHLayout);
+        verticalLayout_3->addLayout(ImgOperateHLayout);
+
+        verticalLayout_2 = new QVBoxLayout();
+        verticalLayout_2->setSpacing(6);
+        verticalLayout_2->setObjectName(QStringLiteral("verticalLayout_2"));
+        Btn_MprLinesShow = new QPushButton(Viewer);
+        Btn_MprLinesShow->setObjectName(QStringLiteral("Btn_MprLinesShow"));
+        sizePolicy1.setHeightForWidth(Btn_MprLinesShow->sizePolicy().hasHeightForWidth());
+        Btn_MprLinesShow->setSizePolicy(sizePolicy1);
+        Btn_MprLinesShow->setMinimumSize(QSize(50, 50));
+        Btn_MprLinesShow->setMaximumSize(QSize(50, 50));
+        QIcon icon12;
+        icon12.addFile(QStringLiteral("Image/appbar.resource.png"), QSize(), QIcon::Normal, QIcon::Off);
+        Btn_MprLinesShow->setIcon(icon12);
+        Btn_MprLinesShow->setIconSize(QSize(60, 60));
+        Btn_MprLinesShow->setCheckable(true);
+        Btn_MprLinesShow->setChecked(true);
+        Btn_MprLinesShow->setProperty("ToolButton", QVariant(true));
+
+        verticalLayout_2->addWidget(Btn_MprLinesShow);
+
+        horizontalLayout_4 = new QHBoxLayout();
+        horizontalLayout_4->setSpacing(6);
+        horizontalLayout_4->setObjectName(QStringLiteral("horizontalLayout_4"));
+        horizontalLayout_2 = new QHBoxLayout();
+        horizontalLayout_2->setSpacing(6);
+        horizontalLayout_2->setObjectName(QStringLiteral("horizontalLayout_2"));
+        label = new QLabel(Viewer);
+        label->setObjectName(QStringLiteral("label"));
+        label->setProperty("uiLable", QVariant(true));
+
+        horizontalLayout_2->addWidget(label);
+
+        comboBox = new QComboBox(Viewer);
+        comboBox->setObjectName(QStringLiteral("comboBox"));
+        comboBox->setMinimumSize(QSize(0, 20));
+
+        horizontalLayout_2->addWidget(comboBox);
+
+        horizontalLayout_2->setStretch(0, 2);
+        horizontalLayout_2->setStretch(1, 8);
+
+        horizontalLayout_4->addLayout(horizontalLayout_2);
+
+        horizontalLayout_3 = new QHBoxLayout();
+        horizontalLayout_3->setSpacing(6);
+        horizontalLayout_3->setObjectName(QStringLiteral("horizontalLayout_3"));
+        label_2 = new QLabel(Viewer);
+        label_2->setObjectName(QStringLiteral("label_2"));
+        label_2->setProperty("uiLable", QVariant(true));
+
+        horizontalLayout_3->addWidget(label_2);
+
+        comboBox_2 = new QComboBox(Viewer);
+        comboBox_2->setObjectName(QStringLiteral("comboBox_2"));
+        comboBox_2->setMinimumSize(QSize(0, 20));
+
+        horizontalLayout_3->addWidget(comboBox_2);
+
+        horizontalLayout_3->setStretch(0, 2);
+        horizontalLayout_3->setStretch(1, 8);
+
+        horizontalLayout_4->addLayout(horizontalLayout_3);
+
+
+        verticalLayout_2->addLayout(horizontalLayout_4);
+
+
+        verticalLayout_3->addLayout(verticalLayout_2);
+
+
+        verticalLayout_4->addLayout(verticalLayout_3);
 
         OperateTab->addTab(Viewer, QString());
         RenderWidget = new QWidget();
@@ -450,6 +528,7 @@ public:
         QObject::connect(Orientation_L, SIGNAL(clicked()), Workzone, SLOT(Btn_VrOrientationClick()));
         QObject::connect(Orientation_R, SIGNAL(clicked()), Workzone, SLOT(Btn_VrOrientationClick()));
         QObject::connect(VRModeCBox, SIGNAL(currentIndexChanged(QString)), Workzone, SLOT(CB_VrModeChanged(QString)));
+        QObject::connect(Btn_MprLinesShow, SIGNAL(clicked()), Workzone, SLOT(Btn_IsMprLineShow()));
 
         OperateTab->setCurrentIndex(0);
 
@@ -491,6 +570,9 @@ public:
         Img_wl->setText(QString());
         Img_zoom->setText(QString());
         Img_pan->setText(QString());
+        Btn_MprLinesShow->setText(QString());
+        label->setText(QApplication::translate("VisionPacs_3D", "\345\261\202\345\216\232\357\274\232", Q_NULLPTR));
+        label_2->setText(QApplication::translate("VisionPacs_3D", "\346\250\241\345\274\217\357\274\232", Q_NULLPTR));
         OperateTab->setTabText(OperateTab->indexOf(Viewer), QApplication::translate("VisionPacs_3D", "\345\270\270\350\247\204", Q_NULLPTR));
         OperateTab->setTabText(OperateTab->indexOf(RenderWidget), QApplication::translate("VisionPacs_3D", "\346\270\262\346\237\223\346\226\271\346\241\210", Q_NULLPTR));
         menuDICOM->setTitle(QApplication::translate("VisionPacs_3D", "DICOM\346\226\207\344\273\266", Q_NULLPTR));
