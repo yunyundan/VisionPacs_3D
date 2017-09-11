@@ -224,9 +224,13 @@ void Vtk3DWnd::Set3DVRmode(QString sMode)
 		m_pImgResample->GetOutput()->GetScalarRange(range);
 
 		m_pPieceFun->AddPoint(range[0], 0.0, 0.5, 0.0);
-		m_pPieceFun->AddPoint(range[1] / 2, 1.0, 0.5, 0.0);
-		m_pClrTrans->AddRGBSegment(0.0, 1.0, 1.0, 1.0, 255.0, 1.0, 1.0, 1.0);
+		m_pPieceFun->AddPoint(range[0] + 20, 0.0, 0.5, 0.0);
+		m_pPieceFun->AddPoint(range[1] * 0.7, 1.0, 0.5, 0.0);
+
+		m_pClrTrans->AddRGBPoint(range[0], 1.0, 1.0, 1.0, 0.5, 0.0);
+		m_pClrTrans->AddRGBPoint(range[1], 1.0, 1.0, 1.0, 0.5, 0.0);
 		m_pSlicerMapper->SetBlendModeToMaximumIntensity();
+
 		m_pVolProperty->SetIndependentComponents(TRUE);
 		m_pVolProperty->ShadeOn();
 		m_pVolProperty->SetAmbient(0.3);

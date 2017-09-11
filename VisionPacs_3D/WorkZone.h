@@ -27,6 +27,10 @@ private:
 	int m_nOriImageType;			//原始图像类型
 	int m_nDataX, m_nDataY, m_nDataZ;
 
+	int m_nOldSlicePos;	//判断层厚是否发生变化
+
+	bool m_bOblique;
+
 public:
 	void ClearImg(bool bIncludeVR);
 
@@ -52,11 +56,15 @@ private:
 private slots:
 	void Btn_VrOrientationClick();
 	void CB_VrModeChanged(QString sModeName);
-	void Btn_IsMprLineShow();
-
+	void Btn_SetMprState(int nBtnID);
+	void OnMprLinesInfo(MprLinesInfo info);
+	void CB_MprModeChanged(QString sModeName);
+	void OnEditSTChange(double dSliceThick);
+	void OnScrollBarChange(QString sWndName, int nValue);
 signals:
 	void SetWaitProgress(int);
 	void MprLinesShowChange(bool);
+	void ActiveMprOblique(bool);
 };
 
 #endif // WORKZONE_H

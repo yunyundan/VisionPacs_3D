@@ -129,6 +129,9 @@
         <string>常规</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_4">
+        <property name="spacing">
+         <number>3</number>
+        </property>
         <property name="leftMargin">
          <number>0</number>
         </property>
@@ -821,75 +824,96 @@
           <item>
            <layout class="QVBoxLayout" name="verticalLayout_2">
             <item>
-             <widget class="QPushButton" name="Btn_MprLinesShow">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="minimumSize">
-               <size>
-                <width>50</width>
-                <height>50</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>50</width>
-                <height>50</height>
-               </size>
-              </property>
-              <property name="text">
-               <string/>
-              </property>
-              <property name="icon">
-               <iconset>
-                <normaloff>Image/appbar.resource.png</normaloff>Image/appbar.resource.png</iconset>
-              </property>
-              <property name="iconSize">
-               <size>
-                <width>60</width>
-                <height>60</height>
-               </size>
-              </property>
-              <property name="checkable">
-               <bool>true</bool>
-              </property>
-              <property name="checked">
-               <bool>true</bool>
-              </property>
-              <property name="ToolButton" stdset="0">
-               <bool>true</bool>
-              </property>
-             </widget>
+             <layout class="QHBoxLayout" name="horizontalLayout_5">
+              <item>
+               <widget class="QPushButton" name="Btn_MprLinesShow">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>50</width>
+                  <height>50</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>50</width>
+                  <height>50</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="icon">
+                 <iconset>
+                  <normaloff>Image/appbar.resource.png</normaloff>Image/appbar.resource.png</iconset>
+                </property>
+                <property name="iconSize">
+                 <size>
+                  <width>60</width>
+                  <height>60</height>
+                 </size>
+                </property>
+                <property name="checkable">
+                 <bool>true</bool>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+                <property name="ToolButton" stdset="0">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="Btn_ActiveMprOblique">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>50</width>
+                  <height>50</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>50</width>
+                  <height>50</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="icon">
+                 <iconset>
+                  <normaloff>Image/mpr_ob.png</normaloff>Image/mpr_ob.png</iconset>
+                </property>
+                <property name="iconSize">
+                 <size>
+                  <width>50</width>
+                  <height>50</height>
+                 </size>
+                </property>
+                <property name="checkable">
+                 <bool>true</bool>
+                </property>
+                <property name="ToolButton" stdset="0">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </item>
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_4">
-              <item>
-               <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="2,8">
-                <item>
-                 <widget class="QLabel" name="label">
-                  <property name="text">
-                   <string>层厚：</string>
-                  </property>
-                  <property name="uiLable" stdset="0">
-                   <bool>true</bool>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QComboBox" name="comboBox">
-                  <property name="minimumSize">
-                   <size>
-                    <width>0</width>
-                    <height>20</height>
-                   </size>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
-              </item>
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="2,8">
                 <item>
@@ -903,13 +927,23 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QComboBox" name="comboBox_2">
+                 <widget class="QComboBox" name="MprModeCBox">
                   <property name="minimumSize">
                    <size>
                     <width>0</width>
                     <height>20</height>
                    </size>
                   </property>
+                  <item>
+                   <property name="text">
+                    <string>MIP</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>MAP</string>
+                   </property>
+                  </item>
                  </widget>
                 </item>
                </layout>
@@ -977,6 +1011,8 @@
     <slot>Btn_VrOrientationClick()</slot>
     <slot>CB_VrModeChanged(QString)</slot>
     <slot>Btn_IsMprLineShow()</slot>
+    <slot>Btn_ActiveMprOblique()</slot>
+    <slot>CB_MprModeChanged(QString)</slot>
    </slots>
   </customwidget>
  </customwidgets>
@@ -1095,18 +1131,18 @@
    </hints>
   </connection>
   <connection>
-   <sender>Btn_MprLinesShow</sender>
-   <signal>clicked()</signal>
+   <sender>MprModeCBox</sender>
+   <signal>currentIndexChanged(QString)</signal>
    <receiver>Workzone</receiver>
-   <slot>Btn_IsMprLineShow()</slot>
+   <slot>CB_MprModeChanged(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>51</x>
-     <y>448</y>
+     <x>237</x>
+     <y>493</y>
     </hint>
     <hint type="destinationlabel">
-     <x>375</x>
-     <y>448</y>
+     <x>311</x>
+     <y>489</y>
     </hint>
    </hints>
   </connection>

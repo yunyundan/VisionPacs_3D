@@ -7,92 +7,28 @@ public:
 	~OperateMprLines();
 
 private:
-	typedef struct _FPOINT
-	{
-		double x;
-		double y;
-
-		_FPOINT()
-		{
-			x = y = 0.00;
-		}
-
-		QPoint Int()
-		{
-			QPoint t(qRound(x), qRound(y));
-			return t;
-		}
-	}FPOINT;
-
-	typedef struct _MprPoint
-	{
-		FPOINT ImgPt;//这个点对应在图像上
-		QPoint WndPt;//这个点对应到窗口上
-		_MprPoint()
-		{
-			WndPt = QPoint(0, 0);
-		}
-	}MprPoint;
-
-	typedef struct _MprLine//直线
-	{
-		MprPoint pt1;
-		MprPoint pt2;
-		bool bActive;
-
-		_MprLine()
-		{
-			bActive = false;
-		}
-	}MprLine;
-
-	typedef struct _MprTriAngle//三角形
-	{
-		QPoint ptTop;
-		QPoint ptBtm1;
-		QPoint ptBtm2; 
-		bool bActive;
-
-		_MprTriAngle() 
-		{
-			ptTop = QPoint(0, 0);
-			ptBtm1 = QPoint(0, 0);
-			ptBtm2 = QPoint(0, 0);
-			bActive = false;
-		}
-	}MprTriAngle;
-
-	enum MoveObject{
-		HLINE = 0,
-		HSTARTROTATE,
-		HENDROTATE,
-		HTOPSLICE,
-		HBOTTOMSLICE,
-		VLINE,
-		VSTARTROTATE,
-		VENDROTATE,
-		VTOPSLICE,
-		VBOTTOMSLICE,
-		CENTERPOINT
-	};
+	
 
 private:
 	int m_nWndType;	//父窗口的类型
 	bool m_bShow;	//是否显示
+	bool m_bActiveOblique; //是否允许斜切
 	bool m_bInitLines; //是否初始化过
 
 	int m_nNearFactor; //靠近系数
 	bool m_bMousePressed;//鼠标是否按下
-	bool m_bCenterPoint;//中间点是否被选中
 
 	QPoint m_prePt;
 	
-	MoveObject m_moveObject;
+	MoveObject m_moveObject;//移动名称
+
 private:
 	//每个成分的位置
 	MprLine *m_pLineH;
-	MprLine *m_pLineHStartRotate;
-	MprLine *m_pLineHEndRotate;
+	MprPoint *m_ptHStartRotate;
+	MprPoint *m_ptHEndRotate;
+	MprPoint *m_ptHStartInter;
+	MprPoint *m_ptHEndInter;
 	MprLine *m_pLineHSliceTop;
 	MprLine *m_pLineHSliceBottom;
 	MprTriAngle *m_pTriHStartTop;
@@ -101,8 +37,10 @@ private:
 	MprTriAngle *m_pTriHEndBottom;
 
 	MprLine *m_pLineV;
-	MprLine *m_pLineVStartRotate;
-	MprLine *m_pLineVEndRotate;
+	MprPoint *m_ptVStartRotate;
+	MprPoint *m_ptVEndRotate;
+	MprPoint *m_ptVStartInter;
+	MprPoint *m_ptVEndInter;
 	MprLine *m_pLineVSliceTop;
 	MprLine *m_pLineVSliceBottom;
 	MprTriAngle *m_pTriVStartTop;
@@ -125,26 +63,45 @@ private:
 	//颜色部分
 	QColor m_clrLineH;
 	QColor m_clrLineV;
+	QColor m_clrCenter;
 
 	//层厚
-	int m_fSlicePos;
+	int m_nSlicePos;
+
+	//图像分辨率
+	double m_fSpacingX;
+	double m_fSpacingY;
 public:
-	bool RefreshMprLinesPara(RECT rcImg, int nImgWidth, int nImgHeigh);
+	bool RefreshMprLinesPara(RECT rcImg, int nImgWidth, int nImgHeigh, double fspacingX, double fspacingY);
 	void OnMprLinesMousePress(QMouseEvent *event);
 	bool OnMprLinesMouseMove(QMouseEvent *event);
 	void OnMprLinesMouseRelease(QMouseEvent *event);
-
 	void OnMprLinesPaint(QPainter *painter);
 
 public:
 	void SetMprLineShow(bool isShow) { m_bShow = isShow; }
+	void ActiveOblique() { m_bActiveOblique = true; }
+	void DisactiveOblique() { m_bActiveOblique = false; }
 	bool IsMprLineShow() { return m_bShow; }
+	void OutputLineInfo();
+	
+	//设置主线
+	void SetManiLinePos(MoveObject object, MprLine *pLine);
+
+	//设置层厚
+	void SetSliceLinePos(double nSliceThick);
 private:
+	//已知主线，更新两个旋转点的坐标
+	void UpdateRotatePoint(MprLine *pMainLine, MprPoint *ptStartRotate, MprPoint *ptEndRotate);
+
 	//根据窗口类型设置线的颜色
 	void GetLinesColor();
 
 	//图像窗口坐标转换
 	bool ConvertImgToWnd(MprPoint &pt);
+
+	//将窗口坐标转换为图像坐标
+	bool ConvertWndToImg(MprPoint &pt);
 
 	//已知线段p1-p2,在内侧与p1、p2相距[线段长度*f，其中1.00>f>0.00]处，求一个高度为nHeight的、底部宽度为nWidth*2的三角形(共4个),箭头朝外,bUseLeft:是要p1-p2方向上，左侧的三角形吗
 	bool GetTrianglePoint(QPoint &p1, QPoint &p2, int iDis, UINT nHeight, UINT nWidth, MprTriAngle &T1, MprTriAngle &T2, bool bUseLeft);
@@ -167,37 +124,46 @@ private:
 	//鼠标位置激活三角形
 	bool GetPointNearTriAngle(QPoint pt);
 	//鼠标位置激活中间点
-	bool GetPointNearCenter(QPoint pt);
+	bool GetPointNearPoint(QPoint pt);
 
 	//判断是否为靠近
 	bool DistanceToLines(MprLine* pLine, QPoint pt);
 	bool DistanceToTriangle(MprTriAngle *pTriangle, QPoint pt);
+	bool DistanceToPoint(MprPoint *ptMpr,QPoint pt, int nDistance);
 	float Dist2(QPoint pt1, QPoint pt2);
 
 	//移动主直线
 	void MoveMainLines(QPoint deltaPt);
 
 	//移动中心点
-	void MoveCenterPt(int hPos, int vPos);
+	void MoveCenterPt(QPoint pt);
+	//已知直线，求过直线外一点与此直线平行直线
+	void GetParalleLine(MprLine *pMainLine, MprPoint *pt, MprPoint &pParalleLinePt1, MprPoint &pParalleLinePt2);
 
 	//移动层厚线
 	void MoveSliceTriangle(QPoint deltaPt);
-	void CalSliceLine(MprLine *pMainLine,MprLine *pTopSlice, MprTriAngle *pTriST, MprTriAngle *pTriET, MprLine *pBottomSlice, MprTriAngle *pTriSB, MprTriAngle *pTriEB);
-
+	void CalSliceLine(MprPoint *pStart, MprPoint *pEnd, MprLine *pTopSlice, MprTriAngle *pTriST, MprTriAngle *pTriET, MprLine *pBottomSlice, MprTriAngle *pTriSB, MprTriAngle *pTriEB);
+	void CalDistanceOfParalleLine(QPoint pPt, MprLine *pLine, int &fdistance);
 	//移动旋转线
 	void MoveRotateLine(QPoint pt);
 
 	//已知矩形内部任意两点，求所在直线与矩形的两个交点
 	bool GetLineAcrossRc(RECT rc, QPoint p1, QPoint p2, QPoint &retP1, QPoint &retP2);
 
-	//重新求主线和旋转线
-	bool ReCalMainAndRotateLines(MprLine *pNewLine, MprLine *pMainLine, MprLine *pStartRotate, MprLine *pEndRotate);
+	//重新求层厚点
+	bool ReCalInterPoint(MprLine *pManiLine, MprPoint *pStartInter, MprPoint *pEndInter);
 
 	//已知线段p1-p2,求与p1距离为nLen的、并且靠近p2的一个点	
 	bool GetInterPtByLength(QPoint &p1, QPoint &p2, double nLen,QPoint &RetPt);
 
 	//判断此点是否在rc去欲孽
 	bool IsPointInRc(RECT rc, QPoint pt);
+
+	//将所有组件的窗口坐标转为图像坐标
+	void AllCovertWndToImg();
+
+signals:
+	void MprLinesInfoOutput(MprLinesInfo);
 };
 
 

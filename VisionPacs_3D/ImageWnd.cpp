@@ -9,7 +9,6 @@
 
 #include "AppConfig.h"
 
-
 extern RECT GetShowRcByImgSize(RECT rc, double ImgWidth, double ImgHeight);
 
 ImageWnd::ImageWnd(QWidget *parent):
@@ -66,8 +65,10 @@ ImageWnd::~ImageWnd()
 void ImageWnd::paintEvent(QPaintEvent *event)
 {
 	QPainter painter(this);
-	if (m_pPixmap == NULL)
-		m_pPixmap = new QPixmap(size());
+	QSize s = size();
+	if (m_pPixmap )
+		delete m_pPixmap;
+	m_pPixmap = new QPixmap(size());
 	m_pPixmap->fill(Qt::black);
 	painter.drawPixmap(QPoint(0, 0), *m_pPixmap);
 
@@ -110,6 +111,17 @@ void ImageWnd::paintEvent(QPaintEvent *event)
 			m_pOperateLines->OnMprLinesPaint(&painter);
 		}
 	}
+}
+
+void ImageWnd::resizeEvent(QResizeEvent* size)
+{
+	if (m_pImg)
+	{
+		QSize deltaSize = size->size() - size->oldSize();
+		m_pImg->SetWndRc(CalDisplayRect(m_pImg));
+		ReSetPosCorInfo(deltaSize);
+	}
+	update();
 }
 
 void ImageWnd::mousePressEvent(QMouseEvent *event)
@@ -395,13 +407,14 @@ int ImageWnd::SetImage(CHsImage *pImg)
 		{
 			m_pImg->Hs_Reload(0);
 		}
+
 		RECT rc = CalDisplayRect(m_pImg);
 		m_pImg->SetWndRc(rc);
 
 		RefreshCornorInfoWidget();
-	}		
-	update();
+	}	
 
+	update();
 	return Ret_Success;
 }
 
@@ -504,7 +517,7 @@ void ImageWnd::ConvertCoord(long *x1, long *y1, long *x2, long *y2, bool bFromHw
 	}
 }
 
-void ImageWnd::setOperate(QString operate)
+void ImageWnd::SetOperate(QString operate)
 {
 	if (operate.compare("Img_location") == 0)
 		m_nLeftButtonInteractionStyle = LOCTION_INTERACTION;
@@ -594,16 +607,31 @@ int ImageWnd::CalcAndShowNormalImg(QString sWndName, int nOriImgType, int iImgIn
 		m_pNormalMaker = new CHsNormalMprMaker();
 		m_pNormalMaker->InitParaAndData(m_vOriImg, m_p3DArray, m_p3DImgData, m_nImgWndType, nOriImgType);
 	}
+	
+	m_pNormalMaker->GetShowImage(m_pImg, iImgIndex, iSlice);
 
 	if (m_pOperateLines == NULL)
 	{
-		m_pOperateLines = new OperateMprLines(this,m_nImgWndType);
+		m_pOperateLines = new OperateMprLines(this, m_nImgWndType);
+		connect(m_pOperateLines, SIGNAL(MprLinesInfoOutput(MprLinesInfo)), this->parent()->parent(), SLOT(OnMprLinesInfo(MprLinesInfo)));
 	}
-	
-	m_pNormalMaker->GetShowImage(m_pImg, iImgIndex, iSlice);		
+
 	SetImage(m_pImg);
 
 	return 0;
+}
+
+void ImageWnd::SetMprMode(QString sModeName)
+{
+	if (m_pNormalMaker == NULL)
+		return;
+
+	if (sModeName.compare("MIP") == 0)
+		m_pNormalMaker->m_nMprMode = 0;
+	else if (sModeName.compare("MAP") == 0)
+		m_pNormalMaker->m_nMprMode = 1;
+
+	SetImage(m_pImg);
 }
 
 void ImageWnd::RefreshCornorInfoWidget()
@@ -627,11 +655,11 @@ void ImageWnd::RefreshCornorInfoWidget()
 			else if (m_vCornorEdit[i].sName == "zoomfactor")
 				m_vCornorEdit[i].qEdit->setText(QString::number(m_pImg->m_ImgState.fZoomX,'f',2));
 			else if (m_vCornorEdit[i].sName == "slicethick")
-				m_vCornorEdit[i].qEdit->setText(QString::number(m_pImg->m_fSilceThick, 'f', 2));
+				m_vCornorEdit[i].qEdit->setText(QString::number(m_pImg->m_fCurSliceThick, 'f', 2));
 			else if (m_vCornorEdit[i].sName == "imageindex")
 			{
-				m_vCornorEdit[i].qLabel->setText(QString("Index:%1").arg(m_nCurImgIndex));
-				m_vCornorEdit[i].qLabel->adjustSize();
+				m_vCornorEdit[i].qPreLabel->setText(QString("Index:%1").arg(m_nCurImgIndex));
+				m_vCornorEdit[i].qPreLabel->adjustSize();
 			}			
 		}
 	}
@@ -671,6 +699,7 @@ void ImageWnd::InitNormalCorInfo()
 					rcLocation = QRect(rect().right() - rcLable.width() - 2, rect().bottom() - rcLable.height()*(mapRow.size() - iter->first + 1) - 2, rcLable.width(), rcLable.height());
 				label->setGeometry(rcLocation);
 				label->show();
+				m_mapInfoLabel[label] = corInfo.sPos;
 			}
 			else
 			{
@@ -689,6 +718,7 @@ void ImageWnd::InitNormalCorInfo()
 					rcWcLable = QRect(2, rect().bottom() - rcWcLable.height()*(mapRow.size() - iter->first + 1) - 2, rcWcLable.width(), rcWcLable.height());
 					wcLabel->setGeometry(rcWcLable);
 					wcLabel->show();
+					m_mapInfoLabel[wcLabel] = corInfo.sPos;
 					//创建窗宽LineEdit，为了更好地控制控件长度，先用edit得到长度
 					QLabel *tLabel = new QLabel(this);
 					tLabel->setFont(ft);
@@ -704,8 +734,9 @@ void ImageWnd::InitNormalCorInfo()
 					qWwLineEdit->setText(ww);
 					qWwLineEdit->setGeometry(QRect(rcWcLable.right(), rect().bottom() - rcWcLable.height()*(mapRow.size() - iter->first + 1) - 2, tRC.width() + 4, tRC.height()));
 					qWwLineEdit->show();
-					QObject::connect(qWwLineEdit, SIGNAL(textChanged(const QString &)), this, SLOT(OnEditTextChanged(const QString &)));
-					QObject::connect(qWwLineEdit, SIGNAL(editingFinished()), this, SLOT(OnEditFinished()));
+					m_mapInfoEdit[qWwLineEdit] = corInfo.sPos;
+					connect(qWwLineEdit, SIGNAL(textChanged(const QString &)), this, SLOT(OnEditTextChanged(const QString &)));
+					connect(qWwLineEdit, SIGNAL(editingFinished()), this, SLOT(OnEditFinished()));
 					QEDITITEM wwitem;
 					wwitem.sName = "ww";
 					wwitem.qEdit = qWwLineEdit;
@@ -719,8 +750,9 @@ void ImageWnd::InitNormalCorInfo()
 					rcSplite = QRect(qWwLineEdit->geometry().right(), rect().bottom() - rcSplite.height()*(mapRow.size() - iter->first + 1) - 2, rcSplite.width(), rcSplite.height());
 					wcSplite->setGeometry(rcSplite);
 					wcSplite->show();
-					wwitem.qLabel = wcSplite;
+					wwitem.qPreLabel = wcSplite;
 					m_vCornorEdit.push_back(wwitem);
+					m_mapInfoLabel[wcSplite] = corInfo.sPos;
 					//创建窗位LineEdit，为了更好地控制控件长度，先用edit得到长度
 					tLabel->setText(wc);
 					tLabel->adjustSize();
@@ -734,8 +766,9 @@ void ImageWnd::InitNormalCorInfo()
 					qWcLineEdit->setText(wc);
 					qWcLineEdit->setGeometry(QRect(rcSplite.right() + 2, rect().bottom() - rcSplite.height()*(mapRow.size() - iter->first + 1) - 2, tRC.width() + 4, tRC.height()));
 					qWcLineEdit->show();
-					QObject::connect(qWcLineEdit, SIGNAL(textChanged(const QString &)), this, SLOT(OnEditTextChanged(const QString &)));
-					QObject::connect(qWcLineEdit, SIGNAL(editingFinished()), this, SLOT(OnEditFinished()));
+					m_mapInfoEdit[qWcLineEdit] = corInfo.sPos;
+					connect(qWcLineEdit, SIGNAL(textChanged(const QString &)), this, SLOT(OnEditTextChanged(const QString &)));
+					connect(qWcLineEdit, SIGNAL(editingFinished()), this, SLOT(OnEditFinished()));
 					QEDITITEM wcitem;
 					wcitem.sName = "wc";
 					wcitem.qEdit = qWcLineEdit;
@@ -746,7 +779,7 @@ void ImageWnd::InitNormalCorInfo()
 			if (iter->second.sType.compare("slicethick") == 0)
 			{
 				//创建层厚LineEdit，为了更好地控制控件长度，先用edit得到长度
-				QString sSt = QString::number(m_pImg->m_fSilceThick, 'f', 2);
+				QString sSt = QString::number(m_pImg->m_fCurSliceThick, 'f', 2);
 				QLabel *tLabel = new QLabel(this);
 				tLabel->setFont(ft);
 				tLabel->setAlignment(Qt::AlignLeft);
@@ -755,7 +788,7 @@ void ImageWnd::InitNormalCorInfo()
 				QRect tRC = tLabel->geometry();
 				delete tLabel;
 				QLineEdit *qStLineEdit = new QLineEdit(this);
-				tLabel->setObjectName("slicethick");
+				qStLineEdit->setObjectName("slicethick");
 				qStLineEdit->setFont(ft);
 				qStLineEdit->setAlignment(Qt::AlignLeft);
 				QDoubleValidator *pDoubleValidator = new QDoubleValidator(qStLineEdit);
@@ -766,6 +799,7 @@ void ImageWnd::InitNormalCorInfo()
 				qStLineEdit->setText(sSt);
 				qStLineEdit->setGeometry(QRect(2, rect().bottom() - tRC.height()*(mapRow.size() - iter->first + 1) - 2, tRC.width() + 4, tRC.height()));
 				qStLineEdit->show();
+				m_mapInfoEdit[qStLineEdit] = corInfo.sPos;
 				QObject::connect(qStLineEdit, SIGNAL(textChanged(const QString &)), this, SLOT(OnEditTextChanged(const QString &)));
 				QObject::connect(qStLineEdit, SIGNAL(editingFinished()), this, SLOT(OnEditFinished()));
 				//层厚单位Label
@@ -778,10 +812,11 @@ void ImageWnd::InitNormalCorInfo()
 				rcStUnit = QRect(qStLineEdit->geometry().right(), rect().bottom() - rcStUnit.height()*(mapRow.size() - iter->first + 1) - 2, rcStUnit.width(), rcStUnit.height());
 				stUnit->setGeometry(rcStUnit);
 				stUnit->show();
+				m_mapInfoLabel[stUnit] = corInfo.sPos;
 				QEDITITEM stitem;
 				stitem.sName = "slicethick";
 				stitem.qEdit = qStLineEdit;
-				stitem.qLabel = stUnit;
+				stitem.qPreLabel = stUnit;
 				m_vCornorEdit.push_back(stitem);
 			}
 
@@ -807,6 +842,7 @@ void ImageWnd::InitNormalCorInfo()
 				qZfLineEdit->setText(sZf);
 				qZfLineEdit->setGeometry(QRect(rect().right() - tRC.width() - 4, rect().bottom() - tRC.height()*(mapRow.size() - iter->first + 1) - 2, tRC.width() + 4, tRC.height()));
 				qZfLineEdit->show();
+				m_mapInfoEdit[qZfLineEdit] = corInfo.sPos;
 				QObject::connect(qZfLineEdit, SIGNAL(textChanged(const QString &)), this, SLOT(OnEditTextChanged(const QString &)));
 				QObject::connect(qZfLineEdit, SIGNAL(editingFinished()), this, SLOT(OnEditFinished()));
 				QEDITITEM zfitem;
@@ -832,6 +868,7 @@ void ImageWnd::InitNormalCorInfo()
 				QRect zfRC = zfLabel->geometry();
 				zfLabel->setGeometry(QRect(rect().right() - zfRC.width(), rect().bottom() - zfRC.height()*(mapRow.size() - iter->first + 1) - 2, zfRC.width(), zfRC.height()));
 				zfLabel->show();
+				m_mapInfoLabel[zfLabel] = corInfo.sPos;
 			}
 
 
@@ -846,9 +883,10 @@ void ImageWnd::InitNormalCorInfo()
 				QRect indexRC = indexLabel->geometry();
 				indexLabel->setGeometry(2, 2 + indexRC.height()*(iter->first - 1), indexRC.width(), indexRC.height());
 				indexLabel->show();
+				m_mapInfoLabel[indexLabel] = corInfo.sPos;
 				QEDITITEM zfitem;
 				zfitem.sName = "imageindex";
-				zfitem.qLabel = indexLabel;
+				zfitem.qPreLabel = indexLabel;
 				m_vCornorEdit.push_back(zfitem);
 			}
 		}
@@ -885,6 +923,7 @@ void ImageWnd::InitPosCorInfo()
 	QRect tRC = tLabel->geometry();
 	tLabel->setGeometry((rect().right() - tRC.width())/2, 2, tRC.width(), tRC.height());
 	tLabel->show();
+	m_mapInfoLabel[tLabel] = "TC";
 
 	QLabel *rLabel = new QLabel(this);
 	rLabel->setFont(ft);
@@ -894,6 +933,7 @@ void ImageWnd::InitPosCorInfo()
 	tRC = rLabel->geometry();
 	rLabel->setGeometry(rect().right()-2-tRC.width(), (rect().height()-tRC.height())/2, tRC.width(), tRC.height());
 	rLabel->show();
+	m_mapInfoLabel[rLabel] = "RC";
 
 	QLabel *bLabel = new QLabel(this);
 	bLabel->setFont(ft);
@@ -903,6 +943,7 @@ void ImageWnd::InitPosCorInfo()
 	tRC = bLabel->geometry();
 	bLabel->setGeometry((rect().right() - tRC.width()) / 2, rect().bottom()-tRC.height()-2 , tRC.width(), tRC.height());
 	bLabel->show();
+	m_mapInfoLabel[bLabel] = "BC";
 
 	QLabel *lLabel = new QLabel(this);
 	lLabel->setFont(ft);
@@ -912,6 +953,101 @@ void ImageWnd::InitPosCorInfo()
 	tRC = lLabel->geometry();
 	lLabel->setGeometry( 2, (rect().height() - tRC.height()) / 2, tRC.width(), tRC.height());
 	lLabel->show();
+	m_mapInfoLabel[bLabel] = "LC";
+}
+
+void ImageWnd::ReSetPosCorInfo(QSize deltaSize)
+{
+	map <QLabel*, QString>::iterator  labeIter;
+	for (labeIter = m_mapInfoLabel.begin(); labeIter != m_mapInfoLabel.end(); labeIter++)
+	{
+		if (labeIter->second.compare("RT") == 0 && deltaSize.width() != 0)
+		{
+			QRect oldRc = labeIter->first->geometry();
+			QRect newRc = oldRc;
+			newRc.setLeft(oldRc.left() + deltaSize.width());
+			newRc.setWidth(oldRc.width());
+			labeIter->first->setGeometry(newRc);
+		}
+		else if (labeIter->second.compare("LB") == 0 && deltaSize.height() != 0)
+		{
+			QRect oldRc = labeIter->first->geometry();
+			QRect newRc = oldRc;
+			newRc.setTop(oldRc.top() + deltaSize.height());
+			newRc.setHeight(oldRc.height());
+			labeIter->first->setGeometry(newRc);
+		}
+		else if (labeIter->second.compare("RB") == 0 && (deltaSize.height() != 0 || deltaSize.width() != 0))
+		{
+			QRect oldRc = labeIter->first->geometry();
+			QRect newRc = oldRc;
+			newRc.setLeft(oldRc.left() + deltaSize.width());
+			newRc.setWidth(oldRc.width());
+			newRc.setTop(oldRc.top() + deltaSize.height());
+			newRc.setHeight(oldRc.height());
+			labeIter->first->setGeometry(newRc);
+		}
+
+		if (labeIter->second.compare("TC") == 0 && deltaSize.width() != 0)
+		{
+			QRect oldRc = labeIter->first->geometry();
+			QRect newRc = oldRc;
+			newRc.setLeft(oldRc.left() + deltaSize.width());
+			newRc.setWidth(oldRc.width());
+			labeIter->first->setGeometry(newRc);
+		}
+		else if (labeIter->second.compare("LC") == 0 && deltaSize.height() != 0)
+		{
+			QRect oldRc = labeIter->first->geometry();
+			QRect newRc = oldRc;
+			newRc.setTop(oldRc.top() + deltaSize.height());
+			newRc.setHeight(oldRc.height());
+			labeIter->first->setGeometry(newRc);
+		}
+		else if ((labeIter->second.compare("BC") == 0 || labeIter->second.compare("RC") == 0) && (deltaSize.height() != 0 || deltaSize.width() != 0))
+		{
+			QRect oldRc = labeIter->first->geometry();
+			QRect newRc = oldRc;
+			newRc.setLeft(oldRc.left() + deltaSize.width());
+			newRc.setWidth(oldRc.width());
+			newRc.setTop(oldRc.top() + deltaSize.height());
+			newRc.setHeight(oldRc.height());
+			labeIter->first->setGeometry(newRc);
+		}
+	}
+
+	map <QLineEdit*, QString>::iterator  editIter;
+	for (editIter = m_mapInfoEdit.begin(); editIter != m_mapInfoEdit.end(); editIter++)
+	{
+		if (editIter->second.compare("RT") == 0 && deltaSize.width() != 0)
+		{
+			QRect oldRc = editIter->first->geometry();
+			QRect newRc = oldRc;
+			newRc.setLeft(oldRc.left() + deltaSize.width());
+			newRc.setWidth(oldRc.width());
+			editIter->first->setGeometry(newRc);
+		}
+		else if (editIter->second.compare("LB") == 0 && deltaSize.height() != 0)
+		{
+			QRect oldRc = editIter->first->geometry();
+			QRect newRc = oldRc;
+			newRc.setTop(oldRc.top() + deltaSize.height());
+			newRc.setHeight(oldRc.height());
+			editIter->first->setGeometry(newRc);
+		}
+		else if (editIter->second.compare("RB") == 0 && (deltaSize.height() != 0 || deltaSize.width() != 0))
+		{
+			QRect oldRc = editIter->first->geometry();
+			QRect newRc = oldRc;
+			newRc.setLeft(oldRc.left() + deltaSize.width());
+			newRc.setWidth(oldRc.width());
+			newRc.setTop(oldRc.top() + deltaSize.height());
+			newRc.setHeight(oldRc.height());
+			editIter->first->setGeometry(newRc);
+		}
+	}
+
+
 }
 
 int ImageWnd::ArrangeCorinfo(CORNORINFO corInfo, map<int, ROWITEM> &mapRow)
@@ -971,9 +1107,9 @@ void ImageWnd::OnEditTextChanged(const QString &sText)
 		rcEdit.setWidth(tRc.width() + 4);
 		edit->setGeometry(rcEdit);
 		delete tLabel;
-		QRect rcLabel = ww.qLabel->geometry();
-		ww.qLabel->setGeometry(QRect(rcEdit.right(), rcLabel.top(), rcLabel.width(), rcLabel.height()));
-		rcLabel = ww.qLabel->geometry();
+		QRect rcLabel = ww.qPreLabel->geometry();
+		ww.qPreLabel->setGeometry(QRect(rcEdit.right(), rcLabel.top(), rcLabel.width(), rcLabel.height()));
+		rcLabel = ww.qPreLabel->geometry();
 		rcEdit = wc.qEdit->geometry();
 		wc.qEdit->setGeometry(QRect(rcLabel.right(), rcEdit.top(), rcEdit.width(), rcEdit.height()));
 	}
@@ -994,8 +1130,8 @@ void ImageWnd::OnEditTextChanged(const QString &sText)
 				rcEdit.setWidth(tRc.width() + 4);
 				edit->setGeometry(rcEdit);
 				delete tLabel;
-				QRect rcLabel = st.qLabel->geometry();
-				st.qLabel->setGeometry(QRect(rcEdit.right(), rcLabel.top(),rcLabel.width(),rcLabel.height()));
+				QRect rcLabel = st.qPreLabel->geometry();
+				st.qPreLabel->setGeometry(QRect(rcEdit.right(), rcLabel.top(),rcLabel.width(),rcLabel.height()));
 				break;
 			}
 		}
@@ -1048,6 +1184,11 @@ void ImageWnd::OnEditFinished()
 		m_pImg->m_ImgState.fZoomX = fZf;
 		m_pImg->SetWndRc(CalDisplayRect(m_pImg));
 	}
+	else if (sName.compare("slicethick") == 0)
+	{
+		double fSliceThick = edit->text().toDouble();
+		emit ImageThickChange(fSliceThick);
+	}
 	edit->clearFocus();
 	update();
 }
@@ -1060,4 +1201,7 @@ void ImageWnd::OnMprLinesShow(bool isShow)
 	}
 	update();
 }
+
+
+
 

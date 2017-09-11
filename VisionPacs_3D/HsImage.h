@@ -63,7 +63,8 @@ public:
 	void Hs_GetCornerInfo(bool bFrist);
 
 	//层厚
-	float m_fSilceThick;
+	float m_fOriSilceThick;
+	float m_fCurSliceThick;
 
 	//设置、获取所属窗体
 	void SetBelongWnd(ImageWnd *pWnd) { m_pBelongWnd = pWnd; }

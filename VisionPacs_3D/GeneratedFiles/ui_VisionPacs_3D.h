@@ -68,14 +68,13 @@ public:
     QPushButton *Img_zoom;
     QPushButton *Img_pan;
     QVBoxLayout *verticalLayout_2;
+    QHBoxLayout *horizontalLayout_5;
     QPushButton *Btn_MprLinesShow;
+    QPushButton *Btn_ActiveMprOblique;
     QHBoxLayout *horizontalLayout_4;
-    QHBoxLayout *horizontalLayout_2;
-    QLabel *label;
-    QComboBox *comboBox;
     QHBoxLayout *horizontalLayout_3;
     QLabel *label_2;
-    QComboBox *comboBox_2;
+    QComboBox *MprModeCBox;
     QWidget *RenderWidget;
     QHBoxLayout *RenderWHLayout;
     QVBoxLayout *RenderVLayout;
@@ -138,7 +137,7 @@ public:
         Viewer->setObjectName(QStringLiteral("Viewer"));
         Viewer->setStyleSheet(QStringLiteral(""));
         verticalLayout_4 = new QVBoxLayout(Viewer);
-        verticalLayout_4->setSpacing(6);
+        verticalLayout_4->setSpacing(3);
         verticalLayout_4->setContentsMargins(11, 11, 11, 11);
         verticalLayout_4->setObjectName(QStringLiteral("verticalLayout_4"));
         verticalLayout_4->setContentsMargins(0, 0, 0, 0);
@@ -422,6 +421,9 @@ public:
         verticalLayout_2 = new QVBoxLayout();
         verticalLayout_2->setSpacing(6);
         verticalLayout_2->setObjectName(QStringLiteral("verticalLayout_2"));
+        horizontalLayout_5 = new QHBoxLayout();
+        horizontalLayout_5->setSpacing(6);
+        horizontalLayout_5->setObjectName(QStringLiteral("horizontalLayout_5"));
         Btn_MprLinesShow = new QPushButton(Viewer);
         Btn_MprLinesShow->setObjectName(QStringLiteral("Btn_MprLinesShow"));
         sizePolicy1.setHeightForWidth(Btn_MprLinesShow->sizePolicy().hasHeightForWidth());
@@ -436,31 +438,29 @@ public:
         Btn_MprLinesShow->setChecked(true);
         Btn_MprLinesShow->setProperty("ToolButton", QVariant(true));
 
-        verticalLayout_2->addWidget(Btn_MprLinesShow);
+        horizontalLayout_5->addWidget(Btn_MprLinesShow);
+
+        Btn_ActiveMprOblique = new QPushButton(Viewer);
+        Btn_ActiveMprOblique->setObjectName(QStringLiteral("Btn_ActiveMprOblique"));
+        sizePolicy1.setHeightForWidth(Btn_ActiveMprOblique->sizePolicy().hasHeightForWidth());
+        Btn_ActiveMprOblique->setSizePolicy(sizePolicy1);
+        Btn_ActiveMprOblique->setMinimumSize(QSize(50, 50));
+        Btn_ActiveMprOblique->setMaximumSize(QSize(50, 50));
+        QIcon icon13;
+        icon13.addFile(QStringLiteral("Image/mpr_ob.png"), QSize(), QIcon::Normal, QIcon::Off);
+        Btn_ActiveMprOblique->setIcon(icon13);
+        Btn_ActiveMprOblique->setIconSize(QSize(50, 50));
+        Btn_ActiveMprOblique->setCheckable(true);
+        Btn_ActiveMprOblique->setProperty("ToolButton", QVariant(true));
+
+        horizontalLayout_5->addWidget(Btn_ActiveMprOblique);
+
+
+        verticalLayout_2->addLayout(horizontalLayout_5);
 
         horizontalLayout_4 = new QHBoxLayout();
         horizontalLayout_4->setSpacing(6);
         horizontalLayout_4->setObjectName(QStringLiteral("horizontalLayout_4"));
-        horizontalLayout_2 = new QHBoxLayout();
-        horizontalLayout_2->setSpacing(6);
-        horizontalLayout_2->setObjectName(QStringLiteral("horizontalLayout_2"));
-        label = new QLabel(Viewer);
-        label->setObjectName(QStringLiteral("label"));
-        label->setProperty("uiLable", QVariant(true));
-
-        horizontalLayout_2->addWidget(label);
-
-        comboBox = new QComboBox(Viewer);
-        comboBox->setObjectName(QStringLiteral("comboBox"));
-        comboBox->setMinimumSize(QSize(0, 20));
-
-        horizontalLayout_2->addWidget(comboBox);
-
-        horizontalLayout_2->setStretch(0, 2);
-        horizontalLayout_2->setStretch(1, 8);
-
-        horizontalLayout_4->addLayout(horizontalLayout_2);
-
         horizontalLayout_3 = new QHBoxLayout();
         horizontalLayout_3->setSpacing(6);
         horizontalLayout_3->setObjectName(QStringLiteral("horizontalLayout_3"));
@@ -470,11 +470,11 @@ public:
 
         horizontalLayout_3->addWidget(label_2);
 
-        comboBox_2 = new QComboBox(Viewer);
-        comboBox_2->setObjectName(QStringLiteral("comboBox_2"));
-        comboBox_2->setMinimumSize(QSize(0, 20));
+        MprModeCBox = new QComboBox(Viewer);
+        MprModeCBox->setObjectName(QStringLiteral("MprModeCBox"));
+        MprModeCBox->setMinimumSize(QSize(0, 20));
 
-        horizontalLayout_3->addWidget(comboBox_2);
+        horizontalLayout_3->addWidget(MprModeCBox);
 
         horizontalLayout_3->setStretch(0, 2);
         horizontalLayout_3->setStretch(1, 8);
@@ -528,7 +528,7 @@ public:
         QObject::connect(Orientation_L, SIGNAL(clicked()), Workzone, SLOT(Btn_VrOrientationClick()));
         QObject::connect(Orientation_R, SIGNAL(clicked()), Workzone, SLOT(Btn_VrOrientationClick()));
         QObject::connect(VRModeCBox, SIGNAL(currentIndexChanged(QString)), Workzone, SLOT(CB_VrModeChanged(QString)));
-        QObject::connect(Btn_MprLinesShow, SIGNAL(clicked()), Workzone, SLOT(Btn_IsMprLineShow()));
+        QObject::connect(MprModeCBox, SIGNAL(currentIndexChanged(QString)), Workzone, SLOT(CB_MprModeChanged(QString)));
 
         OperateTab->setCurrentIndex(0);
 
@@ -571,8 +571,13 @@ public:
         Img_zoom->setText(QString());
         Img_pan->setText(QString());
         Btn_MprLinesShow->setText(QString());
-        label->setText(QApplication::translate("VisionPacs_3D", "\345\261\202\345\216\232\357\274\232", Q_NULLPTR));
+        Btn_ActiveMprOblique->setText(QString());
         label_2->setText(QApplication::translate("VisionPacs_3D", "\346\250\241\345\274\217\357\274\232", Q_NULLPTR));
+        MprModeCBox->clear();
+        MprModeCBox->insertItems(0, QStringList()
+         << QApplication::translate("VisionPacs_3D", "MIP", Q_NULLPTR)
+         << QApplication::translate("VisionPacs_3D", "MAP", Q_NULLPTR)
+        );
         OperateTab->setTabText(OperateTab->indexOf(Viewer), QApplication::translate("VisionPacs_3D", "\345\270\270\350\247\204", Q_NULLPTR));
         OperateTab->setTabText(OperateTab->indexOf(RenderWidget), QApplication::translate("VisionPacs_3D", "\346\270\262\346\237\223\346\226\271\346\241\210", Q_NULLPTR));
         menuDICOM->setTitle(QApplication::translate("VisionPacs_3D", "DICOM\346\226\207\344\273\266", Q_NULLPTR));

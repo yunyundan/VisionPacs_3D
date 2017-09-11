@@ -106,6 +106,7 @@ WorkZone::WorkZone(QWidget *parent) :
 	,m_nDataX(0)
 	,m_nDataY(0)
 	,m_nDataZ(0)
+	,m_bOblique(false)
 {
     ui->setupUi(this);
 
@@ -145,6 +146,7 @@ void WorkZone::ProcessImageData()
 		QMessageBox::about(this, "提示", "不能输入1张图像");
 		return;
 	}
+
 	//先确定本序列属于什么断位
 	int nImageNum = m_vImage.size();
 	double dTotalSpacingX = abs(m_vImage[0]->m_ImgInfo.fImagePosition[0] - m_vImage[nImageNum-1]->m_ImgInfo.fImagePosition[0]);
@@ -395,7 +397,9 @@ void WorkZone::InitSignalsAndSlots()
 {
 	for (int i=0; i<m_v2DWnd.size();i++)
 	{
-		QObject::connect(this, SIGNAL(MprLinesShowChange(bool)), m_v2DWnd[i]->GetImageWnd(), SLOT(OnMprLinesShow(bool)));
+		connect(this, SIGNAL(ActiveMprOblique(bool)), m_v2DWnd[i], SLOT(OnActiveMprOblique(bool)));
+		connect(m_v2DWnd[i]->GetImageWnd(), SIGNAL(ImageThickChange(double)), this, SLOT(OnEditSTChange(double)));
+		connect(m_v2DWnd[i], SIGNAL(ScrollBarChange(QString, int)), this, SLOT(OnScrollBarChange(QString, int)));
 	}
 }
 
@@ -412,11 +416,187 @@ void WorkZone::CB_VrModeChanged(QString sModeName)
 	ReRenderVrWnd();
 }
 
-void WorkZone::Btn_IsMprLineShow()
-{	
-	QPushButton *btn = (QPushButton *)sender();
-	bool isDown = btn->isChecked();
-	emit MprLinesShowChange(isDown);
+void WorkZone::Btn_SetMprState(int nBtnID)
+{
+	if ( nBtnID == 0)
+	{
+		m_bOblique = false;
+		emit ActiveMprOblique(false);
+	}
+	else if (nBtnID == 1)
+	{
+		m_bOblique = true;
+		emit ActiveMprOblique(true);
+	}
+}
+
+void WorkZone::OnMprLinesInfo(MprLinesInfo info)
+{
+	int x = info.ptV1.x();
+	int y = info.ptH1.y();
+	double dSliceThick = info.dSliceThick;
+	int nOriRow, nOriCols;
+	if (m_bOblique == false)
+	{
+		if (info.nWndType == ORIIMG_AXIAL)
+		{
+			ui->Coronal_Wnd->SetSliceLinePos(dSliceThick);
+			ui->Coronal_Wnd->SetNormalMainLine(VLINE, x);
+			ui->Sagittal_Wnd->SetSliceLinePos(dSliceThick);
+			ui->Sagittal_Wnd->SetNormalMainLine(VLINE, y);
+			ui->Axial_Wnd->GetImageRowAndCol(nOriRow, nOriCols);
+			if (m_nOriImageType == ORIIMG_CORONAL)
+			{				
+				y = (y*m_vImage.size()) / nOriRow;
+			}			
+			else if (m_nOriImageType == ORIIMG_SAGITTAL)
+			{
+				x = (x*m_vImage.size()) / nOriCols;
+			}
+			ui->Axial_Wnd->SetImageSlice(dSliceThick);
+			ui->Coronal_Wnd->SetImageSlice(dSliceThick);
+			ui->Coronal_Wnd->SetImageIndex(y);
+			ui->Sagittal_Wnd->SetImageSlice(dSliceThick);
+			ui->Sagittal_Wnd->SetImageIndex(x);
+		}
+		else if (info.nWndType == ORIIMG_CORONAL)
+		{
+			ui->Axial_Wnd->SetSliceLinePos(dSliceThick);
+			ui->Axial_Wnd->SetNormalMainLine(VLINE, x);
+			ui->Sagittal_Wnd->SetSliceLinePos(dSliceThick);
+			ui->Sagittal_Wnd->SetNormalMainLine(HLINE, y);
+			ui->Coronal_Wnd->GetImageRowAndCol(nOriRow, nOriCols);
+			if (m_nOriImageType == ORIIMG_AXIAL)
+			{				
+				y = (y*m_vImage.size()) / nOriRow;
+			}
+			else if (m_nOriImageType == ORIIMG_SAGITTAL)
+			{
+				x = (x*m_vImage.size()) / nOriCols;
+			}
+			ui->Axial_Wnd->SetImageSlice(dSliceThick);
+			ui->Axial_Wnd->SetImageIndex(y);
+			ui->Coronal_Wnd->SetImageSlice(dSliceThick);
+			ui->Sagittal_Wnd->SetImageSlice(dSliceThick);
+			ui->Sagittal_Wnd->SetImageIndex(x);
+
+		}
+		else if (info.nWndType == ORIIMG_SAGITTAL)
+		{
+			ui->Axial_Wnd->SetSliceLinePos(dSliceThick);
+			ui->Axial_Wnd->SetNormalMainLine(HLINE, x);
+			ui->Coronal_Wnd->SetSliceLinePos(dSliceThick);
+			ui->Coronal_Wnd->SetNormalMainLine(HLINE, y);
+			ui->Sagittal_Wnd->GetImageRowAndCol(nOriRow, nOriCols);
+			if (m_nOriImageType == ORIIMG_AXIAL)
+			{				
+				y = (y*m_vImage.size()) / nOriRow;
+			}
+			else if (m_nOriImageType == ORIIMG_CORONAL)
+			{
+				x = (x*m_vImage.size()) / nOriCols;
+			}
+			ui->Axial_Wnd->SetImageSlice(dSliceThick);
+			ui->Axial_Wnd->SetImageIndex(y);
+			ui->Coronal_Wnd->SetImageSlice(dSliceThick);
+			ui->Coronal_Wnd->SetImageIndex(x);
+			ui->Sagittal_Wnd->SetImageSlice(dSliceThick);
+		}
+
+		for (int i=0; i<m_v2DWnd.size(); i++)
+		{
+			m_v2DWnd[i]->ReDrawImage();
+		}
+	}
+	else
+	{
+
+	}
+
+}
+
+void WorkZone::CB_MprModeChanged(QString sModeName)
+{
+	for (int i = 0; i<m_v2DWnd.size();i++)
+	{
+		m_v2DWnd[i]->GetImageWnd()->SetMprMode(sModeName);
+		m_v2DWnd[i]->ReDrawImage();
+	}
+}
+
+void WorkZone::OnEditSTChange(double dSliceThick)
+{
+	for (int i = 0; i < m_v2DWnd.size(); i++)
+	{
+		m_v2DWnd[i]->SetSliceLinePos(dSliceThick);
+		m_v2DWnd[i]->SetImageSlice(dSliceThick);
+		m_v2DWnd[i]->ReDrawImage();
+	}
+}
+
+void WorkZone::OnScrollBarChange(QString sWndName, int nValue)
+{
+	for (int i=0; i<m_v2DWnd.size();i++)
+	{
+		if (m_v2DWnd[i]->GetImageWnd()->GetImage() == NULL)
+			return;
+	}
+
+	int nOriRow, nOriCols;
+	int nNewValue = nValue;
+	
+	if (sWndName.compare("Axial_Wnd")==0)
+	{
+		if (m_nOriImageType == ORIIMG_AXIAL)
+		{
+			ui->Coronal_Wnd->GetImageRowAndCol(nOriRow, nOriCols);
+			nNewValue = (nValue*nOriRow) / (m_vImage.size()-1);
+			ui->Coronal_Wnd->SetNormalMainLine(HLINE, nNewValue);
+			ui->Sagittal_Wnd->GetImageRowAndCol(nOriRow, nOriCols);
+			nNewValue = (nValue*nOriRow) / (m_vImage.size()-1);
+			ui->Sagittal_Wnd->SetNormalMainLine(HLINE, nNewValue);
+		}
+		else
+		{
+			ui->Coronal_Wnd->SetNormalMainLine(HLINE, nValue);
+			ui->Sagittal_Wnd->SetNormalMainLine(HLINE, nValue);
+		}
+	}
+	else if (sWndName.compare("Coronal_Wnd") == 0)
+	{
+		if (m_nOriImageType == ORIIMG_CORONAL)
+		{
+			ui->Axial_Wnd->GetImageRowAndCol(nOriRow, nOriCols);
+			nNewValue = (nValue*nOriRow) / (m_vImage.size() - 1);
+			ui->Axial_Wnd->SetNormalMainLine(HLINE, nNewValue);
+			ui->Sagittal_Wnd->GetImageRowAndCol(nOriRow, nOriCols);
+			nNewValue = (nValue*nOriCols) / (m_vImage.size() - 1);
+			ui->Sagittal_Wnd->SetNormalMainLine(VLINE, nNewValue);
+		}
+		else
+		{
+			ui->Axial_Wnd->SetNormalMainLine(HLINE, nValue);
+			ui->Sagittal_Wnd->SetNormalMainLine(VLINE, nValue);
+		}
+	}
+	else if (sWndName.compare("Sagittal_Wnd") == 0)
+	{
+		if (m_nOriImageType == ORIIMG_SAGITTAL)
+		{
+			ui->Axial_Wnd->GetImageRowAndCol(nOriRow, nOriCols);
+			nNewValue = (nValue*nOriCols) / (m_vImage.size() - 1);
+			ui->Axial_Wnd->SetNormalMainLine(VLINE, nNewValue);
+			ui->Coronal_Wnd->GetImageRowAndCol(nOriRow, nOriCols);
+			nNewValue = (nValue*nOriCols) / (m_vImage.size() - 1);
+			ui->Coronal_Wnd->SetNormalMainLine(VLINE, nNewValue);
+		}
+		else
+		{
+			ui->Axial_Wnd->SetNormalMainLine(VLINE, nValue);
+			ui->Coronal_Wnd->SetNormalMainLine(VLINE, nValue);
+		}
+	}
+	
 }
 
 void WorkZone::ReRenderVrWnd()

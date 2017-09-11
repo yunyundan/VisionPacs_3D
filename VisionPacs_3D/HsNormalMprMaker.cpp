@@ -109,27 +109,49 @@ void CHsNormalMprMaker::GetShowImage(CHsImage *pShowImg, int iIndex, int iSliceN
 
 		dSpacingX = dSpacing[0];
 		dSpacingY = dSpacing[1];
-		pShowImg->m_fSilceThick = dSpacing[2];
+		pShowImg->m_fOriSilceThick = dSpacing[2];
+		pShowImg->m_fCurSliceThick = iSliceNum * dSpacing[2];
 
 		if (nSize == 1)
 		{
 			BYTE ***pData = (BYTE ***)m_p3DImgArray;
 			BYTE **pRetData = (BYTE**)ArrayNew(nRows, nCols, nSize);
 
-			for (int s=iStratS; s<=iEndS; s++)
+			long *pRows = new long[iEndS - iStratS + 1];
+			for (int r = 0; r < nRows; r++)
 			{
-				BYTE **pSlice = pData[s];
-				for (int r=0; r<nRows; r++)
+				int nIndex = 0;
+				for (int s = iStratS; s <= iEndS; s++)
 				{
-					BYTE *pRows = pSlice[r];
-					for (int c=0; c<nCols; c++)
+					BYTE **pSlice = pData[s];
+					pRows[nIndex] = long(pSlice[r]);
+					nIndex++;
+				}
+				BYTE **pAllRows = (BYTE**)pRows;
+				for (int c = 0; c < nCols; c++)
+				{
+					if (m_nMprMode == 0)
 					{
-						int iValue = pRows[c];
-						pRetData[r][c] = iValue;
+						int nMax = pAllRows[0][c];
+						for (int n = 1; n < nIndex; n++)
+						{
+							nMax = max(nMax, pAllRows[n][c]);
+						}
+						pRetData[r][c] = nMax;
 					}
+					else if (m_nMprMode == 1)
+					{
+						int nTotle = pAllRows[0][c];
+						for (int n = 1; n < nIndex; n++)
+						{
+							nTotle += pAllRows[n][c];
+						}
+						pRetData[r][c] = nTotle / nIndex;
+					}
+
 				}
 			}
-
+			delete pRows;
 			pShowImg->m_pOriData = (BYTE**)pRetData;
 		}
 		else if (nSize == 2)
@@ -137,53 +159,41 @@ void CHsNormalMprMaker::GetShowImage(CHsImage *pShowImg, int iIndex, int iSliceN
 			short ***pData = (short ***)m_p3DImgArray;
 			short **pRetData = (short**)ArrayNew(nRows, nCols, nSize);			
 
-			for (int s = iStratS; s <= iEndS; s++)
-			{
-				short **pSlice = pData[s];
-				for (int r = 0; r < nRows; r++)
+			long *pRows = new long[iEndS - iStratS + 1];
+			for (int r = 0; r < nRows; r++)
+			{				
+				int nIndex = 0;
+				for (int s = iStratS; s <= iEndS; s++)
 				{
-					short *pRows = pSlice[r];
-					for (int c = 0; c < nCols; c++)
-					{
-						int iValue = pRows[c];
-						if (iValue != 0)
-						{
-							int a = 0;
-						}
-						pRetData[r][c] = iValue;
-					}
+					short **pSlice = pData[s];
+					pRows[nIndex] = long(pSlice[r]);
+					nIndex++;
 				}
-			}
+				short **pAllRows = (short**)pRows;
+				for (int c = 0; c < nCols; c++)
+				{
+					if (m_nMprMode == 0)
+					{
+						int nMax = pAllRows[0][c];
+						for (int n = 1; n < nIndex; n++)
+						{
+							nMax = max(nMax, pAllRows[n][c]);
+						}
+						pRetData[r][c] = nMax;
+					}
+					else if (m_nMprMode == 1)
+					{
+						int nTotle = pAllRows[0][c];
+						for (int n = 1; n < nIndex; n++)
+						{
+							nTotle += pAllRows[n][c];
+						}
+						pRetData[r][c] = nTotle / nIndex;
+					}
 
-			//for (int r = 0; r < nRows; r++)
-			//{
-			//	for (int c = 0; c < nCols; c++)
-			//	{
-			//		vector<int> vPixelValues;
-			//		for (int s = iStratS; s <= iEndS; s++)
-			//		{
-			//			int iValue = pData[s][r][c];
-			//			//int iValue = pData[nOriRows*nOriCols*s + nOriCols *r + c];
-			//			vPixelValues.push_back(iValue);
-			//		}
-			//		if (iSliceNum > 1)
-			//		{
-			//			if (m_nMprMode == 0)
-			//			{
-			//				vector<int>::iterator maxValue = max_element(begin(vPixelValues), end(vPixelValues));
-			//				pRetData[r][c] = *maxValue;
-			//			}
-			//			else if (m_nMprMode == 1)
-			//			{
-			//				double sum = accumulate(begin(vPixelValues), end(vPixelValues), 0.0);
-			//				int mean = sum / vPixelValues.size();
-			//				pRetData[r][c] = mean;
-			//			}
-			//		}
-			//		else
-			//			pRetData[r][c] = vPixelValues[0];
-			//	}
-			//}
+				}				
+			}
+			delete pRows;
 			pShowImg->m_pOriData = (BYTE**)pRetData;
 		}
 	}
@@ -194,27 +204,48 @@ void CHsNormalMprMaker::GetShowImage(CHsImage *pShowImg, int iIndex, int iSliceN
 
 		dSpacingX = dSpacing[0];
 		dSpacingY = dSpacing[2];
-		pShowImg->m_fSilceThick = dSpacing[1];
+		pShowImg->m_fOriSilceThick = dSpacing[1];
+		pShowImg->m_fCurSliceThick = iSliceNum * dSpacing[1];
 
 		if (nSize == 1)
 		{
 			BYTE ***pData = (BYTE ***)m_p3DImgArray;
 			BYTE **pRetData = (BYTE**)ArrayNew(nRows, nCols, nSize);
 
+			long *pRows = new long[iEndS - iStratS + 1];
 			for (int r = 0; r < nRows; r++)
 			{
 				BYTE **pSlice = pData[nRows - 1 - r];
+				int nIndex = 0;
 				for (int s = iStratS; s <= iEndS; s++)
 				{
-					BYTE *pRows = pSlice[s];
-					for (int c = 0; c < nCols; c++)
+					pRows[nIndex] = long(pSlice[s]);
+					nIndex++;
+				}
+				BYTE **pAllRows = (BYTE**)pRows;
+				for (int c = 0; c < nCols; c++)
+				{
+					if (m_nMprMode == 0)
 					{
-						int iValue = pRows[c];
-						pRetData[r][c] = iValue;
+						int nMax = pAllRows[0][c];
+						for (int n = 1; n < nIndex; n++)
+						{
+							nMax = max(nMax, pAllRows[n][c]);
+						}
+						pRetData[r][c] = nMax;
+					}
+					else if (m_nMprMode == 1)
+					{
+						int nTotle = pAllRows[0][c];
+						for (int n = 1; n < nIndex; n++)
+						{
+							nTotle += pAllRows[n][c];
+						}
+						pRetData[r][c] = nTotle / nIndex;
 					}
 				}
 			}
-
+			delete pRows;
 			pShowImg->m_pOriData = (BYTE**)pRetData;
 		}
 		else
@@ -222,44 +253,40 @@ void CHsNormalMprMaker::GetShowImage(CHsImage *pShowImg, int iIndex, int iSliceN
 			short ***pData = (short ***)m_p3DImgArray;
 			short **pRetData = (short**)ArrayNew(nRows, nCols, nSize);
 
+			long *pRows = new long[iEndS - iStratS + 1];
 			for (int r = 0; r < nRows; r++)
 			{
 				short **pSlice = pData[nRows - 1 - r];
+				int nIndex = 0;
 				for (int s = iStratS; s <= iEndS; s++)
 				{
-					short *pRows = pSlice[s];
-					for (int c = 0; c < nCols; c++)
+					pRows[nIndex] = long(pSlice[s]);
+					nIndex++;
+				}
+				short **pAllRows = (short**)pRows;
+				for (int c = 0; c < nCols; c++)
+				{
+					if (m_nMprMode == 0)
 					{
-						int iValue = pRows[c];
-						pRetData[r][c] = iValue;
+						int nMax = pAllRows[0][c];
+						for (int n = 1; n < nIndex; n++)
+						{
+							nMax = max(nMax, pAllRows[n][c]);
+						}
+						pRetData[r][c] = nMax;
+					}
+					else if (m_nMprMode == 1)
+					{
+						int nTotle = pAllRows[0][c];
+						for (int n = 1; n < nIndex; n++)
+						{
+							nTotle += pAllRows[n][c];
+						}
+						pRetData[r][c] = nTotle / nIndex;
 					}
 				}
 			}
-
-			//for (int r = 0; r < nRows; r++)
-			//{
-			//	for (int c = 0; c < nCols; c++)
-			//	{
-			//		vector<int> vPixelValues;
-			//		for (int s = iStratS; s <= iEndS; s++)
-			//		{
-			//			int iValue = pData[nRows - 1 - r][s][c];
-			//			//int iValue = pData[nOriRows*nOriCols*(nRows - 1 - r) + nOriCols*s + c];
-			//			vPixelValues.push_back(iValue);
-			//		}
-			//		if (m_nMprMode == 0)
-			//		{
-			//			vector<int>::iterator maxValue = max_element(begin(vPixelValues), end(vPixelValues));
-			//			pRetData[r][c] = *maxValue;
-			//		}
-			//		else if (m_nMprMode == 1)
-			//		{
-			//			double sum = accumulate(begin(vPixelValues), end(vPixelValues), 0.0);
-			//			int mean = sum / vPixelValues.size();
-			//			pRetData[r][c] = mean;
-			//		}
-			//	}
-			//}
+			delete pRows;
 			pShowImg->m_pOriData = (BYTE**)pRetData;
 		}
 	}
@@ -270,7 +297,8 @@ void CHsNormalMprMaker::GetShowImage(CHsImage *pShowImg, int iIndex, int iSliceN
 
 		dSpacingX = dSpacing[1];
 		dSpacingY = dSpacing[2];
-		pShowImg->m_fSilceThick = dSpacing[0];
+		pShowImg->m_fOriSilceThick = dSpacing[0];
+		pShowImg->m_fCurSliceThick = iSliceNum * dSpacing[0];
 
 		if (nSize == 1)
 		{
@@ -282,10 +310,24 @@ void CHsNormalMprMaker::GetShowImage(CHsImage *pShowImg, int iIndex, int iSliceN
 				for (int c = 0; c < nCols; c++)
 				{
 					BYTE *pRows = pSlice[nCols-1-c];
-					for (int s = iStratS; s <= iEndS; s++)
+
+					if (m_nMprMode == 0)
 					{
-						int iValue = pRows[s];
-						pRetData[r][c] = iValue;
+						int nMax = pRows[iStratS];
+						for (int s = iStratS+1; s <= iEndS; s++)
+						{
+							nMax = max(nMax, pRows[s]);							
+						}
+						pRetData[r][c] = nMax;
+					}
+					else if(m_nMprMode == 1)
+					{
+						int nTotle = pRows[iStratS];
+						for (int s = iStratS + 1; s <= iEndS; s++)
+						{
+							nTotle += pRows[s];
+						}
+						pRetData[r][c] = nTotle/(iEndS-iStratS+1);
 					}
 				}
 			}
@@ -302,38 +344,27 @@ void CHsNormalMprMaker::GetShowImage(CHsImage *pShowImg, int iIndex, int iSliceN
 				for (int c = 0; c < nCols; c++)
 				{
 					short *pRows = pSlice[nCols-1-c];
-					for (int s = iStratS; s <= iEndS; s++)
+
+					if (m_nMprMode == 0)
 					{
-						int iValue = pRows[s];
-						pRetData[r][c] = iValue;
+						int nMax = pRows[iStratS];
+						for (int s = iStratS + 1; s <= iEndS; s++)
+						{
+							nMax = max(nMax, pRows[s]);
+						}
+						pRetData[r][c] = nMax;
+					}
+					else if (m_nMprMode == 1)
+					{
+						int nTotle = pRows[iStratS];
+						for (int s = iStratS + 1; s <= iEndS; s++)
+						{
+							nTotle += pRows[s];
+						}
+						pRetData[r][c] = nTotle / (iEndS - iStratS + 1);
 					}
 				}
 			}
-
-			//for (int r = 0; r < nRows; r++)
-			//{
-			//	for (int c = 0; c < nCols; c++)
-			//	{
-			//		vector<int> vPixelValues;
-			//		for (int s = iStratS; s <= iEndS; s++)
-			//		{
-			//			int iValue = pData[nRows - 1 - r][nCols - 1 - c][s];
-			//			//int iValue = pData[nOriRows*nOriCols*(nRows - 1 - r) + nOriCols*(nCols - 1 -c) + s];
-			//			vPixelValues.push_back(iValue);
-			//		}
-			//		if (m_nMprMode == 0)
-			//		{
-			//			vector<int>::iterator maxValue = max_element(begin(vPixelValues), end(vPixelValues));
-			//			pRetData[r][c] = *maxValue;
-			//		}
-			//		else if (m_nMprMode == 1)
-			//		{
-			//			double sum = accumulate(begin(vPixelValues), end(vPixelValues), 0.0);
-			//			int mean = sum / vPixelValues.size();
-			//			pRetData[r][c] = mean;
-			//		}
-			//	}
-			//}
 			pShowImg->m_pOriData = (BYTE**)pRetData;
 		}
 	}

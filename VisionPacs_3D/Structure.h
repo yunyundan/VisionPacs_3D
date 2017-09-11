@@ -1075,3 +1075,109 @@ typedef struct _MODINFO
 	}
 
 }MODINFO;
+
+
+typedef struct _MprLinesInfo
+{
+	//横向线段
+	QPoint ptH1;
+	QPoint ptH2;
+
+	//纵向线段
+	QPoint ptV1;
+	QPoint ptV2;
+
+	//层厚
+	double dSliceThick;
+
+	//中心点
+	QPoint ptCenter;
+
+	//线所属窗口类型
+	int nWndType;
+
+	_MprLinesInfo()
+	{
+		ptV1 = QPoint(0, 0);
+		ptV2 = QPoint(0, 0);
+		ptH1 = QPoint(0, 0);
+		ptH2 = QPoint(0, 0);
+
+		dSliceThick = 0.00;
+		ptCenter = QPoint(0, 0);
+
+		nWndType = ORIIMG_AXIAL;
+	}
+}MprLinesInfo;
+
+enum MoveObject {
+	HLINE = 0,
+	HSTARTROTATE,
+	HENDROTATE,
+	HTOPSLICE,
+	HBOTTOMSLICE,
+	VLINE,
+	VSTARTROTATE,
+	VENDROTATE,
+	VTOPSLICE,
+	VBOTTOMSLICE,
+	CENTERPOINT
+};
+
+typedef struct _FPOINT
+{
+	double x;
+	double y;
+
+	_FPOINT()
+	{
+		x = y = 0.00;
+	}
+
+	QPoint Int()
+	{
+		QPoint t(qRound(x), qRound(y));
+		return t;
+	}
+}FPOINT;
+
+typedef struct _MprPoint
+{
+	FPOINT ImgPt;//这个点对应在图像上
+	QPoint WndPt;//这个点对应到窗口上
+
+	bool bActive;
+	_MprPoint()
+	{
+		WndPt = QPoint(0, 0);
+		bActive = false;
+	}
+}MprPoint;
+
+typedef struct _MprLine//直线
+{
+	MprPoint pt1;
+	MprPoint pt2;
+	bool bActive;
+
+	_MprLine()
+	{
+		bActive = false;
+	}
+}MprLine;
+
+typedef struct _MprTriAngle//三角形
+{
+	QPoint ptTop;
+	QPoint ptBtm1;
+	QPoint ptBtm2;
+	bool bActive;
+
+	_MprTriAngle()
+	{
+		ptTop = QPoint(0, 0);
+		ptBtm1 = QPoint(0, 0);
+		ptBtm2 = QPoint(0, 0);
+		bActive = false;
+	}
+}MprTriAngle;

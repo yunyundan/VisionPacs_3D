@@ -66,6 +66,8 @@ private:
 	QButtonGroup *m_pImgLeftBG;
 	QButtonGroup *m_pImgRightBG;
 
+	QButtonGroup *m_pMprType;
+
 	//调节渲染方案widget
 	ctkVTKVolumePropertyWidget *m_pVolumePropertywidget;
 signals:

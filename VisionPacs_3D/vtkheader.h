@@ -46,6 +46,7 @@ VTK_MODULE_INIT(vtkRenderingFreeType)
 #include "gdcmDataSet.h"
 #include "gdcmAttribute.h"
 #include "gdcmTesting.h"
+#include "gdcmDecoder.h"
 
 //CTK Header
 #include "CTK/ctkTransferFunction.h"

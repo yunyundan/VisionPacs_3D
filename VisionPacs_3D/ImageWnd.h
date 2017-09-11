@@ -61,37 +61,54 @@ private:
 			sType = "Normal";
 		}
 	}ROWITEM;
+
 	typedef struct _QEDITITEM
 	{
 		QString sName;
+		QString sPos;
 		QLineEdit *qEdit;
-		QLabel *qLabel;
+		QLabel *qPreLabel;
+		QLabel *qNextLabel;
 		_QEDITITEM()
 		{
 			sName = "";
+			sPos = "";
 			qEdit = NULL;
-			qLabel = NULL;
+			qPreLabel = NULL;
+			qNextLabel = NULL;
 		}
 	}QEDITITEM;
+
 	vector<QEDITITEM> m_vCornorEdit;
 	int ArrangeCorinfo(CORNORINFO corInfo,map<int,ROWITEM> &mapRow);
 	void InitNormalCorInfo();
 	void InitPosCorInfo();
+	void ReSetPosCorInfo(QSize deltaSize);
+
+	//标签集合，方便调整位置
+	map<QLabel*,QString> m_mapInfoLabel;
+	map<QLineEdit *, QString> m_mapInfoEdit;
 
 	//当前图像序数
 	int m_nCurImgIndex;
 
+	//图像
+	CHsImage *m_pImg;
+
+	//操作线
+	OperateMprLines *m_pOperateLines;
 protected:
 	QPixmap *m_pPixmap;
 	QImage *m_pQImage;
 
 	void paintEvent(QPaintEvent *event);
+	void resizeEvent(QResizeEvent* size);
 	void mousePressEvent(QMouseEvent *event);
 	void mouseMoveEvent(QMouseEvent *event);
 	void mouseReleaseEvent(QMouseEvent *event);
-
+	
 public:
-	CHsImage *m_pImg;
+	
 	unsigned int m_nLeftButtonInteractionStyle;
 	unsigned int m_nRightButtonInteractionStyle;
 
@@ -111,7 +128,7 @@ public:
 	void ConvertCoord(long *x1, long *y1, long *x2, long *y2, bool bFromHwdToImg);
 
 	//设置操作
-	void setOperate(QString operate);
+	void SetOperate(QString operate);
 
 	//窗口左边转图像坐标
 	POINT ConvertWndToImg(RECT ImgRcOnWnd, long nImgW, long nImgH, QPoint &pt);
@@ -127,19 +144,29 @@ public:
 	//计算本窗口显示图像
 	int CalcAndShowNormalImg(QString sWndName, int nOriImgType, int iImgIndex,int iSlice);
 
-	void setCurImageIndex(int nIndex) { m_nCurImgIndex = nIndex; }
+	void SetCurImageIndex(int nIndex) { m_nCurImgIndex = nIndex; }
 
-	//操作线
-	OperateMprLines *m_pOperateLines;
+	//获得操作线
+	OperateMprLines *GetOperateLine() { return m_pOperateLines; }
+
+	//获得图像
+	CHsImage *GetImage() { return m_pImg; }
+
+	//设置MPR模式
+	void SetMprMode(QString sModeName);
+
 
 signals:
 	void SendImageNum(int);
 	void ImageIndexChange(int);
+	void ImageThickChange(double);
 
 private slots:
 	void OnEditTextChanged(const QString &sText);
 	void OnEditFinished();
 	void OnMprLinesShow(bool isShow);
+	
+	
 };
 
 #endif // IMAGEWND_H

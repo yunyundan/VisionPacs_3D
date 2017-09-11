@@ -62,6 +62,7 @@ VisionPacs_3D::~VisionPacs_3D()
 	delete m_pImgRightBG;	
 	delete m_pVrLeftBG;
 	delete m_pVrRightBG;
+	delete m_pMprType;
 
 	if (m_pVolumePropertywidget)
 	{
@@ -93,8 +94,8 @@ void VisionPacs_3D::on_actionOpen_File_triggered()
 
 void VisionPacs_3D::on_actionTest_triggered()
 {
-	QString sFilePath = "E:\\TestData\\67";
-	QString sSeriesUID = "1.2.840.113619.2.55.3.12624128.2910.1151313604.894";
+	QString sFilePath = "E:\\TestData\\kidney";
+	QString sSeriesUID = "1.2.392.200036.9116.2.5.1.37.2420749095.1378337466.21712";
 
 	m_sFilePath = sFilePath;
 	m_sSeriesUID = sSeriesUID;
@@ -215,6 +216,12 @@ void VisionPacs_3D::InitUIConfig()
 	m_pImgRightBG->addButton(ui->Img_pan, 4);
 	connect(m_pImgRightBG, SIGNAL(buttonClicked(int)), this, SLOT(Btn_ImgOperateClick(int)));
 
+	m_pMprType = new QButtonGroup();
+	m_pMprType->setExclusive(true);
+	m_pMprType->addButton(ui->Btn_MprLinesShow, 0);
+	m_pMprType->addButton(ui->Btn_ActiveMprOblique, 1);
+	connect(m_pMprType, SIGNAL(buttonClicked(int)), ui->Workzone, SLOT(Btn_SetMprState(int)));
+
 	//VRmodeœ¬¿≠øÚ…Ë÷√
 	QVector<QString> vModeNames;
 	vModeNames.push_back("Bone");
@@ -305,6 +312,7 @@ void VisionPacs_3D::ExtractImage(QString sFilePath, QString sSeriesUID, vector<s
 
 	gdcm::Scanner::ValuesType  vtSopClass = spFilterScanner->GetValues(t2);
 	gdcm::Scanner::ValuesType  vtImageType = spFilterScanner->GetValues(t3);
+
 	if (vtSopClass.size() != 1)
 	{
 		set<string>::iterator set_iter;
@@ -318,6 +326,7 @@ void VisionPacs_3D::ExtractImage(QString sFilePath, QString sSeriesUID, vector<s
 			}
 		}
 	}
+
 	if (vtImageType.size() != 1)
 	{
 		set<string>::iterator set_iter;
@@ -325,7 +334,7 @@ void VisionPacs_3D::ExtractImage(QString sFilePath, QString sSeriesUID, vector<s
 		for (set_iter = vtImageType.begin(); set_iter != vtImageType.end(); set_iter++)
 		{
 			string sImageType = *set_iter;
-			gdcm::Directory::FilenamesType ftTemp = spFilterScanner->GetAllFilenamesFromTagToValue(t2, sImageType.c_str());
+			gdcm::Directory::FilenamesType ftTemp = spFilterScanner->GetAllFilenamesFromTagToValue(t3, sImageType.c_str());
 			int iTempNum = ftTemp.size();
 			if (iTempNum > iFileNum)
 			{

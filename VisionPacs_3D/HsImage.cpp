@@ -59,7 +59,8 @@ LONG ConvertStrToLong(const char *ch)
 
 CHsImage::CHsImage()
 : m_pDs(NULL)
-, m_fSilceThick(0.00)
+, m_fOriSilceThick(0.00)
+, m_fCurSliceThick(0.00)
 ,m_pBelongWnd(NULL)
 {
 	SetRect(&m_WndRc, 0, 0, 0, 0);
@@ -128,9 +129,9 @@ void CHsImage::SetWndRc(RECT rc)
 
 	if (m_pBelongWnd != NULL)
 	{
-		if (m_pBelongWnd->m_pOperateLines)
+		if (m_pBelongWnd->GetOperateLine())
 		{
-			m_pBelongWnd->m_pOperateLines->RefreshMprLinesPara(m_WndRc, m_ImgState.nCurOriPixCol, m_ImgState.nCurOriPixRow);
+			m_pBelongWnd->GetOperateLine()->RefreshMprLinesPara(m_WndRc, m_ImgState.nCurOriPixCol, m_ImgState.nCurOriPixRow,m_ImgInfo.fPixelSpaceX,m_ImgInfo.fPixelSpaceY);
 		}
 	}
 }
@@ -351,7 +352,7 @@ int CHsImage::RefreshInfoItem(CHsFile* pDs, INFOITEM &infoItem)
 
 	if (infoItem.sTag.compare("-1") == 0)//²ãºñ
 	{
-		sprintf(cc, infoItem.sFormat.toLatin1().data(), m_fSilceThick);
+		sprintf(cc, infoItem.sFormat.toLatin1().data(), m_fCurSliceThick);
 		infoItem.sValue = cc;
 	}
 	else if (infoItem.sTag.compare("-3") == 0)//image width
