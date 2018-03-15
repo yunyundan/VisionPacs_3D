@@ -3,11 +3,13 @@
 #include "ui_ImageWnd.h"
 
 #include "HsImage.h"
-#include "HsNormalMprMaker.h"
+#include "HmyMprMaker.h"
 #include "WorkZone.h"
 #include "OperateMprLines.h"
+#include "ResliceControl.h"
 
 #include "AppConfig.h"
+#include "Hmy3DMath.h"
 
 extern RECT GetShowRcByImgSize(RECT rc, double ImgWidth, double ImgHeight);
 
@@ -15,16 +17,20 @@ ImageWnd::ImageWnd(QWidget *parent):
     QWidget(parent)
 	,ui(new Ui::ImageWnd)
 	, m_bFocused(false)
-	, m_pImg(NULL)
-	, m_pQImage(NULL)
-	, m_pPixmap(NULL)
+	, m_pImg(nullptr)
+	, m_pQImage(nullptr)
+	, m_pPixmap(nullptr)
 	, m_nLeftButtonInteractionStyle(LOCTION_INTERACTION)
 	, m_nRightButtonInteractionStyle(WINDOW_LEVEL_INTERACTION)
-	,m_nImgWndType(ORIIMG_AXIAL)
-	,m_pNormalMaker(NULL)
-	,m_nImgNum(0)
-	,m_bInitCorInfo(false)
-	,m_pOperateLines(NULL)
+	, m_nImgWndType(ORIIMG_AXIAL)
+	, m_pMprMaker(nullptr)
+	, m_nImgNum(0)
+	, m_nCurImgIndex(1)
+	, m_bInitCorInfo(false)
+	, m_pOperateLines(nullptr)
+	, m_pLine1(nullptr)
+	, m_pLine2(nullptr)
+	, m_pResliceControl(nullptr)
 {
     ui->setupUi(this);
 	setMouseTracking(true);
@@ -40,25 +46,37 @@ ImageWnd::~ImageWnd()
 	if (m_pImg)
 	{
 		delete m_pImg;
-		m_pImg = NULL;
+		m_pImg = nullptr;
 	}
 
 	if (m_pQImage)
 	{
 		delete m_pQImage;
-		m_pQImage = NULL;
+		m_pQImage = nullptr;
 	}
 
-	if (m_pNormalMaker)
+	if (m_pMprMaker)
 	{
-		delete m_pNormalMaker;
-		m_pNormalMaker = NULL;
+		delete m_pMprMaker;
+		m_pMprMaker = nullptr;
 	}
 
 	if (m_pOperateLines)
 	{
 		delete m_pOperateLines;
-		m_pOperateLines = NULL;
+		m_pOperateLines = nullptr;
+	}
+
+	if (m_pLine1)
+	{
+		delete m_pLine1;
+		m_pLine1 = nullptr;
+	}
+
+	if (m_pLine2)
+	{
+		delete m_pLine2;
+		m_pLine2 = nullptr;
 	}
 }
 
@@ -102,10 +120,9 @@ void ImageWnd::paintEvent(QPaintEvent *event)
 				QRect rc(rcCom.left, rcCom.top, rcCom.right - rcCom.left, rcCom.bottom - rcCom.top);
 				painter.drawImage(rc, qImg);
 			}
-		}
-	
+		}	
 
-		//MPR定位线
+		////MPR定位线
 		if (m_pOperateLines)
 		{
 			m_pOperateLines->OnMprLinesPaint(&painter);
@@ -119,7 +136,7 @@ void ImageWnd::resizeEvent(QResizeEvent* size)
 	{
 		QSize deltaSize = size->size() - size->oldSize();
 		m_pImg->SetWndRc(CalDisplayRect(m_pImg));
-		ReSetPosCorInfo(deltaSize);
+		ReSetPosCorInfoPos(deltaSize);
 	}
 	update();
 }
@@ -546,54 +563,32 @@ POINT ImageWnd::ConvertWndToImg(RECT ImgRcOnWnd, long nImgW, long nImgH, QPoint 
 	return ImgPt;
 }
 
-void ImageWnd::GetImgNumAndWndType(QString sWndName, int nOriImgType)
+void ImageWnd::InitImageDataPara(void ***pImgArray, vtkSmartPointer<vtkImageData> p3Ddata, vector<CHsImage*> vOriImg, HmyImageData3D *pHmyImgData)
 {
-	if (sWndName.compare("Axial_Wnd") == 0)
-		m_nImgWndType = ORIIMG_AXIAL;
-	else if (sWndName.compare("Coronal_Wnd") == 0)
-		m_nImgWndType = ORIIMG_CORONAL;
-	else
-		m_nImgWndType = ORIIMG_SAGITTAL;
-
-	if (m_nImgWndType == nOriImgType)
-	{
-		m_nImgNum = m_vOriImg.size();
-	}
-	else
-	{
-		if (nOriImgType == ORIIMG_AXIAL)
-		{
-			if (sWndName.compare("Coronal_Wnd") == 0)
-				m_nImgNum = m_vOriImg[0]->m_ImgInfo.nOriRows;
-			else
-				m_nImgNum = m_vOriImg[0]->m_ImgInfo.nOriCols;
-		}
-		else if (nOriImgType == ORIIMG_SAGITTAL)
-		{
-			if (sWndName.compare("Coronal_Wnd") == 0)
-				m_nImgNum = m_vOriImg[0]->m_ImgInfo.nOriCols;
-			else
-				m_nImgNum = m_vOriImg[0]->m_ImgInfo.nOriRows;
-		}
-		else
-		{
-			if (sWndName.compare("Axial_Wnd") == 0)
-				m_nImgNum = m_vOriImg[0]->m_ImgInfo.nOriCols;
-			else
-				m_nImgNum = m_vOriImg[0]->m_ImgInfo.nOriRows;
-		}
-	}
-
-	emit SendImageNum(m_nImgNum);
+	m_p3DImgData = p3Ddata;
+	m_vOriImg = vOriImg;
+	m_p3DArray = pImgArray;
+	m_pHmyImageData = pHmyImgData;
 }
 
-int ImageWnd::CalcAndShowNormalImg(QString sWndName, int nOriImgType, int iImgIndex,int iSlice)
+void ImageWnd::SetResliceControl(CResliceControl *pResliceContrl)
 {
-	if (m_pImg)
-		m_pImg->Hs_FreeMem();
+	m_pResliceControl = pResliceContrl;
+}
 
+void ImageWnd::SetImageWndType(QString sWndName)
+{
+	if (sWndName.compare("Axial_Wnd") == 0)
+		m_nImgWndType = AXIAL_WND;
+	else if (sWndName.compare("Coronal_Wnd") == 0)
+		m_nImgWndType = CORONAL_WND;
+	else
+		m_nImgWndType = SAGITTAL_WND;
+}
 
-	if (m_pImg == NULL)
+int ImageWnd::FirstCalAndShowImage()
+{
+	if (m_pImg == nullptr)
 	{
 		m_pImg = new CHsImage;
 		m_pImg->m_ImgInfo = m_vOriImg[0]->m_ImgInfo;//先复制源图基本信息
@@ -601,37 +596,109 @@ int ImageWnd::CalcAndShowNormalImg(QString sWndName, int nOriImgType, int iImgIn
 		m_pImg->Hs_GetCornerInfo(true);
 		m_pImg->SetBelongWnd(this);
 	}
-
-	if (m_pNormalMaker == NULL)
+	if (m_pMprMaker == nullptr)
 	{
-		m_pNormalMaker = new CHsNormalMprMaker();
-		m_pNormalMaker->InitParaAndData(m_vOriImg, m_p3DArray, m_p3DImgData, m_nImgWndType, nOriImgType);
+		m_pMprMaker = new CHmyMprMaker();
+		m_pMprMaker->InitParaAndData(m_vOriImg, m_p3DArray, m_p3DImgData, m_nImgWndType,m_pHmyImageData);
 	}
-	
-	m_pNormalMaker->GetShowImage(m_pImg, iImgIndex, iSlice);
 
-	if (m_pOperateLines == NULL)
+	if (m_pOperateLines == nullptr)
 	{
 		m_pOperateLines = new OperateMprLines(this, m_nImgWndType);
-		connect(m_pOperateLines, SIGNAL(MprLinesInfoOutput(MprLinesInfo)), this->parent()->parent(), SLOT(OnMprLinesInfo(MprLinesInfo)));
+		if (m_pResliceControl)
+			m_pOperateLines->SetResliceControl(m_pResliceControl);
+		connect(m_pOperateLines, SIGNAL(MprLinesInfoChange(MprLinesInfo)), this->parent()->parent(), SLOT(OnMprLinesInfoChange(MprLinesInfo)));
+	}
+	if (m_pLine1 == nullptr)
+	{
+		m_pLine1 = new HmyLine3D();
 	}
 
-	SetImage(m_pImg);
+	if (m_pLine2 == nullptr)
+	{
+		m_pLine2 = new HmyLine3D();
+	}
 
+	int nExtents[6];
+	m_p3DImgData->GetExtent(nExtents);
+	
+	int nImageNum = 0;
+	if (m_nImgWndType == AXIAL_WND)
+	{
+		nImageNum = nExtents[5];
+	}
+	else if (m_nImgWndType == CORONAL_WND)
+	{
+		nImageNum = nExtents[3];
+	}
+	else if (m_nImgWndType == SAGITTAL_WND)
+	{
+		nImageNum = nExtents[1];
+	}
+	emit SendImageNum(nImageNum);
 	return 0;
+}
+
+void ImageWnd::SetOrthogonalIndex(int nIndex)
+{
+	int nExtents[6];
+	m_p3DImgData->GetExtent(nExtents);
+
+	if (m_nImgWndType == AXIAL_WND)
+	{
+		m_pLine1->SetValue(0, Hmy3DVector(0, 0, nIndex));
+		m_pLine1->SetValue(1, Hmy3DVector(nExtents[1], 0, nIndex));
+		m_pLine2->SetValue(0, Hmy3DVector(nExtents[1], 0, nIndex));
+		m_pLine2->SetValue(1, Hmy3DVector(nExtents[1], nExtents[3], nIndex));
+	}
+	else if (m_nImgWndType == CORONAL_WND)
+	{
+		m_pLine1->SetValue(0, Hmy3DVector(0, nIndex, 0));
+		m_pLine1->SetValue(1, Hmy3DVector(nExtents[1], nIndex, 0));
+		m_pLine2->SetValue(0, Hmy3DVector(nExtents[1], nIndex, 0));
+		m_pLine2->SetValue(1, Hmy3DVector(nExtents[1], nIndex, nExtents[5]));
+	}
+	else if (m_nImgWndType == SAGITTAL_WND)
+	{
+		m_pLine1->SetValue(0, Hmy3DVector(nIndex, nExtents[3], 0));
+		m_pLine1->SetValue(1, Hmy3DVector(nIndex, 0, 0));
+		m_pLine2->SetValue(0, Hmy3DVector(nIndex, 0, 0));
+		m_pLine2->SetValue(1, Hmy3DVector(nIndex, 0, nExtents[5]));
+	}
+}
+
+int ImageWnd::CalcAndShowImg(QString sWndName, int nSliceNum)
+{
+	if (!m_pImg->Hs_IsEmpty())
+	{
+		m_pImg->Hs_FreeMem();
+	}
+	m_pMprMaker->GetCutImage(m_pImg, m_pLine1, m_pLine2, 1);
+	SetImage(m_pImg);
+	return 0;
+}
+
+void ImageWnd::CalcAndShowImg()
+{
+
 }
 
 void ImageWnd::SetMprMode(QString sModeName)
 {
-	if (m_pNormalMaker == NULL)
+	if (m_pMprMaker == NULL)
 		return;
 
 	if (sModeName.compare("MIP") == 0)
-		m_pNormalMaker->m_nMprMode = 0;
+		m_pMprMaker->m_nSlabMode = 0;
 	else if (sModeName.compare("MAP") == 0)
-		m_pNormalMaker->m_nMprMode = 1;
+		m_pMprMaker->m_nSlabMode = 1;
 
 	SetImage(m_pImg);
+}
+
+void ImageWnd::GetLinesDirection(QPoint pt1, QPoint pt2, HmyLine3D &line)
+{
+
 }
 
 void ImageWnd::RefreshCornorInfoWidget()
@@ -662,6 +729,7 @@ void ImageWnd::RefreshCornorInfoWidget()
 				m_vCornorEdit[i].qPreLabel->adjustSize();
 			}			
 		}
+		RefreshPosCorInfo();
 	}
 }
 
@@ -956,7 +1024,7 @@ void ImageWnd::InitPosCorInfo()
 	m_mapInfoLabel[bLabel] = "LC";
 }
 
-void ImageWnd::ReSetPosCorInfo(QSize deltaSize)
+void ImageWnd::ReSetPosCorInfoPos(QSize deltaSize)
 {
 	map <QLabel*, QString>::iterator  labeIter;
 	for (labeIter = m_mapInfoLabel.begin(); labeIter != m_mapInfoLabel.end(); labeIter++)
@@ -1048,6 +1116,45 @@ void ImageWnd::ReSetPosCorInfo(QSize deltaSize)
 	}
 
 
+}
+
+void ImageWnd::RefreshPosCorInfo()
+{
+	if (m_pImg->m_ImgInfo.ImgLocPara.bValide == true)
+	{
+		m_pImg->Hs_GetPatientPos(m_pImg->m_ImgInfo.ImgLocPara.fFirstColCosX,
+			m_pImg->m_ImgInfo.ImgLocPara.fFirstColCosY,
+			m_pImg->m_ImgInfo.ImgLocPara.fFirstColCosZ,
+			m_pImg->m_ImgState.sTopPatientPos,
+			m_pImg->m_ImgState.sBottomPatientPos);
+
+		m_pImg->Hs_GetPatientPos(m_pImg->m_ImgInfo.ImgLocPara.fFirstRowCosX,
+			m_pImg->m_ImgInfo.ImgLocPara.fFirstRowCosY,
+			m_pImg->m_ImgInfo.ImgLocPara.fFirstRowCosZ,
+			m_pImg->m_ImgState.sLeftPatientPos,
+			m_pImg->m_ImgState.sRightPatientPos);
+	}
+
+	map <QLabel*, QString>::iterator  labeIter;
+	for (labeIter = m_mapInfoLabel.begin(); labeIter != m_mapInfoLabel.end(); labeIter++)
+	{
+		if (labeIter->second.compare("TC") == 0)
+		{
+			labeIter->first->setText(m_pImg->m_ImgState.sTopPatientPos);
+		}
+		else if (labeIter->second.compare("LC") == 0 )
+		{
+			labeIter->first->setText(m_pImg->m_ImgState.sLeftPatientPos);
+		}
+		else if (labeIter->second.compare("BC") == 0)
+		{
+			labeIter->first->setText(m_pImg->m_ImgState.sBottomPatientPos);
+		}
+		else if (labeIter->second.compare("RC") == 0)
+		{
+			labeIter->first->setText(m_pImg->m_ImgState.sRightPatientPos);
+		}
+	}
 }
 
 int ImageWnd::ArrangeCorinfo(CORNORINFO corInfo, map<int, ROWITEM> &mapRow)

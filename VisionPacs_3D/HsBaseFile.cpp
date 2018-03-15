@@ -61,7 +61,7 @@ void** ArrayCopy(void** pSrcArr,unsigned long nSrcRow, unsigned long nSrcCol, un
 } 
 
 
-RECT GetShowRcByImgSize(RECT rc, long ImgWidth, long ImgHeight);
+RECT GetShowRcByImgSize(RECT rc, double ImgWidth, double ImgHeight);
 RECT GetShowRcByImgSize(RECT rc, double ImgWidth, double ImgHeight)
 {
     RECT reRC;
@@ -774,6 +774,7 @@ int CHsBaseFile::Hs_LoadFile(const char *cFileName,bool bFullLoad)
 {//载入文件,成功返回TRUE,Recode=0;失败返回FALSE,Recode=错误代码
 	Hs_CloseFile();
 	FreeBuffer();
+
 	delete m_pMainEle;
 	m_pMainEle = NULL;
 
@@ -781,7 +782,7 @@ int CHsBaseFile::Hs_LoadFile(const char *cFileName,bool bFullLoad)
 		return Ret_InvalidPara;
 
 	//if (_access(cFileName,0)!=0)//文件不存在不行---不判断了，网络路径的话浪费时间，反正后面err会报错
-	//	return Ret_InvalidPara;
+		//return Ret_InvalidPara;
 
 	errno_t err = fopen_s( &m_fp, cFileName, "rb" );
 	if( err !=0 )
@@ -838,7 +839,6 @@ int CHsBaseFile::Hs_LoadFile(const char *cFileName,bool bFullLoad)
 
 			return Ret_LoadFileError;
 		}
-
 
 		m_BaseFileInfo.nReadLen = (unsigned long)nToRead;
 
@@ -943,17 +943,6 @@ int CHsBaseFile::Hs_LoadFile(const char *cFileName,bool bFullLoad)
 		unsigned long nByte = 0;
 		BYTE* pByte = GetByteFromBuffer(pEle,nByte,nRet);
 		pEle->pValue = pByte;
-
-		//if(pEle->nTag == TAG_SOP_INSTANCE_UID)
-		//{
-		//	for (int i=0;i<pEle->nLen;i++)
-		//	{
-		//		if(i==55)
-		//			int g = 0;
-		//		AtlTrace("%02d: --------  [%c] -------  [%d] --------  [%x]\r\n",i,pByte[i],pByte[i],pByte[i]);
-		//	}
-
-		//}
 
 		pEle = pEle->pNextEle;
 	}
@@ -2384,48 +2373,6 @@ int CHsBaseFile::Hs_GetImageInfo(pHsElement pPixEle, ImageInfo& ImgInfo,int iFra
 	//nFrame
 	ImgInfo.nFrame = m_BaseFileInfo.nFrame;
 
-	//p = Hs_FindFirstEle(pPixEle,TAG_NUMBER_OF_FRAMES,true);
-	//if(p)//如果是多帧，必须有这个Tag,单帧的可以没有
-	//	Hs_GetLongValue(p,ImgInfo.nFrame,0);
-	//else
-	//	ImgInfo.nFrame = 1;
-
-	/*
-	if(ImgInfo.nFrame==0)//没找到
-	{//能否替代leadtools 找到帧数？
-		if (ImgInfo.iCompress==0)
-		{ 
-			if(pPixEle->nLen==0)
-				ImgInfo.nFrame = 0;
-			else if(pPixEle->nLen==0xFFFFFFFF)
-				ImgInfo.nFrame = -1;//待定之意
-			else
-			{
-				unsigned long nBytePerFrame = (ImgInfo.nBitsAllocated/8) * ImgInfo.nRows * ImgInfo.nCols * ImgInfo.nSamplePerPixel;
-				if(nBytePerFrame!=0)
-					ImgInfo.nFrame = pPixEle->nLen/nBytePerFrame;
-				else
-					ImgInfo.nFrame = -1;
-			}
-		}
-		else//LeadTool来确定帧数
-		{
-			LDicomDS ds;
-			char cfile[512];
-			strcpy(cfile,m_BaseFileInfo.sFileName.c_str());
-			if(ds.LoadDS(cfile, 0)!=DICOM_SUCCESS)
-				return Ret_LoadFileError;
-
-			pDICOMELEMENT pLtPix = GetLtEleByMyEle(pPixEle,&ds);
-
-			DICOMIMAGE LtInfo;
-			ds.GetInfoImage(pLtPix,&LtInfo,0);
-			ImgInfo.nFrame = LtInfo.nFrames;
-		}
-
-	}
-	*/
-
 	//////////////////////////////////////////////////////////////////////////
 
 	ImgInfo.pEle = pPixEle;
@@ -2506,14 +2453,13 @@ int CHsBaseFile::Hs_GetImageInfo(pHsElement pPixEle, ImageInfo& ImgInfo,int iFra
 
 
 	//计算WL_Lut的长度
-
 	if ( ImgInfo.nPixelRepresentation == 1 ) //高位补码
 		ImgInfo.nWcLutLen = 1<<ImgInfo.nBitsAllocated;
 	else
 		ImgInfo.nWcLutLen = 1<<(ImgInfo.iHighBit+1);
 
 	if(ImgInfo.nWcLutLen>256)
-		ImgInfo.fWinLevelStep = min(ImgInfo.nWcLutLen/1000,10);
+		ImgInfo.fWinLevelStep = min(ImgInfo.nWcLutLen/1000,(long)10);
 
 
 	if (ImgInfo.nPixelRepresentation==0)
@@ -2535,7 +2481,7 @@ int CHsBaseFile::Hs_GetImageInfo(pHsElement pPixEle, ImageInfo& ImgInfo,int iFra
 	else if (pOverlayData!=NULL && ImgInfo.nOverlayCols>0 && ImgInfo.nOverlayRows>0)//独立式
 	{
 		//if (ImgInfo.nOverlayCols*ImgInfo.nOverlayRows == pOverlayData->nLen*8)
-			ImgInfo.nOverLayType = OverLay_Bits;
+		ImgInfo.nOverLayType = OverLay_Bits;
 		//else if(ImgInfo.nOverlayCols*ImgInfo.nOverlayRows*ImgInfo.nOverlayBitsAllocated == pOverlayData->nLen*8)
 		//	ImgInfo.nOverLayType = OverLay_Byte;
 		//else
@@ -2600,7 +2546,7 @@ int CHsBaseFile::Hs_GetImageInfo(pHsElement pPixEle, ImageInfo& ImgInfo,int iFra
 
 			}
 		}
-		//
+		
 		//Rescale Para
 		if (m_sModality.compare("CT") == 0)
 		{
@@ -2736,8 +2682,8 @@ int CHsBaseFile::Hs_GetImageInfo(pHsElement pPixEle, ImageInfo& ImgInfo,int iFra
 int CHsBaseFile::Hs_GetImage(pHsElement pPixEle,CHsBaseImg &Img, int iFrame)
 {
 	//CTstRunTime tsm("Hs_GetImage");
-//CLog a;
-//a.Log("\r\n开始读取像素");
+	//CLog a;
+	//a.Log("\r\n开始读取像素");
 	//基本条件判断
 	if(pPixEle==NULL)
 		return Ret_InvalidPara;
@@ -2795,10 +2741,8 @@ int CHsBaseFile::Hs_GetImage(pHsElement pPixEle,CHsBaseImg &Img, int iFrame)
 	//if(nSizePerFrame + nFrameStartPos>m_BaseFileInfo.nFullSize)
 	//	return Ret_GetImgError;
 
-
-	LDicomDS *pDs = NULL;//ds(_T("c:\\"));
-	LBitmap lbm;
-
+	DcmFileFormat *pMtkFile = NULL;
+	DicomImage *dcmImage = NULL;
 	if (Img.m_ImgInfo.iCompress==0)
 	{
 		//打开文件
@@ -2814,30 +2758,26 @@ int CHsBaseFile::Hs_GetImage(pHsElement pPixEle,CHsBaseImg &Img, int iFrame)
 	}
 	else
 	{
-        pDs = new LDicomDS("c:\\");
-		//LeadTools加载该文件
-		char cfile[512];
-		QByteArray ba = m_BaseFileInfo.sFileName.toLatin1();
-		strcpy(cfile,ba.data());
-		if(pDs->LoadDS(cfile, 0)!=DICOM_SUCCESS)
+		pMtkFile = new DcmFileFormat();
+		OFCondition result = pMtkFile->loadFile(m_BaseFileInfo.sFileName.toLatin1().data());
+		if (!result.good())
 		{
-			delete pDs;
-			pDs = NULL;
+			delete pMtkFile;
+			pMtkFile = NULL;
 			return Ret_LoadFileError;
 		}
-		
-		pDICOMELEMENT pLtPix = GetLtEleByMyEle(pPixEle,pDs);
-
-		L_UINT16 r = pDs->GetImage(pLtPix,lbm.GetHandle(),sizeof(BITMAPHANDLE),iFrame,0,0,0,0,0);
-		if(r)
+		DcmDataset *dataset = pMtkFile->getDataset();
+		E_TransferSyntax xfer = dataset->getOriginalXfer();
+		dataset->chooseRepresentation(xfer, NULL);
+		DJDecoderRegistration::registerCodecs();
+		dcmImage = new DicomImage((DcmObject*)dataset, xfer);
+		if (!(dcmImage->getStatus() == EIS_Normal))
 		{
-			delete pDs;
-			pDs = NULL;
-			return Ret_LedtolsGetImgError;
+			delete pMtkFile;
+			pMtkFile = NULL;
+			return Ret_LoadFileError;
 		}
-
-		delete pDs;
-		pDs = NULL;
+		DJDecoderRegistration::cleanup();
 	}
 
 
@@ -2861,44 +2801,65 @@ int CHsBaseFile::Hs_GetImage(pHsElement pPixEle,CHsBaseImg &Img, int iFrame)
 	int nStep = int(nBt/2);//BigEnian情况下,Sample内部字节对换时,要调换几次
 
 	bool bGetMaxMinValue = true;//需要得到最大值最小值吗?
-	//if (Img.m_ImgInfo.nSmallestPixelValue == 0 && Img.m_ImgInfo.nLargestPixelValue == 0)
-	//	bGetMaxMinValue = true;
 
 	long nMax = -2147483640;
 	long nMin = 2147483640;
 
 	if (iCompress == 0)//无压缩的话
 	{
-		fseek(m_fp,nFrameStartPos, SEEK_SET);//在文件中来到该帧起始处
-		size_t nCount = fread(Img.m_pOriData[0], nRow*nCol*nSample*nBt, 1,m_fp);//连续内存m_pOriData[0]一下子读取该帧所有像素
-		if(nCount != 1)//失败处理,不要返回了,这样可以看到残缺的坏图像.
+		fseek(m_fp, nFrameStartPos, SEEK_SET);//在文件中来到该帧起始处
+		size_t nCount = fread(Img.m_pOriData[0], nRow*nCol*nSample*nBt, 1, m_fp);//连续内存m_pOriData[0]一下子读取该帧所有像素
+		if (nCount != 1)//失败处理,不要返回了,这样可以看到残缺的坏图像.
 		{
 			ArrayFree((void**)Img.m_pOriData);
 			return Ret_GetImgError;
 		}
-
-		//R1 R2 R3 R4...Rx. G1 G2 G3 G4...Gx. B1 B2 B3 B4...Bx.摆放形式.整理成RGB RGB....
-		if (Img.m_ImgInfo.iPlanarConfig==1 && Img.m_ImgInfo.nBitsPerPixel==24 && int(Img.m_ImgInfo.sPhotometric.indexOf("RGB"))>=0)
+	}
+	else
+	{
+		DcmElement *ele = NULL;
+		OFCondition result = pMtkFile->getDataset()->findAndGetElement(DCM_PixelData, ele);
+		if (result.bad() || ele == NULL)
 		{
-			unsigned long sz = nCol*nRow*3;//像素总共多少字节
+			delete pMtkFile;
+			pMtkFile = NULL;
+			delete dcmImage;
+			dcmImage = NULL;
+			return Ret_LoadFileError;
+		}
+		Uint8 *pData;
+		ele->getUint8Array(pData);
+		memcpy(Img.m_pOriData[0], (BYTE *)pData, nRow*nCol*nSample*nBt);
+		delete pMtkFile;
+		pMtkFile = NULL;
+		delete dcmImage;
+		dcmImage = NULL;
+	}
+
+	if (1)
+	{
+		//R1 R2 R3 R4...Rx. G1 G2 G3 G4...Gx. B1 B2 B3 B4...Bx.摆放形式.整理成RGB RGB....
+		if (Img.m_ImgInfo.iPlanarConfig == 1 && Img.m_ImgInfo.nBitsPerPixel == 24 && int(Img.m_ImgInfo.sPhotometric.indexOf("RGB")) >= 0)
+		{
+			unsigned long sz = nCol*nRow * 3;//像素总共多少字节
 
 			BYTE * pByte = new BYTE[sz];//分配临时内存
-			memcpy(pByte,Img.m_pOriData[0],sz);//把像素拷到临时内存
+			memcpy(pByte, Img.m_pOriData[0], sz);//把像素拷到临时内存
 
-			unsigned long nSec = sz/3;
+			unsigned long nSec = sz / 3;
 			BYTE *pImgData = Img.m_pOriData[0];
 
-			unsigned long nSec2 = 2*nSec;
+			unsigned long nSec2 = 2 * nSec;
 
 			//从临时内存逐个挑拣回来
-			for (unsigned long i=0;i<nSec;i++)
+			for (unsigned long i = 0; i < nSec; i++)
 			{
-				pImgData[3*i] = pByte[i];
-				pImgData[3*i+1] = pByte[nSec+i];
-				pImgData[3*i+2] = pByte[nSec2+i];
+				pImgData[3 * i] = pByte[i];
+				pImgData[3 * i + 1] = pByte[nSec + i];
+				pImgData[3 * i + 2] = pByte[nSec2 + i];
 			}
 
-			delete []pByte;
+			delete[]pByte;
 		}
 
 		int nAppend = nNewCol - nCol;
@@ -2906,223 +2867,104 @@ int CHsBaseFile::Hs_GetImage(pHsElement pPixEle,CHsBaseImg &Img, int iFrame)
 		{
 			unsigned long nBytePerRow4 = nNewCol * nBytePerPix;//补4之后的每行字节数
 
-			BYTE** pTmpData = (BYTE**)ArrayNew(nNewRow,	nNewCol,nBytePerPix);
+			BYTE** pTmpData = (BYTE**)ArrayNew(nNewRow, nNewCol, nBytePerPix);
 
-			for (int r=0;r<nNewRow;r++)//nNewRow和nRow永远会一致的
+			for (int r = 0; r < nNewRow; r++)//nNewRow和nRow永远会一致的
 			{
 				BYTE* p = Img.m_pOriData[0] + r * nBytePerRow;//原始矩阵中这一行的起始位置
 				BYTE* pTmp = pTmpData[0] + r * nBytePerRow4;
 
-				memcpy(pTmp,p,nBytePerRow);//nBytePerRow4
+				memcpy(pTmp, p, nBytePerRow);//nBytePerRow4
 			}
 			ArrayFree((void**)Img.m_pOriData);
 			Img.m_pOriData = pTmpData;
 		}
 	}
-	
+
 	//开始读:一次读一行,直接放到Img里,不必再辟新内存
 	for (int r=0;r<nRow;r++)
 	{
-		if(iCompress==0)
+		// 若为大端还要在Sample内部把字节顺序颠倒过来.其实应该说CPU与文件大小端不一致就得换.
+		if (pPixEle->bBigEndian!=m_BaseFileInfo.bCpuBigEndia && Img.m_ImgInfo.nBitsAllocated>8)
 		{
-			//下面注释掉的读取方式，会导致nRow次磁盘读取，若是远程图像的话，还会导致nRow次的网络传输，不如上面一下子读取所有像素到内存，再在内存里倒腾的好
-			//fseek(m_fp,nFrameStartPos + r*nBytePerRow, SEEK_SET);//在文件中来到该帧起始处
-			//size_t nCount = fread(Img.m_pOriData[r], nBytePerRow, 1,m_fp);//连续内存m_pOriData[r]
-			//if(nCount != 1)//失败处理,不要返回了,这样可以看到残缺的坏图像.
-			//{
-			//	nRet = Ret_GetImgError;
-			//	break;
-			//}
+			BYTE *pSamleData0 = Img.m_pOriData[r];
 
-			// 若为大端还要在Sample内部把字节顺序颠倒过来.其实应该说CPU与文件大小端不一致就得换.
-			if (pPixEle->bBigEndian!=m_BaseFileInfo.bCpuBigEndia && Img.m_ImgInfo.nBitsAllocated>8)
+			for (unsigned long i=0;i<nSamplePerRow;i++)
 			{
-				BYTE *pSamleData0 = Img.m_pOriData[r];
+				BYTE *pSamleDatai = pSamleData0 + i*nBt;
 
-				for (unsigned long i=0;i<nSamplePerRow;i++)
+				for (int b=0;b<nStep;b++)//12->21
 				{
-					BYTE *pSamleDatai = pSamleData0 + i*nBt;
-
-					for (int b=0;b<nStep;b++)//12->21
-					{
-						BYTE t = pSamleDatai[b];
-						pSamleDatai[b] = pSamleDatai[nBt-b-1];
-						pSamleDatai[nBt-b-1] = t;
-					}
-				}
-			}
-
-			//无高位补码时,灰度图需要求最大值最小值 或者有嵌入式的OverLay要扣掉,则需要遍历每个像素
-			if (Img.m_ImgInfo.nSamplePerPixel==1 && Img.m_ImgInfo.nPixelRepresentation==0)
-			{
-				SeparatePixdataAndOverlayByRow(Img,r,nCol,nMin,nMax);	
-			}
-			else
-			{
-				if (nBytePerPix == 1)
-				{
-					if (Img.m_ImgInfo.nPixelRepresentation==0)
-					{
-						unsigned char *t = (unsigned char*)Img.m_pOriData[r];
-						for ( int i=0; i<nCol; i++)
-						{
-							if(t[i] > nMax)
-								nMax = t[i];
-
-							if(t[i] < nMin)
-								nMin = t[i];
-						}
-					}
-					else
-					{
-						char *t = (char*)(Img.m_pOriData[r]);
-						for ( int i=0; i<nCol; i++)
-						{
-							if(t[i] > nMax)
-								nMax = t[i];
-
-							if(t[i] < nMin)
-								nMin = t[i];
-						}
-					}
-				}
-				else if (nBytePerPix == 2)
-				{
-					if (Img.m_ImgInfo.nPixelRepresentation==0)
-					{
-						unsigned short *t = (unsigned short*)Img.m_pOriData[r];
-						for ( int i=0; i<nCol; i++)
-						{
-							if(t[i] > nMax)
-								nMax = t[i];
-
-							if(t[i] < nMin)
-								nMin = t[i];
-						}
-					}
-					else
-					{
-						short *t = (short*)Img.m_pOriData[r];
-						for ( int i=0; i<nCol; i++)
-						{
-							if(t[i] > nMax)
-								nMax = t[i];
-
-							if(t[i] < nMin)
-								nMin = t[i];
-						}
-					}
-
+					BYTE t = pSamleDatai[b];
+					pSamleDatai[b] = pSamleDatai[nBt-b-1];
+					pSamleDatai[nBt-b-1] = t;
 				}
 			}
 		}
-		else//Leadtools帮忙解压后读给我
+
+		//无高位补码时,灰度图需要求最大值最小值 或者有嵌入式的OverLay要扣掉,则需要遍历每个像素
+		if (Img.m_ImgInfo.nSamplePerPixel==1 && Img.m_ImgInfo.nPixelRepresentation==0)
 		{
-			if(nBytePerPix==1)
-			{
-				unsigned short nBitOffset = 8 - Img.m_ImgInfo.nBitStored;
-				for ( int i=0; i<nCol; i++)
-				{
-					lbm.GetPixelData(&(Img.m_pOriData[r][i]) , r, i,  nBytePerPix);//从LeadTools处得到解压后的数据
-
-					//1.不存在大端小端问题
-					
-					//2.分离Overlay和像素、求最大值最小值
-					if (Img.m_ImgInfo.bGrayImg && Img.m_ImgInfo.nPixelRepresentation==0)
-					{
-						
-						if (Img.m_pOriData[r][i] >> Img.m_ImgInfo.nBitStored )
-						{
-							if(Img.m_pOriOverlayData==NULL)
-							{
-								Img.m_pOriOverlayData = (BYTE**)ArrayNew(Img.m_ImgInfo.nRows,Img.m_ImgInfo.nCols,1);
-								Img.m_ImgInfo.nOverLayType = OverLay_Pixel;
-								Img.m_ImgInfo.nOverlayRows = Img.m_ImgInfo.nRows;
-								Img.m_ImgInfo.nOverlayCols = Img.m_ImgInfo.nCols;
-							}
-
-							Img.m_pOriOverlayData[r][i] = OverlayValue;
-						}
-
-
-						//我不管你OverLay第几位,全部滚蛋:左移挤出去,右移抽回来,就只剩像素了.这一步可确保像素在可控范围内;有的Dcm文件是骗人的.没说明OverLay,却偷偷塞了OverLay数据.导致像素值超出nBitStored指定的范围
-						Img.m_pOriData[r][i] = Img.m_pOriData[r][i] << nBitOffset;
-						Img.m_pOriData[r][i] = Img.m_pOriData[r][i] >> nBitOffset;
-
-						if(Img.m_pOriData[r][i] > nMax)
-							nMax = Img.m_pOriData[r][i];
-
-						if(Img.m_pOriData[r][i] < nMin)
-							nMin = Img.m_pOriData[r][i];
-					}
-
-				}
-			}
-			else if (nBytePerPix==2)
-			{
-				unsigned short nBitOffset = 16 - Img.m_ImgInfo.nBitStored;
-
-				unsigned short **pOutData = (unsigned short **)(Img.m_pOriData);
-
-				for ( int i=0; i<nCol; i++)
-				{
-					lbm.GetPixelData(&pOutData[r][i] , r, i,  nBytePerPix);
-
-					//存在大小端问题
-					if (pPixEle->bBigEndian!=m_BaseFileInfo.bCpuBigEndia)
-					{
-						BYTE *pSamleData0 = (BYTE*)pOutData[r][i];
-
-						BYTE t = pSamleData0[0];
-						pSamleData0[0] = pSamleData0[1];
-						pSamleData0[1] = t;
-
-					}
-
-					if (Img.m_ImgInfo.bGrayImg && Img.m_ImgInfo.nPixelRepresentation==0)
-					{
-						//分离OverLay和像素、求最大值最小值					
-						if (pOutData[r][i] >> Img.m_ImgInfo.nBitStored )//我不管你有没有Overlay,也不管放到第几位.反正除去像素部分剩下的不是0，那就是OverLay
-						{
-							if(Img.m_pOriOverlayData==NULL)
-							{
-								Img.m_pOriOverlayData = (BYTE**)ArrayNew(Img.m_ImgInfo.nRows,Img.m_ImgInfo.nCols,1);
-								Img.m_ImgInfo.nOverLayType = OverLay_Pixel;
-								Img.m_ImgInfo.nOverlayRows = Img.m_ImgInfo.nRows;
-								Img.m_ImgInfo.nOverlayCols = Img.m_ImgInfo.nCols;
-							}
-
-							Img.m_pOriOverlayData[r][i] = OverlayValue;
-						}
-
-						//我不管你OverLay第几位,全部滚蛋,左移挤出去,右移抽回来,就只剩像素了.这一步可确保像素在可控范围内,有的Dcm文件是骗人的.没说明OverLay,却偷偷塞了OverLay数据.导致像素值超出nBitStored指定的范围
-						pOutData[r][i] = pOutData[r][i] << nBitOffset;
-						pOutData[r][i] = pOutData[r][i] >> nBitOffset;
-
-						if(pOutData[r][i] > nMax)
-							nMax = pOutData[r][i];
-
-						if(pOutData[r][i] < nMin)
-							nMin = pOutData[r][i];
-					}
-				}
-			}
-			else if (nBytePerPix==3)
-			{
-				MYDATA24 **pOutData = (MYDATA24 **)(Img.m_pOriData);
-
-				for ( int i=0; i<nCol; i++)
-				{
-					lbm.GetPixelData(&pOutData[r][i] , r, i,  nBytePerPix);
-					BYTE t = pOutData[r][i].pData[0];
-					pOutData[r][i].pData[0] = pOutData[r][i].pData[2];
-					pOutData[r][i].pData[2] = t;
-				}
-			}
+			SeparatePixdataAndOverlayByRow(Img,r,nCol,nMin,nMax);	
 		}
+		else
+		{
+			if (nBytePerPix == 1)
+			{
+				if (Img.m_ImgInfo.nPixelRepresentation==0)
+				{
+					unsigned char *t = (unsigned char*)Img.m_pOriData[r];
+					for ( int i=0; i<nCol; i++)
+					{
+						if(t[i] > nMax)
+							nMax = t[i];
+
+						if(t[i] < nMin)
+							nMin = t[i];
+					}
+				}
+				else
+				{
+					char *t = (char*)(Img.m_pOriData[r]);
+					for ( int i=0; i<nCol; i++)
+					{
+						if(t[i] > nMax)
+							nMax = t[i];
+
+						if(t[i] < nMin)
+							nMin = t[i];
+					}
+				}
+			}
+			else if (nBytePerPix == 2)
+			{
+				if (Img.m_ImgInfo.nPixelRepresentation==0)
+				{
+					unsigned short *t = (unsigned short*)Img.m_pOriData[r];
+					for ( int i=0; i<nCol; i++)
+					{
+						if(t[i] > nMax)
+							nMax = t[i];
+
+						if(t[i] < nMin)
+							nMin = t[i];
+					}
+				}
+				else
+				{
+					short *t = (short*)Img.m_pOriData[r];
+					for ( int i=0; i<nCol; i++)
+					{
+						if(t[i] > nMax)
+							nMax = t[i];
+
+						if(t[i] < nMin)
+							nMin = t[i];
+					}
+				}
+			}
+		}		
 	}
-
-
 
 	if (Img.m_ImgInfo.nPixelRepresentation==1)//对于有符号的图像，尤其是两字节的图像，其最大值有可能超出范围
 	{//E:\1图片\胶片质量测试图像\vlut_p06.dcm
@@ -3148,12 +2990,6 @@ int CHsBaseFile::Hs_GetImage(pHsElement pPixEle,CHsBaseImg &Img, int iFrame)
 		Img.m_ImgInfo.nLargestPixelValue = nMax;
 		Img.m_ImgInfo.nSmallestPixelValue = nMin;
 
-		//if (Img.m_ImgInfo.fWinWidth==0.00)
-		//{
-		//	Img.m_ImgInfo.fWinCenter = (nMin+nMax)*1.00/2;
-		//	Img.m_ImgInfo.fWinWidth = nMax - nMin;
-		//}
-
 		if (Img.m_ImgInfo.fWinWidth==0.00)
 		{
 			//如果图像有斜率截距，那么像素值经过斜率截距加工才能使用，所以要根据像素值算窗宽窗位，务必考虑斜率截距
@@ -3170,7 +3006,6 @@ int CHsBaseFile::Hs_GetImage(pHsElement pPixEle,CHsBaseImg &Img, int iFrame)
 		}
 
 	}
-
 
 
 	Img.m_ImgInfo.iFrame = iFrame;
@@ -3338,10 +3173,6 @@ int CHsBaseFile::Hs_GetImage(pHsElement pPixEle,CHsBaseImg &Img, int iFrame)
 		}
 
 	}
-
-
-	if (lbm.IsAllocated())//Leadtools应该自己会释放吧.不确定所以此处再释放一次
-		lbm.Free();
 	
 	//注释信息
 	//CAppConfig::GetInfoSet()
@@ -3690,38 +3521,9 @@ pHsElement CHsBaseFile::BuildListRelation(pHsElement pEle)
 		pPre = BuildListRelation(pEle->pChildEleV[i]);
 	}
 
-	return pPre;
-}
+	return pPre;}
 
-pDICOMELEMENT CHsBaseFile::GetLtEleByMyEle(pHsElement pMyEle, LDicomDS *pDS)
-{
-	if(pDS==NULL)
-		return NULL;
 
-	//pMyEle在本文件中是第几个同类型Ele
-	int nPixID0 = 0;
-	pHsElement tHsPixEle = Hs_FindFirstEle(0,pMyEle->nTag,false);
-	while(tHsPixEle)
-	{
-		tHsPixEle = Hs_FindNextEle(tHsPixEle,FALSE);
-		if(tHsPixEle)
-			nPixID0++;
-	}
-
-	//在pDS中也应该是第nPixID0个
-	int nPixID1 = 0;
-	pDICOMELEMENT pLtPix = pDS->FindFirstElement(NULL,pMyEle->nTag,FALSE);
-	while(pLtPix)
-	{
-		if(nPixID1==nPixID0)
-			return pLtPix;
-
-		pLtPix = pDS->FindNextElement(pLtPix,FALSE);
-		nPixID1++;
-	}
-
-	return NULL;
-}
 
 int CHsBaseFile::SeparatePixdataAndOverlayByRow(CHsBaseImg &Img,unsigned long iRow,unsigned long nCol,long &nMin,long &nMax)
 {
@@ -4400,7 +4202,7 @@ int CHsBaseFile::Hs_SetDataTimeValue(pHsElement pEle, HsDateTime nValue,bool bCo
 		sOffsetState = "-";
 
 	QByteArray ba = sOffsetState.toLatin1();
-	sprintf_s(temp,"%04d%02d%02d%02d%02d%02d.%d%c%04d",nValue.nYear,nValue.nMonth,nValue.nDay,nValue.nFractions,ba.data(),nValue.nOffset);
+	sprintf_s(temp,"%04d%02d%02d%02d%s%02d.%d%c%04d",nValue.nYear,nValue.nMonth,nValue.nDay,nValue.nFractions,ba.data(),nValue.nOffset);
 
 	int nLen = strlen(temp);
 
@@ -4710,7 +4512,7 @@ int CHsBaseFile::Hs_SaveFile(const char *cFileName,int nTsType)
 		bBigEndia = true; 
 
     QString str = QString(QLatin1String(cFileName));
-    HANDLE hf = ::CreateFile(str.toStdWString().data(),GENERIC_WRITE,
+    HANDLE hf = ::CreateFile(str.toLatin1().data(),GENERIC_WRITE,
 		FILE_SHARE_READ|FILE_SHARE_WRITE,
 		NULL,
 		OPEN_ALWAYS,

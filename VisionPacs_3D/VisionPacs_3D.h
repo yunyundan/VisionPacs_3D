@@ -80,6 +80,8 @@ private slots:
 	void ReceiveProcessEnd();
 	void Btn_VrOperateClick(int nButtonID);
 	void Btn_ImgOperateClick(int nButtonID);
+	void Btn_CloseWndClick();
+	void Btn_MinimizeWndClick();
 public:
 	//在指定文件夹中筛选出指定seriesUID的图像并排序
 	void ExtractImage(QString sFilePath, QString sSeriesUID, vector<string> &vImagePathList);

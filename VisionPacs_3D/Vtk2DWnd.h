@@ -6,6 +6,10 @@
 
 class CHsImage;
 class ImageWnd;
+class Hmy3DVector;
+class HmyPlane3D;
+class HmyLine3D;
+class HmyImageData3D;
 
 namespace Ui {
 class Vtk2DWnd;
@@ -22,22 +26,22 @@ public:
 private:
     Ui::Vtk2DWnd *ui;
 
-	int m_nOriImgType;
 	int m_nImageNum;
-
 	int m_nSliceNum;
 
 public:
 	ImageWnd *GetImageWnd() { return ui->ImgWnd; }
-	void InitShowImage(int nOriImgType);
+	void InitShowImage();
 	void ChangeOperate(QString operate);
-	void SetImageData(void ***pImgArray, vtkSmartPointer<vtkImageData> p3Ddata, vector<CHsImage*> vOriImg);
+	void SetImageData(void ***pImgArray, vtkSmartPointer<vtkImageData> p3Ddata, vector<CHsImage*> vOriImg, HmyImageData3D *pHmyImgData,CResliceControl *pRControl);
 	void SetImageIndex(int nIndex);
 	void SetImageSlice(double dSlicePos);
 	void GetImageRowAndCol(int &nRow, int &nCol);
 	void SetSliceLinePos(double dSliceThick);
-	void SetNormalMainLine(MoveObject object,int nIndex);
+	void SetNormalMainLine(MoveObject object, int nIndex);
+	void CenterPointChanged();
 	void ReDrawImage();
+	void ReCalculateImage();
 
 private slots:
 	void OnScrollBarMoved(int nValue);

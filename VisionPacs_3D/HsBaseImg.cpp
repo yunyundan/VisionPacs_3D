@@ -250,13 +250,11 @@ int CHsBaseImg::WinLevelNormal(long w,long c,bool bUpdateBits)
 		}
 
 		//pLut[i] = int((i-nMin)*nPerGray);
-
 		//if(pLut[i]<0) 
 		//	pLut[i]=0;
-
 		//if(pLut[i]>255) 
 		//	pLut[i]=255;
-//AtlTrace("\r\npLut[%d] = %d",i,pLut[i]);
+		//AtlTrace("\r\npLut[%d] = %d",i,pLut[i]);
 	}
 
 
@@ -2251,8 +2249,8 @@ int CHsBaseImg::Hs_InitImgState()
 int CHsBaseImg::GetMinMaxValue( const RECT &ImgPixRc,long &nMin,long &nMax,bool bUseSlope )
 {
 	RECT rc;
-	rc.left = max(0,ImgPixRc.left);
-	rc.top = max(0,ImgPixRc.top);
+	rc.left = max((long)0,ImgPixRc.left);
+	rc.top = max((long)0,ImgPixRc.top);
 
 	rc.right = min( ImgPixRc.right,	m_ImgState.nCurOriPixCol);
 	rc.bottom = min( ImgPixRc.bottom,	m_ImgState.nCurOriPixRow);
@@ -2536,8 +2534,8 @@ int CHsBaseImg::Hs_CreateDisplayBits( RECT ImgRc,BYTE* &pRetBits ,unsigned long 
 	int nBytePerPix = m_ImgInfo.nBitsPerPixel/8;
 
 	//相当于求ImgRc和图像像素矩阵Rc的交集:
-	int nMinRow = max(0,ImgRc.top);		int nMaxRow = min(m_ImgState.nCurOriPixRow,  ImgRc.bottom);
-	int nMinCol = max(0,ImgRc.left);	int nMaxCol = min(m_ImgState.nCurOriPixCol, ImgRc.right);
+	int nMinRow = max((long)0,ImgRc.top);		int nMaxRow = min(m_ImgState.nCurOriPixRow,  ImgRc.bottom);
+	int nMinCol = max((long)0,ImgRc.left);	int nMaxCol = min(m_ImgState.nCurOriPixCol, ImgRc.right);
 	
 
 	//开始对pOriData做双线性插值

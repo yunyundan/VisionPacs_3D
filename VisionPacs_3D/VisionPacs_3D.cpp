@@ -94,8 +94,8 @@ void VisionPacs_3D::on_actionOpen_File_triggered()
 
 void VisionPacs_3D::on_actionTest_triggered()
 {
-	QString sFilePath = "E:\\TestData\\kidney";
-	QString sSeriesUID = "1.2.392.200036.9116.2.5.1.37.2420749095.1378337466.21712";
+	QString sFilePath = "E:\\TestData\\Heart1";
+	QString sSeriesUID = "1.2.840.113619.2.55.3.163580517.749.1227660948.182";
 
 	m_sFilePath = sFilePath;
 	m_sSeriesUID = sSeriesUID;
@@ -117,7 +117,7 @@ void VisionPacs_3D::StartProcessImage()
 	m_iPeriodNum = m_mPriodList.size();
 	ChoosePeriod(0);
 
-	ui->Workzone->ProcessImageData();
+	ui->Workzone->LoadImageData();
 }
 
 void VisionPacs_3D::ReceiveProcessEnd()
@@ -173,6 +173,16 @@ void VisionPacs_3D::Btn_ImgOperateClick(int nButtonID)
 		break;
 	}
 	ui->Workzone->ImgOperteChange(sOperateName);
+}
+
+void VisionPacs_3D::Btn_CloseWndClick()
+{
+	close();
+}
+
+void VisionPacs_3D::Btn_MinimizeWndClick()
+{
+	showMinimized();
 }
 
 void VisionPacs_3D::ShowWaitDlg()
@@ -249,6 +259,10 @@ void VisionPacs_3D::InitUIConfig()
 		m_pVolumePropertywidget = new ctkVTKVolumePropertyWidget;
 		ui->RenderVLayout->addWidget(m_pVolumePropertywidget);
 	}
+
+	//Ö÷°´Å¥ÅäÖÃ
+	connect(ui->CloseButton, SIGNAL(clicked()), this, SLOT(Btn_CloseWndClick()));
+	connect(ui->MinimizeButton, SIGNAL(clicked()), this, SLOT(Btn_MinimizeWndClick()));
 
 }
 
@@ -355,7 +369,7 @@ bool VisionPacs_3D::ReadImgListFromIni(QString sFilePath, QString sSeriesUID, ve
 	if (fSeriesIni.exists() != true)
 		return false;
 
-	HANDLE hf = ::CreateFile(sIniPath.toStdWString().data(), GENERIC_READ,
+	HANDLE hf = ::CreateFile(sIniPath.toLatin1().data(), GENERIC_READ,
 		FILE_SHARE_READ | FILE_SHARE_WRITE,
 		NULL,
 		OPEN_ALWAYS,

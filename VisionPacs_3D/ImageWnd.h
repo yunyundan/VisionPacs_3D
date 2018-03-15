@@ -5,9 +5,14 @@
 
 
 class CHsImage;
-class CHsNormalMprMaker;
+class CHmyMprMaker;
 class WorkZone;
 class OperateMprLines;
+class Hmy3DVector;
+class HmyPlane3D;
+class HmyLine3D;
+class HmyImageData3D;
+class CResliceControl;
 
 namespace Ui {
 class ImageWnd;
@@ -41,7 +46,7 @@ private:
 	int m_nImgWndType;
 
 	//普通MPR切割类
-	CHsNormalMprMaker *m_pNormalMaker;
+	CHmyMprMaker *m_pMprMaker;
 
 	//本窗口图像总数
 	int m_nImgNum;
@@ -83,20 +88,27 @@ private:
 	int ArrangeCorinfo(CORNORINFO corInfo,map<int,ROWITEM> &mapRow);
 	void InitNormalCorInfo();
 	void InitPosCorInfo();
-	void ReSetPosCorInfo(QSize deltaSize);
+	void ReSetPosCorInfoPos(QSize deltaSize);
+	void RefreshPosCorInfo();
 
 	//标签集合，方便调整位置
 	map<QLabel*,QString> m_mapInfoLabel;
 	map<QLineEdit *, QString> m_mapInfoEdit;
 
-	//当前图像序数
+	//序数
 	int m_nCurImgIndex;
 
 	//图像
+	HmyLine3D *m_pLine1;
+	HmyLine3D *m_pLine2;
 	CHsImage *m_pImg;
 
 	//操作线
 	OperateMprLines *m_pOperateLines;
+
+	//切割面管理器
+	CResliceControl *m_pResliceControl;
+
 protected:
 	QPixmap *m_pPixmap;
 	QImage *m_pQImage;
@@ -139,12 +151,20 @@ public:
 	vtkSmartPointer<vtkImageData> m_p3DImgData;
 	vector<CHsImage*> m_vOriImg;
 
-	void GetImgNumAndWndType(QString sWndName, int nOriImgType);
+	//初始化参数
+	void InitImageDataPara(void ***pImgArray, vtkSmartPointer<vtkImageData> p3Ddata, vector<CHsImage*> vOriImg, HmyImageData3D *pHmyImgData);
+	void SetResliceControl(CResliceControl *pResliceContrl);
+	void SetImageWndType(QString sWndName);
 
-	//计算本窗口显示图像
-	int CalcAndShowNormalImg(QString sWndName, int nOriImgType, int iImgIndex,int iSlice);
+	//初次显示图像
+	int FirstCalAndShowImage();
 
-	void SetCurImageIndex(int nIndex) { m_nCurImgIndex = nIndex; }
+	//根据叙述正向位置的Line参数
+	void SetOrthogonalIndex(int nIndex);
+
+	//获得图像
+	int CalcAndShowImg(QString sWndName, int nSliceNum);
+	void CalcAndShowImg();
 
 	//获得操作线
 	OperateMprLines *GetOperateLine() { return m_pOperateLines; }
@@ -155,7 +175,12 @@ public:
 	//设置MPR模式
 	void SetMprMode(QString sModeName);
 
+	//MPR切面方程
+	HmyImageData3D *m_pHmyImageData;
 
+	//计算此直线在本图像坐标系上的空间方向
+	void GetLinesDirection(QPoint pt1, QPoint pt2, HmyLine3D &line);
+	
 signals:
 	void SendImageNum(int);
 	void ImageIndexChange(int);

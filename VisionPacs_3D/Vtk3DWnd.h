@@ -48,7 +48,7 @@ public:
     void Set3DVRmode(QString sMode);//透明度等设置
     void SetupCamera(QString sOrientationName);//设置观看角度
 
-	void SetImageDate(vtkSmartPointer<vtkImageData> pImageData);
+	void SetImageDateAndShow(vtkSmartPointer<vtkImageData> pImageData);
 
 	void SetupCornorInfo();
 

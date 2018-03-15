@@ -148,9 +148,6 @@
     <ClCompile Include="Slicer\vtkSlicerGPUVolumeMapper.cxx">
       <Filter>Slicer</Filter>
     </ClCompile>
-    <ClCompile Include="HsNormalMprMaker.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="CTK\ctkBasePopupWidget.cpp">
       <Filter>CTK</Filter>
     </ClCompile>
@@ -604,6 +601,24 @@
     <ClCompile Include="GeneratedFiles\Release\moc_OperateMprLines.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="HmyMprMaker.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Hmy3dMath.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_LoadImageThread.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_LoadImageThread.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="LoadImageThread.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ResliceControl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="VisionPacs_3D.h">
@@ -822,6 +837,9 @@
     <CustomBuild Include="OperateMprLines.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
+    <CustomBuild Include="LoadImageThread.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GeneratedFiles\ui_VisionPacs_3D.h">
@@ -899,9 +917,6 @@
     <ClInclude Include="Slicer\vtkVolumeRenderingReplacements.h">
       <Filter>Slicer</Filter>
     </ClInclude>
-    <ClInclude Include="HsNormalMprMaker.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="GeneratedFiles\ui_ctkMaterialPropertyWidget.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
@@ -969,6 +984,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="vector3d.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HmyMprMaker.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Hmy3dMath.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ResliceControl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -45,8 +45,18 @@ VTK_MODULE_INIT(vtkRenderingFreeType)
 #include "gdcmScanner.h"
 #include "gdcmDataSet.h"
 #include "gdcmAttribute.h"
-#include "gdcmTesting.h"
-#include "gdcmDecoder.h"
+#include "gdcmImageReader.h"
+#include "gdcmImageChangeTransferSyntax.h"
+#include "gdcmImage.h"
+
+//DCMTK Header
+#include "dcmtk/dcmdata/dctk.h"
+#include "dcmtk/dcmdata/dcfilefo.h"
+#include "dcmtk/dcmdata/dcitem.h"
+#include "dcmtk/dcmimage/diregist.h"
+#include "dcmtk/dcmimgle/dcmimage.h"
+#include "dcmtk/dcmdata/dcpxitem.h"  
+#include "dcmtk/dcmjpeg/djdecode.h"
 
 //CTK Header
 #include "CTK/ctkTransferFunction.h"

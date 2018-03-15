@@ -38,7 +38,6 @@ public:
     QWidget *MainWidget;
     QGridLayout *gridLayout;
     WorkZone *Workzone;
-    QWidget *MainBar;
     QTabWidget *OperateTab;
     QWidget *Viewer;
     QVBoxLayout *verticalLayout_4;
@@ -78,6 +77,11 @@ public:
     QWidget *RenderWidget;
     QHBoxLayout *RenderWHLayout;
     QVBoxLayout *RenderVLayout;
+    QWidget *MainBar;
+    QHBoxLayout *horizontalLayout_2;
+    QPushButton *CloseButton;
+    QPushButton *MinimizeButton;
+    QPushButton *ConfigButton;
     QMenuBar *menuBar;
     QMenu *menuDICOM;
 
@@ -105,15 +109,6 @@ public:
         Workzone->setStyleSheet(QStringLiteral(""));
 
         gridLayout->addWidget(Workzone, 0, 1, 2, 1);
-
-        MainBar = new QWidget(MainWidget);
-        MainBar->setObjectName(QStringLiteral("MainBar"));
-        MainBar->setMinimumSize(QSize(0, 40));
-        MainBar->setMaximumSize(QSize(16777215, 16777215));
-        MainBar->setContextMenuPolicy(Qt::DefaultContextMenu);
-        MainBar->setStyleSheet(QStringLiteral(""));
-
-        gridLayout->addWidget(MainBar, 0, 0, 1, 1);
 
         OperateTab = new QTabWidget(MainWidget);
         OperateTab->setObjectName(QStringLiteral("OperateTab"));
@@ -507,6 +502,56 @@ public:
 
         gridLayout->addWidget(OperateTab, 1, 0, 1, 1);
 
+        MainBar = new QWidget(MainWidget);
+        MainBar->setObjectName(QStringLiteral("MainBar"));
+        MainBar->setMinimumSize(QSize(0, 50));
+        MainBar->setMaximumSize(QSize(16777215, 16777215));
+        MainBar->setContextMenuPolicy(Qt::DefaultContextMenu);
+        MainBar->setStyleSheet(QStringLiteral(""));
+        horizontalLayout_2 = new QHBoxLayout(MainBar);
+        horizontalLayout_2->setSpacing(6);
+        horizontalLayout_2->setContentsMargins(11, 11, 11, 11);
+        horizontalLayout_2->setObjectName(QStringLiteral("horizontalLayout_2"));
+        horizontalLayout_2->setContentsMargins(0, 5, -1, 5);
+        CloseButton = new QPushButton(MainBar);
+        CloseButton->setObjectName(QStringLiteral("CloseButton"));
+        CloseButton->setMinimumSize(QSize(35, 35));
+        CloseButton->setMaximumSize(QSize(35, 35));
+        QIcon icon14;
+        icon14.addFile(QStringLiteral("Image/close.png"), QSize(), QIcon::Normal, QIcon::Off);
+        CloseButton->setIcon(icon14);
+        CloseButton->setIconSize(QSize(30, 30));
+        CloseButton->setProperty("ControlButton", QVariant(true));
+
+        horizontalLayout_2->addWidget(CloseButton);
+
+        MinimizeButton = new QPushButton(MainBar);
+        MinimizeButton->setObjectName(QStringLiteral("MinimizeButton"));
+        MinimizeButton->setMinimumSize(QSize(35, 35));
+        MinimizeButton->setMaximumSize(QSize(35, 35));
+        QIcon icon15;
+        icon15.addFile(QStringLiteral("Image/minimize.png"), QSize(), QIcon::Normal, QIcon::Off);
+        MinimizeButton->setIcon(icon15);
+        MinimizeButton->setIconSize(QSize(30, 30));
+        MinimizeButton->setProperty("ControlButton", QVariant(true));
+
+        horizontalLayout_2->addWidget(MinimizeButton);
+
+        ConfigButton = new QPushButton(MainBar);
+        ConfigButton->setObjectName(QStringLiteral("ConfigButton"));
+        ConfigButton->setMinimumSize(QSize(35, 35));
+        ConfigButton->setMaximumSize(QSize(35, 35));
+        QIcon icon16;
+        icon16.addFile(QStringLiteral("Image/Config.png"), QSize(), QIcon::Normal, QIcon::Off);
+        ConfigButton->setIcon(icon16);
+        ConfigButton->setIconSize(QSize(28, 28));
+        ConfigButton->setProperty("ControlButton", QVariant(true));
+
+        horizontalLayout_2->addWidget(ConfigButton);
+
+
+        gridLayout->addWidget(MainBar, 0, 0, 1, 1);
+
         VisionPacs_3D->setCentralWidget(MainWidget);
         menuBar = new QMenuBar(VisionPacs_3D);
         menuBar->setObjectName(QStringLiteral("menuBar"));
@@ -580,6 +625,9 @@ public:
         );
         OperateTab->setTabText(OperateTab->indexOf(Viewer), QApplication::translate("VisionPacs_3D", "\345\270\270\350\247\204", Q_NULLPTR));
         OperateTab->setTabText(OperateTab->indexOf(RenderWidget), QApplication::translate("VisionPacs_3D", "\346\270\262\346\237\223\346\226\271\346\241\210", Q_NULLPTR));
+        CloseButton->setText(QString());
+        MinimizeButton->setText(QString());
+        ConfigButton->setText(QString());
         menuDICOM->setTitle(QApplication::translate("VisionPacs_3D", "DICOM\346\226\207\344\273\266", Q_NULLPTR));
     } // retranslateUi
 

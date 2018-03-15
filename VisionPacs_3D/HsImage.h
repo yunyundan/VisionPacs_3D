@@ -26,6 +26,7 @@ private:
 protected:
 	//在窗体上占有的区域
 	RECT m_WndRc;
+
 public:
 	void SetDs(CHsFile *pDS);
 	CHsFile *GetDs();
@@ -69,5 +70,6 @@ public:
 	//设置、获取所属窗体
 	void SetBelongWnd(ImageWnd *pWnd) { m_pBelongWnd = pWnd; }
 	ImageWnd *GetBelongWnd() { return m_pBelongWnd; }
+
 };
 

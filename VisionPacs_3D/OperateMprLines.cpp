@@ -1,5 +1,7 @@
 #include "stdafx.h"
 #include "OperateMprLines.h"
+#include "ResliceControl.h"
+#include "Hmy3dMath.h"
 
 
 OperateMprLines::OperateMprLines(QObject *parent,int nImgWndType)
@@ -10,179 +12,133 @@ OperateMprLines::OperateMprLines(QObject *parent,int nImgWndType)
 	m_bActiveOblique = false;
 	m_nNearFactor = 5;
 	m_bMousePressed = false;
-	m_moveObject = HLINE;
+	m_moveObject = A1LINE;
 
 	m_prePt = QPoint(0, 0);
 
-	m_pLineH = nullptr;
-	m_ptHStartRotate = nullptr;
-	m_ptHEndRotate = nullptr;
-	m_ptHStartInter = nullptr;
-	m_ptHEndInter = nullptr;
-	m_pLineHSliceTop = nullptr;
-	m_pLineHSliceBottom = nullptr;
-	m_pTriHStartTop = nullptr;
-	m_pTriHStartBottom = nullptr;
-	m_pTriHEndTop = nullptr;
-	m_pTriHEndBottom = nullptr;
+	m_pLineAxis1 = nullptr;
+	m_ptA1StartRotate = nullptr;
+	m_ptA1EndRotate = nullptr;
+	m_ptA1StartInter = nullptr;
+	m_ptA1EndInter = nullptr;
 
-	m_pLineV = nullptr;
-	m_ptVStartRotate = nullptr;
-	m_ptVEndRotate = nullptr;
-	m_ptVStartInter = nullptr;
-	m_ptVEndInter = nullptr;
-	m_pLineVSliceTop = nullptr;
-	m_pLineVSliceBottom = nullptr;
-	m_pTriVStartTop = nullptr;
-	m_pTriVStartBottom = nullptr;
-	m_pTriVEndTop = nullptr;
-	m_pTriVEndBottom = nullptr;
+
+	m_pLineA1SliceTop = nullptr;
+	m_pLineA1SliceBottom = nullptr;
+
+	m_pLineAxis2 = nullptr;
+	m_ptA2StartRotate = nullptr;
+	m_ptA2EndRotate = nullptr;
+	m_ptA2StartInter = nullptr;
+	m_ptA2EndInter = nullptr;
+	m_pLineA2SliceTop = nullptr;
+	m_pLineA2SliceBottom = nullptr;
 
 	m_ptCenter = nullptr;
+
+	m_pResliceControl = nullptr;
 
 	m_iPointWidth = 2;
 	m_fRotateLineRate = 0.1;
 
-	m_nTriAngleWidth = 15;
-	m_nTriAngleDis = 6;
-
 	m_nWndType = nImgWndType;
 
-	m_nSlicePos = 0.00;
+	m_nHWndSlicePos = 0;
+	m_nVWndSlicePos = 0;
+	m_nHImgSlicePos = 0;
+	m_nVImgSlicePos = 0;
 
+	m_dSpacingX = 0.00;
+	m_dSpacingY = 0.00;
 	GetLinesColor();
-
 }
 
 OperateMprLines::~OperateMprLines()
 {
-	if (m_pLineH)
+	if (m_pLineAxis1)
 	{
-		delete m_pLineH;
-		m_pLineH = nullptr;
+		delete m_pLineAxis1;
+		m_pLineAxis1 = nullptr;
 	}
 
-	if (m_ptHStartRotate)
+	if (m_ptA1StartRotate)
 	{
-		delete m_ptHStartRotate;
-		m_ptHStartRotate = nullptr;
+		delete m_ptA1StartRotate;
+		m_ptA1StartRotate = nullptr;
 	}
 
-	if (m_ptHEndRotate)
+	if (m_ptA1EndRotate)
 	{
-		delete m_ptHEndRotate;
-		m_ptHEndRotate = nullptr;
+		delete m_ptA1EndRotate;
+		m_ptA1EndRotate = nullptr;
 	}
 
-	if (m_ptHStartInter)
+	if (m_ptA1StartInter)
 	{
-		delete m_ptHStartInter;
-		m_ptHStartInter = nullptr;
+		delete m_ptA1StartInter;
+		m_ptA1StartInter = nullptr;
 	}
 
-	if (m_ptHEndInter)
+	if (m_ptA1EndInter)
 	{
-		delete m_ptHEndInter;
-		m_ptHEndInter = nullptr;
+		delete m_ptA1EndInter;
+		m_ptA1EndInter = nullptr;
 	}
 
-	if (m_pLineHSliceTop)
+	if (m_pLineA1SliceTop)
 	{
-		delete m_pLineHSliceTop;
-		m_pLineHSliceTop = nullptr;
+		delete m_pLineA1SliceTop;
+		m_pLineA1SliceTop = nullptr;
 	} 
 
-	if (m_pLineHSliceBottom)
+	if (m_pLineA1SliceBottom)
 	{
-		delete m_pLineHSliceBottom;
-		m_pLineHSliceBottom = nullptr;
-	}
-	if (m_pTriHStartTop)
-	{
-		delete m_pTriHStartTop;
-		m_pTriHStartTop = nullptr;
-	}
-	if (m_pTriHStartBottom)
-	{
-		delete m_pTriHStartBottom;
-		m_pTriHStartBottom = nullptr;
-	}
-	if (m_pTriHEndTop)
-	{
-		delete m_pTriHEndTop;
-		m_pTriHEndTop = nullptr;
-	}
-	if (m_pTriHEndBottom)
-	{
-		delete m_pTriHEndBottom;
-		m_pTriHEndBottom = nullptr;
+		delete m_pLineA1SliceBottom;
+		m_pLineA1SliceBottom = nullptr;
 	}
 
-	if (m_pLineV)
+	if (m_pLineAxis2)
 	{
-		delete m_pLineV;
-		m_pLineV = nullptr;
+		delete m_pLineAxis2;
+		m_pLineAxis2 = nullptr;
 	}
 
-	if (m_ptVStartRotate)
+	if (m_ptA2StartRotate)
 	{
-		delete m_ptVStartRotate;
-		m_ptVStartRotate = nullptr;
+		delete m_ptA2StartRotate;
+		m_ptA2StartRotate = nullptr;
 	}
 
-	if (m_ptVEndRotate)
+	if (m_ptA2EndRotate)
 	{
-		delete m_ptVEndRotate;
-		m_ptVEndRotate = nullptr;
+		delete m_ptA2EndRotate;
+		m_ptA2EndRotate = nullptr;
 	}
 
-	if (m_ptVStartInter)
+	if (m_ptA2StartInter)
 	{
-		delete m_ptVStartInter;
-		m_ptVStartInter = nullptr;
+		delete m_ptA2StartInter;
+		m_ptA2StartInter = nullptr;
 	}
 
-	if (m_ptVEndInter)
+	if (m_ptA2EndInter)
 	{
-		delete m_ptVEndInter;
-		m_ptVEndInter = nullptr;
+		delete m_ptA2EndInter;
+		m_ptA2EndInter = nullptr;
 	}
 
-	if (m_pLineVSliceTop)
+	if (m_pLineA2SliceTop)
 	{
-		delete m_pLineVSliceTop;
-		m_pLineVSliceTop = nullptr;
+		delete m_pLineA2SliceTop;
+		m_pLineA2SliceTop = nullptr;
 	}
 
-	if (m_pLineVSliceBottom)
+	if (m_pLineA2SliceBottom)
 	{
-		delete m_pLineVSliceBottom;
-		m_pLineVSliceBottom = nullptr;
+		delete m_pLineA2SliceBottom;
+		m_pLineA2SliceBottom = nullptr;
 	}
 
-	if (m_pTriVStartTop)
-	{
-		delete m_pTriVStartTop;
-		m_pTriVStartTop = nullptr;
-	}
-
-	if (m_pTriVStartBottom)
-	{
-		delete m_pTriVStartBottom;
-		m_pTriHStartBottom = nullptr;
-	}
-
-	if (m_pTriVEndTop)
-	{
-		delete m_pTriVEndTop;
-		m_pTriVEndTop = nullptr;
-	}
-
-	if (m_pTriVEndBottom)
-	{
-		delete m_pTriVEndBottom;
-		m_pTriVEndBottom = nullptr;
-	}
 
 	if (m_ptCenter)
 	{
@@ -192,7 +148,7 @@ OperateMprLines::~OperateMprLines()
 }
 
 
-bool OperateMprLines::RefreshMprLinesPara(RECT rcImg, int nImgWidth, int nImgHeigh, double fspacingX, double fspacingY)
+bool OperateMprLines::RefreshMprLinesPara(RECT rcImg, int nImgWidth, int nImgHeigh, double dSpacingX, double dSpacingY)
 {
 	if (rcImg.right - rcImg.left <= 0 || rcImg.bottom - rcImg.top <= 0)
 		return false;
@@ -202,104 +158,91 @@ bool OperateMprLines::RefreshMprLinesPara(RECT rcImg, int nImgWidth, int nImgHei
 	m_rcImgOnWnd = rcImg;
 	m_nImgW = nImgWidth;
 	m_nImgH = nImgHeigh;
-	m_fSpacingX = fspacingX;
-	m_fSpacingY = fspacingY;
+	m_dSpacingX = dSpacingX;
+	m_dSpacingY = dSpacingY;
+
 	if (m_bInitLines == false)
 	{
 		if (1) //横向
 		{
-			m_pLineH = new MprLine;
-			m_pLineH->pt1.ImgPt.x = 0.00;
-			m_pLineH->pt1.ImgPt.y = m_nImgH*1.00 / 2;
-			ConvertImgToWnd(m_pLineH->pt1);
+			m_pLineAxis1 = new MprLine;
+			m_pLineAxis1->pt1.ImgPt.x = 0.00;
+			m_pLineAxis1->pt1.ImgPt.y = m_nImgH*1.00 / 2;
+			ConvertImgToWnd(m_pLineAxis1->pt1);
 
-			m_pLineH->pt2.ImgPt.x = m_nImgW*1.00;
-			m_pLineH->pt2.ImgPt.y = m_nImgH*1.00 / 2;
-			ConvertImgToWnd(m_pLineH->pt2);
+			m_pLineAxis1->pt2.ImgPt.x = m_nImgW*1.00;
+			m_pLineAxis1->pt2.ImgPt.y = m_nImgH*1.00 / 2;
+			ConvertImgToWnd(m_pLineAxis1->pt2);
 
-			m_ptHStartRotate = new MprPoint;
-			m_ptHEndRotate = new MprPoint;
-			UpdateRotatePoint(m_pLineH, m_ptHStartRotate, m_ptHEndRotate);
+			m_ptA1StartRotate = new MprPoint;
+			m_ptA1EndRotate = new MprPoint;
+			UpdateRotatePoint(m_pLineAxis1, m_ptA1StartRotate, m_ptA1EndRotate);
 
-			int nRotateLineLength = (m_pLineH->pt2.WndPt.x() - m_pLineH->pt1.WndPt.x()) * m_fRotateLineRate;
+			int nRotateLineLength = (m_pLineAxis1->pt2.WndPt.x() - m_pLineAxis1->pt1.WndPt.x()) * m_fRotateLineRate;
 
-			m_ptHStartInter = new MprPoint;
-			m_ptHStartInter->WndPt.setX(m_pLineH->pt1.WndPt.x() + nRotateLineLength);
-			m_ptHStartInter->WndPt.setY(m_pLineH->pt1.WndPt.y());
+			m_ptA1StartInter = new MprPoint;
+			m_ptA1StartInter->WndPt.setX(m_pLineAxis1->pt1.WndPt.x() + nRotateLineLength);
+			m_ptA1StartInter->WndPt.setY(m_pLineAxis1->pt1.WndPt.y());
 
-			m_ptHEndInter = new MprPoint;
-			m_ptHEndInter->WndPt.setX(m_pLineH->pt2.WndPt.x() - nRotateLineLength);
-			m_ptHEndInter->WndPt.setY(m_pLineH->pt2.WndPt.y());
+			m_ptA1EndInter = new MprPoint;
+			m_ptA1EndInter->WndPt.setX(m_pLineAxis1->pt2.WndPt.x() - nRotateLineLength);
+			m_ptA1EndInter->WndPt.setY(m_pLineAxis1->pt2.WndPt.y());
 
 			//横向的层厚线--初始值与主线重合
-			m_pLineHSliceTop = new MprLine;
-			m_pLineHSliceTop->pt1 = *m_ptHStartInter;
-			m_pLineHSliceTop->pt2 = *m_ptHEndInter;
+			m_pLineA1SliceTop = new MprLine;
+			m_pLineA1SliceTop->pt1 = *m_ptA1StartInter;
+			m_pLineA1SliceTop->pt2 = *m_ptA1EndInter;
 
-			m_pLineHSliceBottom = new MprLine;
-			m_pLineHSliceBottom->pt1 = *m_ptHStartInter;
-			m_pLineHSliceBottom->pt2 = *m_ptHEndInter;
-
-			//三角形
-			m_pTriHStartTop = new MprTriAngle;
-			m_pTriHEndTop= new MprTriAngle;
-			GetTrianglePoint(m_pLineHSliceTop->pt1.WndPt, m_pLineHSliceTop->pt2.WndPt, m_nTriAngleDis, m_nTriAngleWidth, m_nTriAngleWidth / 2, *m_pTriHStartTop, *m_pTriHEndTop, true);
-
-			m_pTriHStartBottom = new MprTriAngle;
-			m_pTriHEndBottom = new MprTriAngle;
-			GetTrianglePoint(m_pLineHSliceBottom->pt1.WndPt, m_pLineHSliceBottom->pt2.WndPt, m_nTriAngleDis, m_nTriAngleWidth, m_nTriAngleWidth / 2, *m_pTriHStartBottom, *m_pTriHEndBottom, false);
+			m_pLineA1SliceBottom = new MprLine;
+			m_pLineA1SliceBottom->pt1 = *m_ptA1StartInter;
+			m_pLineA1SliceBottom->pt2 = *m_ptA1EndInter;
 		}
 
 		if (2) //纵向
 		{
-			m_pLineV = new MprLine;
-			m_pLineV->pt1.ImgPt.x = m_nImgW*1.00 / 2;
-			m_pLineV->pt1.ImgPt.y = 0.00 ;
-			ConvertImgToWnd(m_pLineV->pt1);
+			m_pLineAxis2 = new MprLine;
+			m_pLineAxis2->pt1.ImgPt.x = m_nImgW*1.00 / 2;
+			m_pLineAxis2->pt1.ImgPt.y = 0.00 ;
+			ConvertImgToWnd(m_pLineAxis2->pt1);
 
-			m_pLineV->pt2.ImgPt.x = m_nImgW*1.00 / 2;
-			m_pLineV->pt2.ImgPt.y = m_nImgH*1.00;
-			ConvertImgToWnd(m_pLineV->pt2);
+			m_pLineAxis2->pt2.ImgPt.x = m_nImgW*1.00 / 2;
+			m_pLineAxis2->pt2.ImgPt.y = m_nImgH*1.00;
+			ConvertImgToWnd(m_pLineAxis2->pt2);
 
-			m_ptVStartRotate = new MprPoint;
-			m_ptVEndRotate = new MprPoint;
-			UpdateRotatePoint(m_pLineV, m_ptVStartRotate, m_ptVEndRotate);
+			m_ptA2StartRotate = new MprPoint;
+			m_ptA2EndRotate = new MprPoint;
+			UpdateRotatePoint(m_pLineAxis2, m_ptA2StartRotate, m_ptA2EndRotate);
 
-			int nRotateLineLength = (m_pLineV->pt2.WndPt.y() - m_pLineV->pt1.WndPt.y()) * m_fRotateLineRate;
+			int nRotateLineLength = (m_pLineAxis2->pt2.WndPt.y() - m_pLineAxis2->pt1.WndPt.y()) * m_fRotateLineRate;
 
-			m_ptVStartInter = new MprPoint;
-			m_ptVStartInter->WndPt.setX(m_pLineV->pt1.WndPt.x());
-			m_ptVStartInter->WndPt.setY(m_pLineV->pt1.WndPt.y() + nRotateLineLength);
+			m_ptA2StartInter = new MprPoint;
+			m_ptA2StartInter->WndPt.setX(m_pLineAxis2->pt1.WndPt.x());
+			m_ptA2StartInter->WndPt.setY(m_pLineAxis2->pt1.WndPt.y() + nRotateLineLength);
 
-			m_ptVEndInter = new MprPoint;
-			m_ptVEndInter->WndPt.setX(m_pLineV->pt2.WndPt.x());
-			m_ptVEndInter->WndPt.setY(m_pLineV->pt2.WndPt.y() - nRotateLineLength);
+			m_ptA2EndInter = new MprPoint;
+			m_ptA2EndInter->WndPt.setX(m_pLineAxis2->pt2.WndPt.x());
+			m_ptA2EndInter->WndPt.setY(m_pLineAxis2->pt2.WndPt.y() - nRotateLineLength);
 
 			//横向的层厚线--初始值与主线重合
-			m_pLineVSliceTop = new MprLine;
-			m_pLineVSliceTop->pt1 = *m_ptVStartInter;
-			m_pLineVSliceTop->pt2 = *m_ptVEndInter;
+			m_pLineA2SliceTop = new MprLine;
+			m_pLineA2SliceTop->pt1 = *m_ptA2StartInter;
+			m_pLineA2SliceTop->pt2 = *m_ptA2EndInter;
 
-			m_pLineVSliceBottom = new MprLine;
-			m_pLineVSliceBottom->pt1 = *m_ptVStartInter;
-			m_pLineVSliceBottom->pt2 = *m_ptVEndInter;
+			m_pLineA2SliceBottom = new MprLine;
+			m_pLineA2SliceBottom->pt1 = *m_ptA2StartInter;
+			m_pLineA2SliceBottom->pt2 = *m_ptA2EndInter;
 
-			//三角形
-			m_pTriVStartTop = new MprTriAngle;
-			m_pTriVStartBottom = new MprTriAngle;
-			GetTrianglePoint(m_pLineVSliceTop->pt1.WndPt, m_pLineVSliceTop->pt2.WndPt, m_nTriAngleDis, m_nTriAngleWidth, m_nTriAngleWidth / 2, *m_pTriVStartTop, *m_pTriVStartBottom, true);
-
-			m_pTriVEndTop = new MprTriAngle;
-			m_pTriVEndBottom = new MprTriAngle;
-			GetTrianglePoint(m_pLineVSliceBottom->pt1.WndPt, m_pLineVSliceBottom->pt2.WndPt, m_nTriAngleDis, m_nTriAngleWidth, m_nTriAngleWidth / 2, *m_pTriVEndTop, *m_pTriVEndBottom, false);
 		}
 
 		if (3)//交点
 		{
 			m_ptCenter = new MprPoint;
-			GetInterPoint(m_pLineV->pt1.ImgPt, m_pLineV->pt2.ImgPt, m_pLineH->pt1.ImgPt, m_pLineH->pt2.ImgPt, m_ptCenter->ImgPt);
+			GetInterPoint(m_pLineAxis2->pt1.ImgPt, m_pLineAxis2->pt2.ImgPt, m_pLineAxis1->pt1.ImgPt, m_pLineAxis1->pt2.ImgPt, m_ptCenter->ImgPt);
 			ConvertImgToWnd(*m_ptCenter);
+
+			m_ptPreCenter = *m_ptCenter;			
 		}
+
 		m_bInitLines = true;
 		AllCovertWndToImg();
 	}
@@ -307,39 +250,41 @@ bool OperateMprLines::RefreshMprLinesPara(RECT rcImg, int nImgWidth, int nImgHei
 	{
 		if (1) //横向
 		{
-			ConvertImgToWnd(m_pLineH->pt1);
-			ConvertImgToWnd(m_pLineH->pt2);
-			ConvertImgToWnd(*m_ptHStartRotate);
-			ConvertImgToWnd(*m_ptHEndRotate);
-			ConvertImgToWnd(*m_ptHStartInter);
-			ConvertImgToWnd(*m_ptHEndInter);
-			ConvertImgToWnd(m_pLineHSliceTop->pt1);
-			ConvertImgToWnd(m_pLineHSliceTop->pt2);
-			ConvertImgToWnd(m_pLineHSliceBottom->pt1);
-			ConvertImgToWnd(m_pLineHSliceBottom->pt2);
-			GetTrianglePoint(m_pLineHSliceTop->pt1.WndPt, m_pLineHSliceTop->pt2.WndPt, m_nTriAngleDis, m_nTriAngleWidth, m_nTriAngleWidth / 2, *m_pTriHStartTop, *m_pTriHEndTop, true);
-			GetTrianglePoint(m_pLineHSliceBottom->pt1.WndPt, m_pLineHSliceBottom->pt2.WndPt, m_nTriAngleDis, m_nTriAngleWidth, m_nTriAngleWidth / 2, *m_pTriHStartBottom, *m_pTriHEndBottom, false);
+			ConvertImgToWnd(m_pLineAxis1->pt1);
+			ConvertImgToWnd(m_pLineAxis1->pt2);
+			ConvertImgToWnd(*m_ptA1StartRotate);
+			ConvertImgToWnd(*m_ptA1EndRotate);
+			ConvertImgToWnd(*m_ptA1StartInter);
+			ConvertImgToWnd(*m_ptA1EndInter);
+			ConvertImgToWnd(m_pLineA1SliceTop->pt1);
+			ConvertImgToWnd(m_pLineA1SliceTop->pt2);
+			ConvertImgToWnd(m_pLineA1SliceBottom->pt1);
+			ConvertImgToWnd(m_pLineA1SliceBottom->pt2);
 		}
 
 		if (2)//纵向
 		{
-			ConvertImgToWnd(m_pLineV->pt1);
-			ConvertImgToWnd(m_pLineV->pt2);
-			ConvertImgToWnd(*m_ptVStartRotate);
-			ConvertImgToWnd(*m_ptVEndRotate);
-			ConvertImgToWnd(*m_ptVStartInter);
-			ConvertImgToWnd(*m_ptVEndInter);
-			ConvertImgToWnd(m_pLineVSliceTop->pt1);
-			ConvertImgToWnd(m_pLineVSliceTop->pt2);
-			ConvertImgToWnd(m_pLineVSliceBottom->pt1);
-			ConvertImgToWnd(m_pLineVSliceBottom->pt2);
-			GetTrianglePoint(m_pLineVSliceTop->pt1.WndPt, m_pLineVSliceTop->pt2.WndPt, m_nTriAngleDis, m_nTriAngleWidth, m_nTriAngleWidth / 2, *m_pTriVStartTop, *m_pTriVEndTop, true);
-			GetTrianglePoint(m_pLineVSliceBottom->pt1.WndPt, m_pLineVSliceBottom->pt2.WndPt, m_nTriAngleDis, m_nTriAngleWidth, m_nTriAngleWidth / 2, *m_pTriVStartBottom, *m_pTriVEndBottom, false);
+			ConvertImgToWnd(m_pLineAxis2->pt1);
+			ConvertImgToWnd(m_pLineAxis2->pt2);
+			ConvertImgToWnd(*m_ptA2StartRotate);
+			ConvertImgToWnd(*m_ptA2EndRotate);
+			ConvertImgToWnd(*m_ptA2StartInter);
+			ConvertImgToWnd(*m_ptA2EndInter);
+			ConvertImgToWnd(m_pLineA2SliceTop->pt1);
+			ConvertImgToWnd(m_pLineA2SliceTop->pt2);
+			ConvertImgToWnd(m_pLineA2SliceBottom->pt1);
+			ConvertImgToWnd(m_pLineA2SliceBottom->pt2);
 		}
 
 		if (3)//交点
 		{
 			ConvertImgToWnd(*m_ptCenter);
+		}
+
+		if (4)//层厚
+		{
+			CalDistanceOfParalleLine(m_pLineA1SliceBottom->pt1.ImgPt.Int(), m_pLineAxis1, m_nHImgSlicePos);
+			CalDistanceOfParalleLine(m_pLineA2SliceBottom->pt1.ImgPt.Int(), m_pLineAxis2, m_nVImgSlicePos);
 		}
 	}
 		
@@ -350,100 +295,100 @@ void OperateMprLines::OnMprLinesMousePress(QMouseEvent *event)
 {
 	m_prePt = event->pos();
 
-	if (m_pLineH->bActive)
+	if (m_pLineAxis1->bActive)
 	{
 		m_bMousePressed = true;
-		m_moveObject = HLINE;
+		m_moveObject = A1LINE;
 		return;
 	}
 
-	if (m_ptHStartRotate->bActive)
+	if (m_ptA1StartRotate->bActive)
 	{
 		m_bMousePressed = true;
-		m_moveObject = HSTARTROTATE;
+		m_moveObject = A1STARTROTATE;
 		return;
 	}
 
-	if (m_ptHEndRotate->bActive)
+	if (m_ptA1EndRotate->bActive)
 	{
 		m_bMousePressed = true;
-		m_moveObject = HENDROTATE;
+		m_moveObject = A1ENDROTATE;
 		return;
 	}
 
-	if (m_ptHStartRotate->bActive)
+	if (m_ptA1StartRotate->bActive)
 	{
 		m_bMousePressed = true;
-		m_moveObject = HSTARTROTATE;
+		m_moveObject = A1STARTROTATE;
 		return;
 	}
 
-	if (m_ptHEndRotate->bActive)
+	if (m_ptA1EndRotate->bActive)
 	{
 		m_bMousePressed = true;
-		m_moveObject = HENDROTATE;
+		m_moveObject = A1ENDROTATE;
 		return;
 	}
 
-	if (m_pLineHSliceTop->bActive)
+	if (m_pLineA1SliceTop->bActive)
 	{
 		m_bMousePressed = true;
-		m_moveObject = HTOPSLICE;
+		m_moveObject = A1TOPSLICE;
 		return;
 	}
 
-	if (m_pLineHSliceBottom->bActive)
+	if (m_pLineA1SliceBottom->bActive)
 	{
 		m_bMousePressed = true;
-		m_moveObject = HBOTTOMSLICE;
+		m_moveObject = A1BOTTOMSLICE;
 		return;
 	}
 
-	if (m_pLineV->bActive)
+	if (m_pLineAxis2->bActive)
 	{
 		m_bMousePressed = true;
-		m_moveObject = VLINE;
+		m_moveObject = A2LINE;
 		return;
 	}
 
-	if (m_ptVStartRotate->bActive)
+	if (m_ptA2StartRotate->bActive)
 	{
 		m_bMousePressed = true;
-		m_moveObject = VSTARTROTATE;
+		m_moveObject = A2STARTROTATE;
 		return;
 	}
 
-	if (m_ptVEndRotate->bActive)
+	if (m_ptA2EndRotate->bActive)
 	{
 		m_bMousePressed = true;
-		m_moveObject = VENDROTATE;
+		m_moveObject = A2ENDROTATE;
 		return;
 	}
-	if (m_ptVStartRotate->bActive)
+	if (m_ptA2StartRotate->bActive)
 	{
 		m_bMousePressed = true;
-		m_moveObject = VSTARTROTATE;
-		return;
-	}
-
-	if (m_ptVEndRotate->bActive)
-	{
-		m_bMousePressed = true;
-		m_moveObject = VENDROTATE;
+		m_moveObject = A2STARTROTATE;
 		return;
 	}
 
-	if (m_pLineVSliceTop->bActive)
+	if (m_ptA2EndRotate->bActive)
 	{
 		m_bMousePressed = true;
-		m_moveObject = VTOPSLICE;
+		m_moveObject = A2ENDROTATE;
 		return;
 	}
 
-	if (m_pLineVSliceBottom->bActive)
+	if (m_pLineA2SliceTop->bActive)
 	{
 		m_bMousePressed = true;
-		m_moveObject = VBOTTOMSLICE;
+		m_moveObject = A2TOPSLICE;
+		return;
+	}
+
+	if (m_pLineA2SliceBottom->bActive)
+	{
+		m_bMousePressed = true;
+		m_moveObject = A2BOTTOMSLICE;
 		return;
 	}
 
@@ -453,7 +398,6 @@ void OperateMprLines::OnMprLinesMousePress(QMouseEvent *event)
 		m_moveObject = CENTERPOINT;
 		return;
 	}
-
 }
 
 bool OperateMprLines::OnMprLinesMouseMove(QMouseEvent *event)
@@ -461,40 +405,43 @@ bool OperateMprLines::OnMprLinesMouseMove(QMouseEvent *event)
 	QPoint pt;
 	pt = event->pos();
 
+	
 	if (m_bMousePressed == false)
 	{
 		bool bLinesUpdate = GetPointNearLines(pt);
-		bool bTriangleUpdate = GetPointNearTriAngle(pt);
 		bool bCenterUpdate = GetPointNearPoint(pt);
 
-		return (bLinesUpdate || bTriangleUpdate || bCenterUpdate);
+		return (bLinesUpdate || bCenterUpdate);
 	}
 	else {
-
 		QPoint ptDelta = pt - m_prePt;
-
-		if (m_moveObject == HLINE || m_moveObject == VLINE)
+		bool bChange = false;
+		if (m_moveObject == A1LINE || m_moveObject == A2LINE)
 		{
-			MoveMainLines(ptDelta);
+			bChange = MoveMainLines(ptDelta);
 		}
 
-		if (m_moveObject == HTOPSLICE || m_moveObject == HBOTTOMSLICE || m_moveObject == VTOPSLICE || m_moveObject == VBOTTOMSLICE)
+		if (m_moveObject == A1TOPSLICE || m_moveObject == A1BOTTOMSLICE || m_moveObject == A2TOPSLICE || m_moveObject == A2BOTTOMSLICE)
 		{
-			MoveSliceTriangle(ptDelta);
+			bChange = MoveSliceLines(ptDelta);
 		}
 
-		if (m_moveObject == HSTARTROTATE || m_moveObject == HENDROTATE || m_moveObject == VSTARTROTATE || m_moveObject == VENDROTATE)
+		if (m_moveObject == A1STARTROTATE || m_moveObject == A1ENDROTATE || m_moveObject == A2STARTROTATE || m_moveObject == A2ENDROTATE)
 		{
 			MoveRotateLine(pt);
 		}
 
 		if (m_moveObject == CENTERPOINT)
 		{
-			MoveCenterPt(pt);
+			bChange = MoveCenterPt(pt);
 		}
 
+		AllCovertWndToImg();
 		m_prePt = pt;
-		OutputLineInfo();
+		if (bChange)
+		{
+			OutputLineInfo();
+		}		
 		return true;
 	}
 }
@@ -512,242 +459,142 @@ void OperateMprLines::OnMprLinesPaint(QPainter *painter)
 	if (1)//横向
 	{
 		//主线
-		m_clrLineH.setAlpha(125);
-		if (m_pLineH->bActive == true)
-			m_clrLineH.setAlpha(255);
-		painter->setPen(QPen(m_clrLineH, 2, Qt::SolidLine));
+		m_clrLineAxis1.setAlpha(125);
+		if (m_pLineAxis1->bActive == true)
+			m_clrLineAxis1.setAlpha(255);
+		painter->setPen(QPen(m_clrLineAxis1, 2, Qt::SolidLine));
 		QPoint ptTmp;
-		if (sqrt(Dist2(m_ptCenter->WndPt, m_pLineH->pt1.WndPt)) < 10)
-			ptTmp = m_pLineH->pt1.WndPt;
+		if (sqrt(Dist2(m_ptCenter->WndPt, m_pLineAxis1->pt1.WndPt)) < 10)
+			ptTmp = m_pLineAxis1->pt1.WndPt;
 		else
-			GetInterPtByLength(m_ptCenter->WndPt, m_pLineH->pt1.WndPt, 10, ptTmp);
-		painter->drawLine(m_pLineH->pt1.WndPt,ptTmp);
-		if (sqrt(Dist2(m_ptCenter->WndPt, m_pLineH->pt2.WndPt)) < 10)
-			ptTmp = m_pLineH->pt2.WndPt;
+			GetInterPtByLength(m_ptCenter->WndPt, m_pLineAxis1->pt1.WndPt, 10, ptTmp);
+		painter->drawLine(m_pLineAxis1->pt1.WndPt,ptTmp);
+		if (sqrt(Dist2(m_ptCenter->WndPt, m_pLineAxis1->pt2.WndPt)) < 10)
+			ptTmp = m_pLineAxis1->pt2.WndPt;
 		else
-			GetInterPtByLength(m_ptCenter->WndPt, m_pLineH->pt2.WndPt, 10, ptTmp);
-		painter->drawLine(ptTmp, m_pLineH->pt2.WndPt);
+			GetInterPtByLength(m_ptCenter->WndPt, m_pLineAxis1->pt2.WndPt, 10, ptTmp);
+		painter->drawLine(ptTmp, m_pLineAxis1->pt2.WndPt);
 
 		//连接处圆形
-		painter->setBrush(m_clrLineH);
-		painter->drawEllipse(m_ptHStartInter->WndPt, 3, 3);
-		painter->drawEllipse(m_ptHEndInter->WndPt, 3, 3);
+		m_clrLineAxis1.setAlpha(125);
+		if (m_ptA1StartInter->bActive == true)
+			m_clrLineAxis1.setAlpha(255);
+		painter->setPen(QPen(m_clrLineAxis1, 1, Qt::SolidLine));
+		painter->setBrush(m_clrLineAxis1);
+		painter->drawEllipse(m_ptA1StartInter->WndPt, 3, 3);
+		m_clrLineAxis1.setAlpha(125);
+		if (m_ptA1EndInter->bActive == true)
+			m_clrLineAxis1.setAlpha(255);
+		painter->setBrush(m_clrLineAxis1);
+		painter->drawEllipse(m_ptA1EndInter->WndPt, 3, 3);
 
 		//旋转圆
-		m_clrLineH.setAlpha(200);
-		if (m_ptHStartRotate->bActive == true)
-			m_clrLineH.setAlpha(255);
-		painter->setPen(QPen(m_clrLineH, 1, Qt::SolidLine));
-		painter->setBrush(m_clrLineH);
-		painter->drawEllipse(m_ptHStartRotate->WndPt, 5, 5);
+		m_clrLineAxis1.setAlpha(200);
+		if (m_ptA1StartRotate->bActive == true)
+			m_clrLineAxis1.setAlpha(255);
+		painter->setPen(QPen(m_clrLineAxis1, 1, Qt::SolidLine));
+		painter->setBrush(m_clrLineAxis1);
+		painter->drawEllipse(m_ptA1StartRotate->WndPt, 5, 5);
 
-		m_clrLineH.setAlpha(200);
-		if (m_ptHEndRotate->bActive == true)
-			m_clrLineH.setAlpha(255);
-		painter->setPen(QPen(m_clrLineH, 1, Qt::SolidLine));
-		painter->setBrush(m_clrLineH);
-		painter->drawEllipse(m_ptHEndRotate->WndPt, 5, 5);
+		m_clrLineAxis1.setAlpha(200);
+		if (m_ptA1EndRotate->bActive == true)
+			m_clrLineAxis1.setAlpha(255);
+		painter->setPen(QPen(m_clrLineAxis1, 1, Qt::SolidLine));
+		painter->setBrush(m_clrLineAxis1);
+		painter->drawEllipse(m_ptA1EndRotate->WndPt, 5, 5);
 
 		//层厚线
-		if (m_nSlicePos != 0.00)
+		if (m_nHWndSlicePos != 0.00)
 		{
-			m_clrLineH.setAlpha(125);
-			painter->setPen(QPen(m_clrLineH, 1, Qt::DashLine));
-			painter->drawLine(m_ptHStartInter->WndPt, m_pLineHSliceTop->pt1.WndPt);
-			painter->drawLine(m_pLineHSliceTop->pt2.WndPt, m_ptHEndInter->WndPt);
-			if (m_pLineHSliceTop->bActive == true)
-				m_clrLineH.setAlpha(255);
-			painter->setPen(QPen(m_clrLineH, 2, Qt::DashLine));			
-			QPoint pEnd1; GetInterPoint(m_pLineHSliceTop->pt1.WndPt, m_pLineHSliceTop->pt2.WndPt, m_pLineVSliceBottom->pt1.WndPt, m_pLineVSliceBottom->pt2.WndPt, pEnd1);
-			QPoint pStart1; GetInterPoint(m_pLineHSliceTop->pt1.WndPt, m_pLineHSliceTop->pt2.WndPt, m_pLineVSliceTop->pt1.WndPt, m_pLineVSliceTop->pt2.WndPt, pStart1);
-			bool bSwitch = false;
-			double dEd = (pEnd1 - m_pLineHSliceTop->pt1.WndPt).manhattanLength();
-			double dSd = (pStart1 - m_pLineHSliceTop->pt1.WndPt).manhattanLength();
-			if (dSd < dEd)
-				bSwitch = true;
-			if (bSwitch == false)
-			{
-				painter->drawLine(m_pLineHSliceTop->pt1.WndPt, pEnd1);
-				painter->drawLine(pStart1, m_pLineHSliceTop->pt2.WndPt);
-			}
-			else
-			{
-				painter->drawLine(m_pLineHSliceTop->pt1.WndPt, pStart1);
-				painter->drawLine(pEnd1, m_pLineHSliceTop->pt2.WndPt);
-			}
+			m_clrLineAxis1.setAlpha(125);
+			painter->setPen(QPen(m_clrLineAxis1, 1, Qt::DashLine));
+			painter->drawLine(m_ptA1StartInter->WndPt, m_pLineA1SliceTop->pt1.WndPt);
+			painter->drawLine(m_pLineA1SliceTop->pt2.WndPt, m_ptA1EndInter->WndPt);
+			if (m_pLineA1SliceTop->bActive == true)
+				m_clrLineAxis1.setAlpha(255);
+			painter->setPen(QPen(m_clrLineAxis1, 2, Qt::DashLine));			
+			painter->drawLine(m_pLineA1SliceTop->pt1.WndPt, m_pLineA1SliceTop->pt2.WndPt);
 			
-			m_clrLineH.setAlpha(125);
-			painter->setPen(QPen(m_clrLineH, 1, Qt::DashLine));
-			painter->drawLine(m_ptHStartInter->WndPt, m_pLineHSliceBottom->pt1.WndPt);
-			painter->drawLine(m_pLineHSliceBottom->pt2.WndPt, m_ptHEndInter->WndPt);
-			if (m_pLineHSliceBottom->bActive == true)
-				m_clrLineH.setAlpha(255);
-			painter->setPen(QPen(m_clrLineH, 2, Qt::DashLine));
-			GetInterPoint(m_pLineHSliceBottom->pt1.WndPt, m_pLineHSliceBottom->pt2.WndPt, m_pLineVSliceBottom->pt1.WndPt, m_pLineVSliceBottom->pt2.WndPt, pEnd1);	
-			GetInterPoint(m_pLineHSliceBottom->pt1.WndPt, m_pLineHSliceBottom->pt2.WndPt, m_pLineVSliceTop->pt1.WndPt, m_pLineVSliceTop->pt2.WndPt, pStart1);
-			if (bSwitch == false) 
-			{
-				painter->drawLine(m_pLineHSliceBottom->pt1.WndPt, pEnd1);
-				painter->drawLine(pStart1, m_pLineHSliceBottom->pt2.WndPt);
-			}
-			else
-			{
-				painter->drawLine(m_pLineHSliceBottom->pt1.WndPt, pStart1);
-				painter->drawLine(pEnd1, m_pLineHSliceBottom->pt2.WndPt);
-			}
-
-		}
-
-		//三角形
-		m_clrLineH.setAlpha(125);
-		painter->setBrush(Qt::NoBrush);
-		if (m_pTriHStartTop->bActive == true)
-			m_clrLineH.setAlpha(255);
-		painter->setPen(QPen(m_clrLineH, 2, Qt::SolidLine));
-		const QPointF points[3] = { m_pTriHStartTop->ptBtm1,m_pTriHStartTop->ptBtm2,m_pTriHStartTop->ptTop };
-		painter->drawPolygon(points, 3);
-
-		m_clrLineH.setAlpha(125);
-		if (m_pTriHEndTop->bActive == true)
-			m_clrLineH.setAlpha(255);
-		painter->setPen(QPen(m_clrLineH, 2, Qt::SolidLine));
-		const QPointF points1[3] = { m_pTriHEndTop->ptBtm1,m_pTriHEndTop->ptBtm2,m_pTriHEndTop->ptTop };
-		painter->drawPolygon(points1, 3);
-
-		m_clrLineH.setAlpha(125);
-		if (m_pTriHEndBottom->bActive == true)
-			m_clrLineH.setAlpha(255);
-		painter->setPen(QPen(m_clrLineH, 2, Qt::SolidLine));
-		const QPointF points2[3] = { m_pTriHEndBottom->ptBtm1,m_pTriHEndBottom->ptBtm2,m_pTriHEndBottom->ptTop };
-		painter->drawPolygon(points2, 3);
-
-		m_clrLineH.setAlpha(125);
-		if (m_pTriHStartBottom->bActive == true)
-			m_clrLineH.setAlpha(255);
-		painter->setPen(QPen(m_clrLineH, 2, Qt::SolidLine));
-		const QPointF points3[3] = { m_pTriHStartBottom->ptBtm1,m_pTriHStartBottom->ptBtm2,m_pTriHStartBottom->ptTop };
-		painter->drawPolygon(points3, 3);
+			m_clrLineAxis1.setAlpha(125);
+			painter->setPen(QPen(m_clrLineAxis1, 1, Qt::DashLine));
+			painter->drawLine(m_ptA1StartInter->WndPt, m_pLineA1SliceBottom->pt1.WndPt);
+			painter->drawLine(m_pLineA1SliceBottom->pt2.WndPt, m_ptA1EndInter->WndPt);
+			if (m_pLineA1SliceBottom->bActive == true)
+				m_clrLineAxis1.setAlpha(255);
+			painter->setPen(QPen(m_clrLineAxis1, 2, Qt::DashLine));
+			painter->drawLine(m_pLineA1SliceBottom->pt1.WndPt, m_pLineA1SliceBottom->pt2.WndPt);
+		}	
 	}
 
 	if (2)//纵向
 	{
 		//主线
-		m_clrLineV.setAlpha(125);
-		if (m_pLineV->bActive == true)
-			m_clrLineV.setAlpha(255);
-		painter->setPen(QPen(m_clrLineV, 2, Qt::SolidLine));
+		m_clrLineAxis2.setAlpha(125);
+		if (m_pLineAxis2->bActive)
+			m_clrLineAxis2.setAlpha(255);
+		painter->setPen(QPen(m_clrLineAxis2, 2, Qt::SolidLine));
 		QPoint ptTmp;
-		if (sqrt(Dist2(m_ptCenter->WndPt, m_pLineV->pt1.WndPt)) < 10)
-			ptTmp = m_pLineV->pt1.WndPt;
+		if (sqrt(Dist2(m_ptCenter->WndPt, m_pLineAxis2->pt1.WndPt)) < 10)
+			ptTmp = m_pLineAxis2->pt1.WndPt;
 		else
-			GetInterPtByLength(m_ptCenter->WndPt, m_pLineV->pt1.WndPt, 10, ptTmp);
-		painter->drawLine(m_pLineV->pt1.WndPt, ptTmp);
-		if (sqrt(Dist2(m_ptCenter->WndPt, m_pLineV->pt2.WndPt)) < 10)
-			ptTmp = m_pLineV->pt2.WndPt;
+			GetInterPtByLength(m_ptCenter->WndPt, m_pLineAxis2->pt1.WndPt, 10, ptTmp);
+		painter->drawLine(m_pLineAxis2->pt1.WndPt, ptTmp);
+		if (sqrt(Dist2(m_ptCenter->WndPt, m_pLineAxis2->pt2.WndPt)) < 10)
+			ptTmp = m_pLineAxis2->pt2.WndPt;
 		else
-			GetInterPtByLength(m_ptCenter->WndPt, m_pLineV->pt2.WndPt, 10, ptTmp);		
-		painter->drawLine(ptTmp,m_pLineV->pt2.WndPt);
+			GetInterPtByLength(m_ptCenter->WndPt, m_pLineAxis2->pt2.WndPt, 10, ptTmp);		
+		painter->drawLine(ptTmp,m_pLineAxis2->pt2.WndPt);
 
 		//连接处圆形
-		painter->setPen(QPen(m_clrLineV, 1, Qt::SolidLine));
-		painter->setBrush(m_clrLineV);
-		painter->drawEllipse(m_ptVStartInter->WndPt, 3, 3);
-		painter->drawEllipse(m_ptVEndInter->WndPt, 3, 3);
+		m_clrLineAxis2.setAlpha(125);
+		if (m_ptA2StartInter->bActive)
+			m_clrLineAxis2.setAlpha(255);
+		painter->setPen(QPen(m_clrLineAxis2, 1, Qt::SolidLine));
+		painter->setBrush(m_clrLineAxis2);	
+		painter->drawEllipse(m_ptA2StartInter->WndPt, 3, 3);
+		m_clrLineAxis2.setAlpha(125);
+		if (m_ptA2EndInter->bActive)
+			m_clrLineAxis2.setAlpha(255);
+		painter->setPen(QPen(m_clrLineAxis2, 1, Qt::SolidLine));
+		painter->setBrush(m_clrLineAxis2);
+		painter->drawEllipse(m_ptA2EndInter->WndPt, 3, 3);
 
 		//旋转圆
-		m_clrLineV.setAlpha(200);
-		if (m_ptVStartRotate->bActive == true)
-			m_clrLineV.setAlpha(255);
-		painter->setPen(QPen(m_clrLineV, 1, Qt::SolidLine));
-		painter->setBrush(m_clrLineV);
-		painter->drawEllipse(m_ptVStartRotate->WndPt, 5, 5);
+		m_clrLineAxis2.setAlpha(200);
+		if (m_ptA2StartRotate->bActive)
+			m_clrLineAxis2.setAlpha(255);
+		painter->setPen(QPen(m_clrLineAxis2, 1, Qt::SolidLine));
+		painter->setBrush(m_clrLineAxis2);
+		painter->drawEllipse(m_ptA2StartRotate->WndPt, 5, 5);
 
-		m_clrLineV.setAlpha(200);
-		if (m_ptVEndRotate->bActive == true)
-			m_clrLineV.setAlpha(255);
-		painter->setPen(QPen(m_clrLineV, 1, Qt::SolidLine));
-		painter->setBrush(m_clrLineV);
-		painter->drawEllipse(m_ptVEndRotate->WndPt, 5, 5);
+		m_clrLineAxis2.setAlpha(200);
+		if (m_ptA2EndRotate->bActive == true)
+			m_clrLineAxis2.setAlpha(255);
+		painter->setPen(QPen(m_clrLineAxis2, 1, Qt::SolidLine));
+		painter->setBrush(m_clrLineAxis2);
+		painter->drawEllipse(m_ptA2EndRotate->WndPt, 5, 5);
 
 		//层厚线
-		if (m_nSlicePos != 0.00)
+		if (m_nVWndSlicePos != 0.00)
 		{
-			m_clrLineV.setAlpha(125);
-			painter->setPen(QPen(m_clrLineV, 1, Qt::DashLine));
-			painter->drawLine(m_ptVStartInter->WndPt, m_pLineVSliceTop->pt1.WndPt);
-			painter->drawLine(m_pLineVSliceTop->pt2.WndPt, m_ptVEndInter->WndPt);
-			if (m_pLineVSliceTop->bActive == true)
-				m_clrLineV.setAlpha(255);
-			painter->setPen(QPen(m_clrLineV, 2, Qt::DashLine));
-			QPoint pStart1; GetInterPoint(m_pLineVSliceTop->pt1.WndPt, m_pLineVSliceTop->pt2.WndPt, m_pLineHSliceBottom->pt1.WndPt, m_pLineHSliceBottom->pt2.WndPt, pStart1);
-			QPoint pEnd1; GetInterPoint(m_pLineVSliceTop->pt1.WndPt, m_pLineVSliceTop->pt2.WndPt, m_pLineHSliceTop->pt1.WndPt, m_pLineHSliceTop->pt2.WndPt, pEnd1);
-			bool bSwitch = false;
-			double dEd = (pEnd1 - m_pLineVSliceTop->pt1.WndPt).manhattanLength();
-			double dSd = (pStart1 - m_pLineVSliceTop->pt1.WndPt).manhattanLength();
-			if (dSd < dEd)
-				bSwitch = true;
-			if (bSwitch == false)
-			{
-				painter->drawLine(m_pLineVSliceTop->pt1.WndPt, pEnd1);
-				painter->drawLine(pStart1, m_pLineVSliceTop->pt2.WndPt);
-			}
-			else
-			{
-				painter->drawLine(m_pLineVSliceTop->pt1.WndPt, pStart1);
-				painter->drawLine(pEnd1, m_pLineVSliceTop->pt2.WndPt);
-			}
+			m_clrLineAxis2.setAlpha(125);
+			painter->setPen(QPen(m_clrLineAxis2, 1, Qt::DashLine));
+			painter->drawLine(m_ptA2StartInter->WndPt, m_pLineA2SliceTop->pt1.WndPt);
+			painter->drawLine(m_pLineA2SliceTop->pt2.WndPt, m_ptA2EndInter->WndPt);
+			if (m_pLineA2SliceTop->bActive == true)
+				m_clrLineAxis2.setAlpha(255);
+			painter->setPen(QPen(m_clrLineAxis2, 2, Qt::DashLine));
+			painter->drawLine(m_pLineA2SliceTop->pt1.WndPt, m_pLineA2SliceTop->pt2.WndPt);
 
-			m_clrLineV.setAlpha(125);
-			painter->setPen(QPen(m_clrLineV, 1, Qt::DashLine));
-			painter->drawLine(m_ptVStartInter->WndPt, m_pLineVSliceBottom->pt1.WndPt);
-			painter->drawLine(m_pLineVSliceBottom->pt2.WndPt, m_ptVEndInter->WndPt);
-			if (m_pLineVSliceBottom->bActive == true)
-				m_clrLineV.setAlpha(255);
-			painter->setPen(QPen(m_clrLineV, 2, Qt::DashLine));
-			GetInterPoint(m_pLineVSliceBottom->pt1.WndPt, m_pLineVSliceBottom->pt2.WndPt, m_pLineHSliceTop->pt1.WndPt, m_pLineHSliceTop->pt2.WndPt, pEnd1);
-			GetInterPoint(m_pLineVSliceBottom->pt1.WndPt, m_pLineVSliceBottom->pt2.WndPt, m_pLineHSliceBottom->pt1.WndPt, m_pLineHSliceBottom->pt2.WndPt, pStart1);
-			if (bSwitch == false)
-			{
-				painter->drawLine(m_pLineVSliceBottom->pt1.WndPt, pEnd1);
-				painter->drawLine(pStart1, m_pLineVSliceBottom->pt2.WndPt);
-			}
-			else
-			{
-				painter->drawLine(m_pLineVSliceBottom->pt1.WndPt, pStart1);
-				painter->drawLine(pEnd1, m_pLineVSliceBottom->pt2.WndPt);
-			}
-
+			m_clrLineAxis2.setAlpha(125);
+			painter->setPen(QPen(m_clrLineAxis2, 1, Qt::DashLine));
+			painter->drawLine(m_ptA2StartInter->WndPt, m_pLineA2SliceBottom->pt1.WndPt);
+			painter->drawLine(m_pLineA2SliceBottom->pt2.WndPt, m_ptA2EndInter->WndPt);
+			if (m_pLineA2SliceBottom->bActive == true)
+				m_clrLineAxis2.setAlpha(255);
+			painter->setPen(QPen(m_clrLineAxis2, 2, Qt::DashLine));
+			painter->drawLine(m_pLineA2SliceBottom->pt1.WndPt, m_pLineA2SliceBottom->pt2.WndPt);
 		}
-
-		//三角形
-		m_clrLineV.setAlpha(125);
-		painter->setBrush(Qt::NoBrush);
-		if (m_pTriVStartTop->bActive == true)
-			m_clrLineV.setAlpha(255);
-		painter->setPen(QPen(m_clrLineV, 2, Qt::SolidLine));
-		const QPointF points[3] = { m_pTriVStartTop->ptBtm1,m_pTriVStartTop->ptBtm2,m_pTriVStartTop->ptTop };
-		painter->drawPolygon(points, 3);
-
-		m_clrLineV.setAlpha(125);
-		if (m_pTriVStartBottom->bActive == true)
-			m_clrLineV.setAlpha(255);
-		painter->setPen(QPen(m_clrLineV, 2, Qt::SolidLine));
-		const QPointF points1[3] = { m_pTriVStartBottom->ptBtm1,m_pTriVStartBottom->ptBtm2,m_pTriVStartBottom->ptTop };
-		painter->drawPolygon(points1, 3);
-
-		m_clrLineV.setAlpha(125);
-		if (m_pTriVEndTop->bActive == true)
-			m_clrLineV.setAlpha(255);
-		painter->setPen(QPen(m_clrLineV, 2, Qt::SolidLine));
-		const QPointF points2[3] = { m_pTriVEndTop->ptBtm1,m_pTriVEndTop->ptBtm2,m_pTriVEndTop->ptTop };
-		painter->drawPolygon(points2, 3);
-
-		m_clrLineV.setAlpha(125);
-		if (m_pTriVEndBottom->bActive == true)
-			m_clrLineV.setAlpha(255);
-		painter->setPen(QPen(m_clrLineV, 2, Qt::SolidLine));
-		const QPointF points3[3] = { m_pTriVEndBottom->ptBtm1,m_pTriVEndBottom->ptBtm2,m_pTriVEndBottom->ptTop };
-		painter->drawPolygon(points3, 3);
 	}
 
 	if (3)
@@ -759,62 +606,151 @@ void OperateMprLines::OnMprLinesPaint(QPainter *painter)
 		painter->setBrush(Qt::NoBrush);
 		painter->drawEllipse(m_ptCenter->WndPt, 2, 2);
 	}
-
 }
 
 void OperateMprLines::OutputLineInfo()
 {
-	AllCovertWndToImg();
-
 	MprLinesInfo info;
-	info.ptH1 = m_pLineH->pt1.ImgPt.Int();
-	info.ptH2 = m_pLineH->pt2.ImgPt.Int();
-	info.ptV1 = m_pLineV->pt1.ImgPt.Int();
-	info.ptV2 = m_pLineV->pt2.ImgPt.Int();
-	info.dSliceThick = m_nSlicePos * m_fSpacingX;
-	info.ptCenter = m_ptCenter->ImgPt.Int();
+	if (m_moveObject == A1LINE || m_moveObject == A2LINE || m_moveObject == CENTERPOINT)
+	{
+		info.moveObject = CENTERPOINT;
+	}
+	else if (m_moveObject == A1STARTROTATE || m_moveObject == A1ENDROTATE || m_moveObject == A2STARTROTATE || m_moveObject == A2ENDROTATE)
+	{
+		info.moveObject = A1STARTROTATE;
+	}
+
 	info.nWndType = m_nWndType;
-	emit MprLinesInfoOutput(info);
+
+	emit MprLinesInfoChange(info);
 }
 
+void OperateMprLines::OnCenterPointChanged()
+{
+	Hmy3DVector vecDelta = m_pResliceControl->GetCenter().Sub(m_pResliceControl->GetPreCenter());
 
+	int nPlaneAxis1Id = GetPlaneAxis1();
+	int nPlaneAxis2Id = GetPlaneAxis2();
+
+	Hmy3DVector vecA1 = m_pResliceControl->GetAxis(nPlaneAxis1Id);
+	Hmy3DVector vecA2 = m_pResliceControl->GetAxis(nPlaneAxis2Id);
+	Hmy3DVector thisNormal = m_pResliceControl->GetPlane(m_nWndType)->normal();
+
+	double dDeltaX = 0.00, dDeltaY = 0.00;
+	double xyX = vecA2.x()*vecA1.y() - vecA1.x()*vecA2.y();
+	double xzX = vecA2.x()*vecA1.z() - vecA1.x()*vecA2.z();
+	double yzX = vecA2.y()*vecA1.z() - vecA1.y()*vecA2.z();
+	vector<double> vecDeltaX;
+	if (abs(xyX - 0.0000) > 0.00001)
+	{
+		double delta = (vecDelta.y()*vecA2.x() - vecA2.y()*vecDelta.x()) / xyX;
+		vecDeltaX.push_back(delta);
+	}
+	if (abs(xzX - 0.0000) > 0.00001)
+	{
+		double delta = (vecDelta.z()*vecA2.x() - vecA2.z()*vecDelta.x()) / xzX;
+		vecDeltaX.push_back(delta);
+	}
+	if(abs(yzX - 0.0000) > 0.00001)
+	{
+		double delta = (vecDelta.z()*vecA2.y() - vecA2.z()*vecDelta.y()) / yzX;
+		vecDeltaX.push_back(delta);
+	}
+	sort(vecDeltaX.begin(), vecDeltaX.end());
+	dDeltaX = vecDeltaX[vecDeltaX.size() - 1];
+
+	double xyY= vecA1.x()*vecA2.y() - vecA2.x()*vecA1.y();
+	double xzY = vecA1.x()*vecA2.z() - vecA2.x()*vecA1.z();
+	double yzY = vecA1.y()*vecA2.z() - vecA2.y()*vecA1.z();
+	vector<double> vecDeltaY;
+	if (abs(xyY - 0.0000) > 0.00001)
+	{
+		double delta = (vecDelta.y()*vecA1.x() - vecA1.y()*vecDelta.x()) / xyY;
+		vecDeltaY.push_back(delta);
+	}
+	if (abs(xzY - 0.0000) > 0.00001)
+	{
+		double delta = (vecDelta.z()*vecA1.x() - vecA1.z()*vecDelta.x()) / xzY;
+		vecDeltaY.push_back(delta);
+	}
+	if (abs(yzY - 0.0000) > 0.00001)
+	{
+		double delta = (vecDelta.z()*vecA1.y() - vecA1.z()*vecDelta.y()) / yzY;
+		vecDeltaY.push_back(delta);
+	}
+	sort(vecDeltaY.begin(), vecDeltaY.end());
+	dDeltaY = vecDeltaY[vecDeltaY.size() - 1];
+
+	double deltaX = dDeltaX / m_dSpacingX;
+	double deltaY = dDeltaY / m_dSpacingY;
+
+	m_ptCenter->ImgPt.x += deltaX;
+	m_ptCenter->ImgPt.y += deltaY;
+
+	ConvertImgToWnd(*m_ptCenter);
+
+	m_ptPreCenter = *m_ptCenter;
+
+	if (1)//H
+	{
+		GetParalleLine(m_pLineAxis1, m_ptCenter, m_pLineAxis1->pt1, m_pLineAxis1->pt2);
+		ReCalInterPoint(m_pLineAxis1, m_ptA1StartInter, m_ptA1EndInter);
+		UpdateRotatePoint(m_pLineAxis1, m_ptA1StartRotate, m_ptA1EndRotate);
+		CalSliceLine(m_ptA1StartInter, m_ptA1EndInter, m_pLineA1SliceTop, m_pLineA1SliceBottom);
+	}
+
+	if (2)//V
+	{
+		GetParalleLine(m_pLineAxis2, m_ptCenter, m_pLineAxis2->pt1, m_pLineAxis2->pt2);
+		ReCalInterPoint(m_pLineAxis2, m_ptA2StartInter, m_ptA2EndInter);
+		UpdateRotatePoint(m_pLineAxis2, m_ptA2StartRotate, m_ptA2EndRotate);
+		CalSliceLine(m_ptA2StartInter, m_ptA2EndInter, m_pLineA2SliceTop, m_pLineA2SliceBottom);
+	}
+	AllCovertWndToImg();
+}
 
 void OperateMprLines::SetManiLinePos(MoveObject object, MprLine *pLine)
 {
 	ConvertImgToWnd(pLine->pt1);
 	ConvertImgToWnd(pLine->pt2);
 	QPoint ptInter;
-	if (object == HLINE)
+	if (object == A1LINE)
 	{
-		m_pLineH->pt1 = pLine->pt1;
-		m_pLineH->pt2 = pLine->pt2;	
-		GetInterPoint(m_pLineH->pt1.WndPt, m_pLineH->pt2.WndPt, m_pLineV->pt1.WndPt, m_pLineV->pt2.WndPt, ptInter);
-		ReCalInterPoint(m_pLineH, m_ptHStartInter, m_ptHEndInter);
-		UpdateRotatePoint(m_pLineH, m_ptHStartRotate, m_ptHEndRotate);	
+		m_pLineAxis1->pt1 = pLine->pt1;
+		m_pLineAxis1->pt2 = pLine->pt2;	
+		GetInterPoint(m_pLineAxis1->pt1.WndPt, m_pLineAxis1->pt2.WndPt, m_pLineAxis2->pt1.WndPt, m_pLineAxis2->pt2.WndPt, ptInter);
+		ReCalInterPoint(m_pLineAxis1, m_ptA1StartInter, m_ptA1EndInter);
+		UpdateRotatePoint(m_pLineAxis1, m_ptA1StartRotate, m_ptA1EndRotate);	
 	}
 
-	if (object == VLINE)
+	if (object == A2LINE)
 	{
-		m_pLineV->pt1 = pLine->pt1;
-		m_pLineV->pt2 = pLine->pt2;
-		GetInterPoint(m_pLineV->pt1.WndPt, m_pLineV->pt2.WndPt, m_pLineH->pt1.WndPt, m_pLineH->pt2.WndPt, ptInter);
-		ReCalInterPoint(m_pLineV, m_ptVStartInter, m_ptVEndInter);
-		UpdateRotatePoint(m_pLineV, m_ptVStartRotate, m_ptVEndRotate);
+		m_pLineAxis2->pt1 = pLine->pt1;
+		m_pLineAxis2->pt2 = pLine->pt2;
+		GetInterPoint(m_pLineAxis2->pt1.WndPt, m_pLineAxis2->pt2.WndPt, m_pLineAxis1->pt1.WndPt, m_pLineAxis1->pt2.WndPt, ptInter);
+		ReCalInterPoint(m_pLineAxis2, m_ptA2StartInter, m_ptA2EndInter);
+		UpdateRotatePoint(m_pLineAxis2, m_ptA2StartRotate, m_ptA2EndRotate);
 	}
 
-	CalSliceLine(m_ptHStartInter, m_ptHEndInter, m_pLineHSliceTop, m_pTriHStartTop, m_pTriHEndTop, m_pLineHSliceBottom, m_pTriHStartBottom, m_pTriHEndBottom);
-	CalSliceLine(m_ptVStartInter, m_ptVEndInter, m_pLineVSliceTop, m_pTriVStartTop, m_pTriVEndTop, m_pLineVSliceBottom, m_pTriVStartBottom, m_pTriVEndBottom);
+	CalSliceLine(m_ptA1StartInter, m_ptA1EndInter, m_pLineA1SliceTop, m_pLineA1SliceBottom);
+	CalSliceLine(m_ptA2StartInter, m_ptA2EndInter, m_pLineA2SliceTop, m_pLineA2SliceBottom);
 
 	m_ptCenter->WndPt = ptInter;
 	AllCovertWndToImg();
 }
 
-void OperateMprLines::SetSliceLinePos(double nSliceThick)
+void OperateMprLines::SetSliceLinePos(double nSliceThick, int nIndex)
 {
-	m_nSlicePos = qRound(nSliceThick / m_fSpacingX);
-
-	CalSliceLine(m_ptHStartInter, m_ptHEndInter, m_pLineHSliceTop, m_pTriHStartTop, m_pTriHEndTop, m_pLineHSliceBottom, m_pTriHStartBottom, m_pTriHEndBottom);
-	CalSliceLine(m_ptVStartInter, m_ptVEndInter, m_pLineVSliceTop, m_pTriVStartTop, m_pTriVEndTop, m_pLineVSliceBottom, m_pTriVStartBottom, m_pTriVEndBottom);
+	if (nIndex == 0)
+	{
+		m_nHWndSlicePos = qRound(nSliceThick); // m_fSpacingX
+		CalSliceLine(m_ptA1StartInter, m_ptA1EndInter, m_pLineA1SliceTop, m_pLineA1SliceBottom);
+	}
+	else
+	{
+		m_nVWndSlicePos = qRound(nSliceThick );// m_fSpacingX
+		CalSliceLine(m_ptA2StartInter, m_ptA2EndInter, m_pLineA2SliceTop, m_pLineA2SliceBottom);
+	}
 	AllCovertWndToImg();
 }
 
@@ -828,20 +764,20 @@ void OperateMprLines::GetLinesColor()
 {
 	if (m_nWndType == ORIIMG_AXIAL)
 	{
-		m_clrLineH = QColor(124, 252, 0, 125);
-		m_clrLineV = QColor(255, 0, 0, 125);
+		m_clrLineAxis1 = QColor(124, 252, 0, 125);
+		m_clrLineAxis2 = QColor(255, 0, 0, 125);
 		m_clrCenter = QColor(0, 191, 255, 125);
 	}
 	else if(m_nWndType == ORIIMG_CORONAL)
 	{
-		m_clrLineH = QColor(0, 191, 255, 125);
-		m_clrLineV = QColor(255, 0, 0, 125);
+		m_clrLineAxis1 = QColor(0, 191, 255, 125);
+		m_clrLineAxis2 = QColor(255, 0, 0, 125);
 		m_clrCenter = QColor(124, 252, 0, 125);
 	}
 	else if (m_nWndType == ORIIMG_SAGITTAL)
 	{
-		m_clrLineH = QColor(0, 191, 255, 125);
-		m_clrLineV = QColor(124, 252, 0, 125);
+		m_clrLineAxis1 = QColor(0, 191, 255, 125);
+		m_clrLineAxis2 = QColor(124, 252, 0, 125);
 		m_clrCenter = QColor(255, 0, 0, 125);
 	}
 }
@@ -874,40 +810,6 @@ bool OperateMprLines::ConvertWndToImg(MprPoint & pt)
 	return true;
 }
 
-bool OperateMprLines::GetTrianglePoint(QPoint &p1, QPoint &p2, int iDis, UINT nHeight, UINT nWidth, MprTriAngle &T1, MprTriAngle &T2, bool bUseLeft)
-{
-	//1、求垂直于p1-p2，且经过 p1,p2的，且与p1-p2距离为nHeight + iDis的点---应该有4个(顶点)
-	QPoint ptTopL1, ptTopL2;
-	GetVerticalLine(p1, p2, p1, nHeight + iDis, ptTopL1, ptTopL2);
-	QPoint ptTopR1, ptTopR2;
-	GetVerticalLine(p1, p2, p2, nHeight + iDis, ptTopR1, ptTopR2);
-
-	//2、这回求出4个点，我只要两个(从p1出发到p2，要左侧的点)
-	QPoint ptTopL = SelectPtSideLine(p1, p2, ptTopL1, ptTopL2, bUseLeft);//去掉下面的那个点
-	QPoint ptTopR = SelectPtSideLine(p1, p2, ptTopR1, ptTopR2, bUseLeft);//去掉下面的那个点
-
-	//3、求垂直于p1-p2，且经过 p1,p2的，且与p1-p2距离为iDis的点---应该有4个(底部中点)
-	QPoint ptBottonCenterL1, ptBottonCenterL2;
-	GetVerticalLine(p1, p2, p1, iDis, ptBottonCenterL1, ptBottonCenterL2);
-	QPoint ptBottonCenterR1, ptBottonCenterR2;
-	GetVerticalLine(p1, p2, p2, iDis, ptBottonCenterR1, ptBottonCenterR2);
-
-	QPoint ptBottonCenterL = SelectPtSideLine(p1, p2, ptBottonCenterL1, ptBottonCenterL2, bUseLeft);//去掉下面的那个点
-	QPoint ptBottonCenterR = SelectPtSideLine(p1, p2, ptBottonCenterR1, ptBottonCenterR2, bUseLeft);//去掉下面的那个点
-
-	//4、分别以两个底部中点各向两侧求距离为nWidth的两点，共四个点
-	QPoint ptBtmLL, ptBtmLR;//左侧三角形的底部两点
-	QPoint ptBtmRL, ptBtmRR;//右侧三角形的底部两点
-	GetPtByLength(ptBottonCenterL,p1, p2, nWidth, ptBtmLL, ptBtmLR);
-	GetPtByLength(ptBottonCenterR,p1, p2, nWidth, ptBtmRL, ptBtmRR);
-
-	//5、完成
-	T1.ptTop = ptTopL;	T1.ptBtm1 = ptBtmLL; T1.ptBtm2 = ptBtmLR;
-	T2.ptTop = ptTopR;	T2.ptBtm1 = ptBtmRL; T2.ptBtm2 = ptBtmRR;
-
-	return true;
-}
-
 bool OperateMprLines::GetVerticalLine(QPoint &p1, QPoint &p2, QPoint &PublicPt, double nLen, QPoint &newPt1, QPoint &newPt2)
 {
 	int x1 = p1.x();
@@ -932,7 +834,7 @@ bool OperateMprLines::GetVerticalLine(QPoint &p1, QPoint &p2, QPoint &PublicPt, 
 		newPt2.setX(qRound(fx2));
 
 		newPt1.setY(qRound(k * fx1 + b));
-		newPt2.setY(qRound(k *fx2 + b));
+		newPt2.setY(qRound(k * fx2 + b));
 
 		return true;
 	}
@@ -960,127 +862,6 @@ bool OperateMprLines::GetVerticalLine(QPoint &p1, QPoint &p2, QPoint &PublicPt, 
 	}
 
 	return false;
-}
-
-QPoint OperateMprLines::SelectPtSideLine(QPoint &p1, QPoint &p2, QPoint &newPt1, QPoint &newPt2, bool bUseLeft)
-{
-	if (p2.x() > p1.x() && p2.y() < p1.y())//p1左下--p2右上
-	{
-
-		if (bUseLeft)//留y()小的
-			return newPt1.y() < newPt2.y() ? newPt1 : newPt2;
-		else
-			return newPt1.y() < newPt2.y() ? newPt2 : newPt1;
-	}
-	else if (p2.x() == p1.x() && p2.y() < p1.y())//垂直，p1在下，p2在上
-	{
-		if (bUseLeft)//留x()小的
-			return newPt1.x() < newPt2.x() ? newPt1 : newPt2;
-		else
-			return newPt1.x() < newPt2.x() ? newPt2 : newPt1;
-	}
-	else if (p2.x() < p1.x() && p2.y() < p1.y())//p2左上，p1右下
-	{
-		if (bUseLeft)//留y()大的
-			return newPt1.y() > newPt2.y() ? newPt1 : newPt2;
-		else
-			return newPt1.y() > newPt2.y() ? newPt2 : newPt1;
-	}
-	else if (p2.y() == p1.y() && p2.x() < p1.x())//水平，p2在左，p1在右
-	{
-		if (bUseLeft)//留y()大的
-			return newPt1.y() > newPt2.y() ? newPt1 : newPt2;
-		else
-			return newPt1.y() > newPt2.y() ? newPt2 : newPt1;
-	}
-	else if (p2.x() < p1.x() && p2.y() > p1.y())//p2左下，p1右上
-	{
-		if (bUseLeft)//留y()大的
-			return newPt1.y() > newPt2.y() ? newPt1 : newPt2;
-		else
-			return newPt1.y() > newPt2.y() ? newPt2 : newPt1;
-	}
-	else if (p2.x() == p1.x() && p2.y() > p1.y())//垂直p2在下，p1在上
-	{
-		if (bUseLeft)//留x()大的
-			return newPt1.x() > newPt2.x() ? newPt1 : newPt2;
-		else
-			return newPt1.x() > newPt2.x() ? newPt2 : newPt1;
-	}
-	else if (p2.x() > p1.x() && p2.y() > p1.y())//p2右下，p1左上
-	{
-		if (bUseLeft)//留y()小的
-			return newPt1.y() < newPt2.y() ? newPt1 : newPt2;
-		else
-			return newPt1.y() < newPt2.y() ? newPt2 : newPt1;
-	}
-	else if (p2.y() == p1.y() && p2.x() > p1.x())//水平p2在右，p1在左
-	{
-		if (bUseLeft)//留y()小的
-			return newPt1.y() < newPt2.y() ? newPt1 : newPt2;
-		else
-			return newPt1.y() < newPt2.y() ? newPt2 : newPt1;
-	}
-
-	return newPt1;
-}
-
-bool OperateMprLines::GetPtByLength(QPoint&pCenterPoint, QPoint &p1, QPoint &p2, double nLen, QPoint &RetPtL, QPoint &RetPtR)
-{
-	//1、先求距离p1处距离为nLen的点
-	double X = pCenterPoint.x()*1.00;
-	double Y = pCenterPoint.y()*1.00;
-	double x1 = p1.x() * 1.00;
-	double y1 = p1.y() * 1.00;
-	double x2 = p2.x() * 1.00;
-	double y2 = p2.y()* 1.00;
-
-	if (p1.x() != p2.x() && p1.y() != p2.y())
-	{
-		double k = (y2 - y1) / (x2 - x1);
-		double b = Y - k * X;
-		//两点间距离公式 ：nLen1 = [ sqrt(1 + k*k) ]*abs(? - x1)
-		//得到:abs(?-x1) = nLen1/sqrt(1+k*k);
-		//得到:? = nLen1/sqrt(1+k*k) + x1; 和 ? = x1 - [nLen1/sqrt(1+k*k)];
-		double X1 = nLen / sqrt(1 + k*k) + X;
-		double Y1 = k * X1 + b;
-
-		double X2 = X - (nLen / sqrt(1 + k*k));
-		double Y2 = k * X2 + b;
-
-
-		RetPtL.setX(qRound(X1));
-		RetPtL.setY(qRound(Y1));
-
-		RetPtR.setX(qRound(X2));
-		RetPtR.setY(qRound(Y2));
-
-	}
-	if (p1.x() == p2.x())//|
-	{
-		int Y1 = Y + nLen;
-		int Y2 = Y - nLen;
-
-		RetPtL.setX(X);
-		RetPtL.setY(Y1);
-
-		RetPtR.setX(X);
-		RetPtR.setY(Y2);
-
-	}
-	if (p1.y() == p2.y())//-
-	{
-		int X1 = X + nLen;
-		int X2 = X - nLen;
-
-		RetPtL.setX(X1);
-		RetPtL.setY(Y);
-
-		RetPtR.setX(X2);
-		RetPtR.setY(Y);
-	}
-
-	return true;
 }
 
 bool OperateMprLines::GetInterPoint(FPOINT pA0, FPOINT pA1, FPOINT pB0, FPOINT pB1, FPOINT &retPt)
@@ -1177,7 +958,7 @@ bool OperateMprLines::GetInterPoint(QPoint pA0, QPoint pA1, QPoint pB0, QPoint p
 	FPOINT fB1; fB1.x = pB1.x()*1.00; fB1.y = pB1.y()*1.00;
 	FPOINT rPt;
 	bool b = GetInterPoint(fA0, fA1, fB0, fB1, rPt);
-	if (b = false)
+	if (!b)
 		return false;
 	retPt = rPt.Int();
 	return true;	
@@ -1188,114 +969,60 @@ bool OperateMprLines::GetPointNearLines(QPoint pt)
 	bool bUpdate = false;
 	if (1)//横向几个成员判断
 	{
-		bool bNear = DistanceToLines(m_pLineH, pt);
-		if ((bNear && !m_pLineH->bActive) || (!bNear && m_pLineH->bActive) )
+		bool bNear = DistanceToLines(m_pLineAxis1, pt);
+		if ((bNear && !m_pLineAxis1->bActive) || (!bNear && m_pLineAxis1->bActive) )
 		{
-			m_pLineH->bActive = !m_pLineH->bActive;
+			m_pLineAxis1->bActive = !m_pLineAxis1->bActive;
 			bUpdate = true;
 		}	
 	}
 
 	if (2)
 	{
-		bool bNear = DistanceToLines(m_pLineV, pt);
-		if ((bNear && !m_pLineV->bActive) || (!bNear && m_pLineV->bActive))
+		bool bNear = DistanceToLines(m_pLineAxis2, pt);
+		if ((bNear && !m_pLineAxis2->bActive) || (!bNear && m_pLineAxis2->bActive))
 		{
-			m_pLineV->bActive = !m_pLineV->bActive;
+			m_pLineAxis2->bActive = !m_pLineAxis2->bActive;
 			bUpdate = true;
 		}
 	}
 
-	return bUpdate;
-}
-
-bool OperateMprLines::GetPointNearTriAngle(QPoint pt)
-{
-	bool bUpdate = false;
-	if (1)//横向的几个三角形
+	if (3 && m_nHWndSlicePos !=0)
 	{
-		bool bNear = DistanceToTriangle(m_pTriHStartTop, pt);
-		if ((bNear && !m_pTriHStartTop->bActive) || (!bNear && m_pTriHStartTop->bActive))
+		m_ptA1EndInter->bActive = false;
+		m_ptA1StartInter->bActive = false;
+		bool bNear = DistanceToLines(m_pLineA1SliceTop, pt);
+		if ((bNear && !m_pLineA1SliceTop->bActive) || (!bNear && m_pLineA1SliceTop->bActive))
 		{
-			m_pTriHStartTop->bActive = !m_pTriHStartTop->bActive;
+			m_pLineA1SliceTop->bActive = !m_pLineA1SliceTop->bActive;
 			bUpdate = true;
 		}
 
-		bNear = DistanceToTriangle(m_pTriHEndTop, pt);
-		if ((bNear && !m_pTriHEndTop->bActive) || (!bNear && m_pTriHEndTop->bActive))
+		bNear = DistanceToLines(m_pLineA1SliceBottom, pt);
+		if ((bNear && !m_pLineA1SliceBottom->bActive) || (!bNear && m_pLineA1SliceBottom->bActive))
 		{
-			m_pTriHEndTop->bActive = !m_pTriHEndTop->bActive;
+			m_pLineA1SliceBottom->bActive = !m_pLineA1SliceBottom->bActive;
 			bUpdate = true;
 		}
-
-		if (m_pTriHStartTop->bActive || m_pTriHEndTop->bActive)
-			m_pLineHSliceTop->bActive = true;
-		
-		if (!m_pTriHStartTop->bActive && !m_pTriHEndTop->bActive)
-			m_pLineHSliceTop->bActive = false;
-
-		bNear = DistanceToTriangle(m_pTriHStartBottom, pt);
-		if ((bNear && !m_pTriHStartBottom->bActive) || (!bNear && m_pTriHStartBottom->bActive))
-		{
-			m_pTriHStartBottom->bActive = !m_pTriHStartBottom->bActive;
-			bUpdate = true;
-		}
-
-		bNear = DistanceToTriangle(m_pTriHEndBottom, pt);
-		if ((bNear && !m_pTriHEndBottom->bActive) || (!bNear && m_pTriHEndBottom->bActive))
-		{
-			m_pTriHEndBottom->bActive = !m_pTriHEndBottom->bActive;
-			bUpdate = true;
-		}
-
-		if (m_pTriHStartBottom->bActive || m_pTriHEndBottom->bActive)
-			m_pLineHSliceBottom->bActive = true;
-
-		if (!m_pTriHStartBottom->bActive && !m_pTriHEndBottom->bActive)
-			m_pLineHSliceBottom->bActive = false;
 	}
 
-	if (2)//纵向的几个三角形
+	if (4 && m_nVWndSlicePos != 0)
 	{
-		bool bNear = DistanceToTriangle(m_pTriVStartTop, pt);
-		if ((bNear && !m_pTriVStartTop->bActive) || (!bNear && m_pTriVStartTop->bActive))
+		m_ptA2EndInter->bActive = false;
+		m_ptA2StartInter->bActive = false;
+		bool bNear = DistanceToLines(m_pLineA2SliceTop, pt);
+		if ((bNear && !m_pLineA2SliceTop->bActive) || (!bNear && m_pLineA2SliceTop->bActive))
 		{
-			m_pTriVStartTop->bActive = !m_pTriVStartTop->bActive;
+			m_pLineA2SliceTop->bActive = !m_pLineA2SliceTop->bActive;
 			bUpdate = true;
 		}
 
-		bNear = DistanceToTriangle(m_pTriVEndTop, pt);
-		if ((bNear && !m_pTriVEndTop->bActive) || (!bNear && m_pTriVEndTop->bActive))
+		bNear = DistanceToLines(m_pLineA2SliceBottom, pt);
+		if ((bNear && !m_pLineA2SliceBottom->bActive) || (!bNear && m_pLineA2SliceBottom->bActive))
 		{
-			m_pTriVEndTop->bActive = !m_pTriVEndTop->bActive;
+			m_pLineA2SliceBottom->bActive = !m_pLineA2SliceBottom->bActive;
 			bUpdate = true;
 		}
-
-		if (m_pTriVStartTop->bActive || m_pTriVEndTop->bActive)
-			m_pLineVSliceTop->bActive = true;
-
-		if (!m_pTriVStartTop->bActive && !m_pTriVEndTop->bActive)
-			m_pLineVSliceTop->bActive = false;
-
-		bNear = DistanceToTriangle(m_pTriVStartBottom, pt);
-		if ((bNear && !m_pTriVStartBottom->bActive) || (!bNear && m_pTriVStartBottom->bActive))
-		{
-			m_pTriVStartBottom->bActive = !m_pTriVStartBottom->bActive;
-			bUpdate = true;
-		}
-
-		bNear = DistanceToTriangle(m_pTriVEndBottom, pt);
-		if ((bNear && !m_pTriVEndBottom->bActive) || (!bNear && m_pTriVEndBottom->bActive))
-		{
-			m_pTriVEndBottom->bActive = !m_pTriVEndBottom->bActive;
-			bUpdate = true;
-		}
-
-		if (m_pTriVStartBottom->bActive || m_pTriVEndBottom->bActive)
-			m_pLineVSliceBottom->bActive = true;
-
-		if (!m_pTriVStartBottom->bActive && !m_pTriVEndBottom->bActive)
-			m_pLineVSliceBottom->bActive = false;
 	}
 
 	return bUpdate;
@@ -1307,45 +1034,45 @@ bool OperateMprLines::GetPointNearPoint(QPoint pt)
 
 	if (1)//横向
 	{
-		bool bNear = DistanceToPoint(m_ptHStartRotate, pt, 8);
-		if ((bNear && !m_ptHStartRotate->bActive) || (!bNear && m_ptHStartRotate->bActive))
+		bool bNear = DistanceToPoint(m_ptA1StartRotate, pt, 8);
+		if ((bNear && !m_ptA1StartRotate->bActive) || (!bNear && m_ptA1StartRotate->bActive))
 		{
-			m_ptHStartRotate->bActive = !m_ptHStartRotate->bActive;
+			m_ptA1StartRotate->bActive = !m_ptA1StartRotate->bActive;
 			bUpdate = true;
 		}
 
-		bNear = DistanceToPoint(m_ptHEndRotate, pt, 8);
-		if ((bNear && !m_ptHEndRotate->bActive) || (!bNear && m_ptHEndRotate->bActive))
+		bNear = DistanceToPoint(m_ptA1EndRotate, pt, 8);
+		if ((bNear && !m_ptA1EndRotate->bActive) || (!bNear && m_ptA1EndRotate->bActive))
 		{
-			m_ptHEndRotate->bActive = !m_ptHEndRotate->bActive;
+			m_ptA1EndRotate->bActive = !m_ptA1EndRotate->bActive;
 			bUpdate = true;
 		}
 
-		if (m_ptHStartRotate->bActive || m_ptHEndRotate->bActive)
+		if (m_ptA1StartRotate->bActive || m_ptA1EndRotate->bActive)
 		{
-			m_pLineH->bActive = false;
+			m_pLineAxis1->bActive = false;
 		}
 	}
 
 	if (2)//纵向
 	{
-		bool bNear = DistanceToPoint(m_ptVStartRotate, pt, 8);
-		if ((bNear && !m_ptVStartRotate->bActive) || (!bNear && m_ptVStartRotate->bActive))
+		bool bNear = DistanceToPoint(m_ptA2StartRotate, pt, 8);
+		if ((bNear && !m_ptA2StartRotate->bActive) || (!bNear && m_ptA2StartRotate->bActive))
 		{
-			m_ptVStartRotate->bActive = !m_ptVStartRotate->bActive;
+			m_ptA2StartRotate->bActive = !m_ptA2StartRotate->bActive;
 			bUpdate = true;
 		}
 
-		bNear = DistanceToPoint(m_ptVEndRotate, pt, 8);
-		if ((bNear && !m_ptVEndRotate->bActive) || (!bNear && m_ptVEndRotate->bActive))
+		bNear = DistanceToPoint(m_ptA2EndRotate, pt, 8);
+		if ((bNear && !m_ptA2EndRotate->bActive) || (!bNear && m_ptA2EndRotate->bActive))
 		{
-			m_ptVEndRotate->bActive = !m_ptVEndRotate->bActive;
+			m_ptA2EndRotate->bActive = !m_ptA2EndRotate->bActive;
 			bUpdate = true;
 		}
 
-		if (m_ptVStartRotate->bActive || m_ptVEndRotate->bActive)
+		if (m_ptA2StartRotate->bActive || m_ptA2EndRotate->bActive)
 		{
-			m_pLineV->bActive = false;
+			m_pLineAxis2->bActive = false;
 		}
 	}
 
@@ -1361,11 +1088,48 @@ bool OperateMprLines::GetPointNearPoint(QPoint pt)
 
 		if (m_ptCenter->bActive)
 		{
-			m_pLineV->bActive = false;
-			m_pLineH->bActive = false;
+			m_pLineAxis2->bActive = false;
+			m_pLineAxis1->bActive = false;
 		}
 	}
 
+	if (4 && m_nHWndSlicePos == 0)
+	{
+		bool bSNear = DistanceToPoint(m_ptA1StartInter, pt, 4);
+		bool bENear = DistanceToPoint(m_ptA1EndInter, pt, 4);
+		m_ptA1StartInter->bActive = bSNear;
+		m_ptA1EndInter->bActive = bENear;
+		bool bNear = (bSNear || bENear);
+		if ((bNear && !m_pLineA1SliceBottom->bActive) || (!bNear && m_pLineA1SliceBottom->bActive))
+		{
+			m_pLineA1SliceBottom->bActive = !m_pLineA1SliceBottom->bActive;
+			bUpdate = true;
+		}
+		
+		if (m_pLineA1SliceBottom->bActive)
+		{
+			m_pLineAxis1->bActive = false;
+		}
+	}
+
+	if (5 && m_nVWndSlicePos == 0)
+	{
+		bool bSNear = DistanceToPoint(m_ptA2StartInter, pt, 4);
+		bool bENear = DistanceToPoint(m_ptA2EndInter, pt, 4);
+		m_ptA2StartInter->bActive = bSNear;
+		m_ptA2EndInter->bActive = bENear;
+		bool bNear = (bSNear || bENear);
+		if ((bNear && !m_pLineA2SliceTop->bActive) || (!bNear && m_pLineA2SliceTop->bActive))
+		{
+			m_pLineA2SliceTop->bActive = !m_pLineA2SliceTop->bActive;
+			bUpdate = true;
+		}
+
+		if (m_pLineA2SliceTop->bActive)
+		{
+			m_pLineAxis2->bActive = false;
+		}
+	}
 
 	return bUpdate;
 }
@@ -1400,29 +1164,6 @@ bool OperateMprLines::DistanceToLines(MprLine* pLine, QPoint pt)
 	ptTemp.setY(pLine->pt1.WndPt.y() + t * (pLine->pt2.WndPt.y() - pLine->pt1.WndPt.y()));
 
 	return (sqrt(Dist2(pt, ptTemp)) < m_nNearFactor);
-}
-
-bool OperateMprLines::DistanceToTriangle(MprTriAngle *pTriangle, QPoint pt)
-{
-	MprLine *pLineLeft = new MprLine;
-	pLineLeft->pt1.WndPt = pTriangle->ptTop;
-	pLineLeft->pt2.WndPt = pTriangle->ptBtm1;
-	bool bNearLineLeft = DistanceToLines(pLineLeft, pt);
-	delete pLineLeft;
-
-	MprLine *pLineBottom = new MprLine;
-	pLineBottom->pt1.WndPt = pTriangle->ptBtm1;
-	pLineBottom->pt2.WndPt = pTriangle->ptBtm2;
-	bool bNearLineBottom = DistanceToLines(pLineBottom, pt);
-	delete pLineBottom;
-
-	MprLine *pLineRight = new MprLine;
-	pLineRight->pt1.WndPt = pTriangle->ptTop;
-	pLineRight->pt2.WndPt = pTriangle->ptBtm2;
-	bool bNearLineRight = DistanceToLines(pLineRight, pt);
-	delete pLineRight;
-
-	return (bNearLineLeft || bNearLineRight || bNearLineBottom);
 }
 
 bool OperateMprLines::DistanceToPoint(MprPoint *ptMpr, QPoint pt, int nDistance)
@@ -1478,139 +1219,140 @@ float OperateMprLines::Dist2(QPoint pt1, QPoint pt2)
 	return (pt1.x() - pt2.x())*(pt1.x() - pt2.x()) + (pt1.y() - pt2.y())*(pt1.y() - pt2.y());
 }
 
-void OperateMprLines::MoveMainLines(QPoint deltaPt)
+bool OperateMprLines::MoveMainLines(QPoint deltaPt)
 {
-	if (m_moveObject == HLINE)
+	if (m_moveObject == A1LINE)
 	{
 		MprLine moveLine;
-		moveLine.pt1.WndPt.setX(m_pLineH->pt1.WndPt.x());
-		moveLine.pt1.WndPt.setY(m_pLineH->pt1.WndPt.y());
-		moveLine.pt2.WndPt.setX(m_pLineH->pt2.WndPt.x());
-		moveLine.pt2.WndPt.setY(m_pLineH->pt2.WndPt.y());
+		moveLine.pt1.WndPt.setX(m_pLineAxis1->pt1.WndPt.x());
+		moveLine.pt1.WndPt.setY(m_pLineAxis1->pt1.WndPt.y());
+		moveLine.pt2.WndPt.setX(m_pLineAxis1->pt2.WndPt.x());
+		moveLine.pt2.WndPt.setY(m_pLineAxis1->pt2.WndPt.y());
 		QPoint ptInter;
-		if (m_pLineH->pt1.WndPt.y() == m_pLineH->pt2.WndPt.y())
+		if (m_pLineAxis1->pt1.WndPt.y() == m_pLineAxis1->pt2.WndPt.y())
 		{
-			moveLine.pt1.WndPt.setY(m_pLineH->pt1.WndPt.y() + deltaPt.y());
-			moveLine.pt2.WndPt.setY(m_pLineH->pt2.WndPt.y() + deltaPt.y());
-			GetInterPoint(moveLine.pt1.WndPt, moveLine.pt2.WndPt, m_pLineV->pt1.WndPt, m_pLineV->pt2.WndPt, ptInter);
-			if (IsPointInRc(m_rcImgOnWnd, ptInter) == false)
-				return;
-			m_pLineH->pt1.WndPt.setY(moveLine.pt1.WndPt.y());
-			m_pLineH->pt2.WndPt.setY(moveLine.pt2.WndPt.y());
+			moveLine.pt1.WndPt.setY(m_pLineAxis1->pt1.WndPt.y() + deltaPt.y());
+			moveLine.pt2.WndPt.setY(m_pLineAxis1->pt2.WndPt.y() + deltaPt.y());
+			GetInterPoint(moveLine.pt1.WndPt, moveLine.pt2.WndPt, m_pLineAxis2->pt1.WndPt, m_pLineAxis2->pt2.WndPt, ptInter);
+			if (!IsPointInRc(m_rcImgOnWnd, ptInter))
+				return false;
+			m_pLineAxis1->pt1.WndPt.setY(moveLine.pt1.WndPt.y());
+			m_pLineAxis1->pt2.WndPt.setY(moveLine.pt2.WndPt.y());
 		}
-		else if (m_pLineH->pt1.WndPt.x() == m_pLineH->pt2.WndPt.x())
+		else if (m_pLineAxis1->pt1.WndPt.x() == m_pLineAxis1->pt2.WndPt.x())
 		{
-			moveLine.pt1.WndPt.setX(m_pLineH->pt1.WndPt.x() + deltaPt.x());
-			moveLine.pt2.WndPt.setX(m_pLineH->pt2.WndPt.x() + deltaPt.x());
-			GetInterPoint(moveLine.pt1.WndPt, moveLine.pt2.WndPt, m_pLineV->pt1.WndPt, m_pLineV->pt2.WndPt, ptInter);
-			if (IsPointInRc(m_rcImgOnWnd, ptInter) == false)
-				return;
-			m_pLineH->pt1.WndPt.setX(moveLine.pt1.WndPt.x());
-			m_pLineH->pt2.WndPt.setX(moveLine.pt2.WndPt.x());
+			moveLine.pt1.WndPt.setX(m_pLineAxis1->pt1.WndPt.x() + deltaPt.x());
+			moveLine.pt2.WndPt.setX(m_pLineAxis1->pt2.WndPt.x() + deltaPt.x());
+			GetInterPoint(moveLine.pt1.WndPt, moveLine.pt2.WndPt, m_pLineAxis2->pt1.WndPt, m_pLineAxis2->pt2.WndPt, ptInter);
+			if (!IsPointInRc(m_rcImgOnWnd, ptInter))
+				return false;
+			m_pLineAxis1->pt1.WndPt.setX(moveLine.pt1.WndPt.x());
+			m_pLineAxis1->pt2.WndPt.setX(moveLine.pt2.WndPt.x());
 		}
 		else 
 		{
-			moveLine.pt1.WndPt.setX(m_pLineH->pt1.WndPt.x() + deltaPt.x());
-			moveLine.pt1.WndPt.setY(m_pLineH->pt1.WndPt.y() + deltaPt.y());
-			moveLine.pt2.WndPt.setX(m_pLineH->pt2.WndPt.x() + deltaPt.x());
-			moveLine.pt2.WndPt.setY(m_pLineH->pt2.WndPt.y() + deltaPt.y());
-			MprLine *pNewLineH = new MprLine;
-			GetLineAcrossRc(m_rcImgOnWnd, moveLine.pt1.WndPt, moveLine.pt2.WndPt, pNewLineH->pt1.WndPt, pNewLineH->pt2.WndPt);
-			GetInterPoint(pNewLineH->pt1.WndPt, pNewLineH->pt2.WndPt, m_pLineV->pt1.WndPt, m_pLineV->pt2.WndPt, ptInter);
-			if (IsPointInRc(m_rcImgOnWnd, ptInter) == false)
+			moveLine.pt1.WndPt.setX(m_pLineAxis1->pt1.WndPt.x() + deltaPt.x());
+			moveLine.pt1.WndPt.setY(m_pLineAxis1->pt1.WndPt.y() + deltaPt.y());
+			moveLine.pt2.WndPt.setX(m_pLineAxis1->pt2.WndPt.x() + deltaPt.x());
+			moveLine.pt2.WndPt.setY(m_pLineAxis1->pt2.WndPt.y() + deltaPt.y());
+			MprLine *pNewLineA1 = new MprLine;
+			GetLineAcrossRc(m_rcImgOnWnd, moveLine.pt1.WndPt, moveLine.pt2.WndPt, pNewLineA1->pt1.WndPt, pNewLineA1->pt2.WndPt);
+			GetInterPoint(pNewLineA1->pt1.WndPt, pNewLineA1->pt2.WndPt, m_pLineAxis2->pt1.WndPt, m_pLineAxis2->pt2.WndPt, ptInter);
+			if (!IsPointInRc(m_rcImgOnWnd, ptInter))
 			{
-				delete pNewLineH;
-				return;
+				delete pNewLineA1;
+				return false;
 			}
-			*m_pLineH = *pNewLineH;
-			delete pNewLineH;
+			*m_pLineAxis1 = *pNewLineA1;
+			delete pNewLineA1;
 		}	
-		ReCalInterPoint(m_pLineH, m_ptHStartInter, m_ptHEndInter);
-		UpdateRotatePoint(m_pLineH, m_ptHStartRotate, m_ptHEndRotate);
+		ReCalInterPoint(m_pLineAxis1, m_ptA1StartInter, m_ptA1EndInter);
+		UpdateRotatePoint(m_pLineAxis1, m_ptA1StartRotate, m_ptA1EndRotate);
 		m_ptCenter->WndPt = ptInter;
-		CalSliceLine(m_ptHStartInter, m_ptHEndInter,m_pLineHSliceTop,m_pTriHStartTop,m_pTriHEndTop,m_pLineHSliceBottom,m_pTriHStartBottom,m_pTriHEndBottom);
+		CalSliceLine(m_ptA1StartInter, m_ptA1EndInter, m_pLineA1SliceTop, m_pLineA1SliceBottom);
 	}
-	else if (m_moveObject == VLINE)
+	else if (m_moveObject == A2LINE)
 	{
 		MprLine moveLine;
-		moveLine.pt1.WndPt.setX(m_pLineV->pt1.WndPt.x());
-		moveLine.pt1.WndPt.setY(m_pLineV->pt1.WndPt.y());
-		moveLine.pt2.WndPt.setX(m_pLineV->pt2.WndPt.x());
-		moveLine.pt2.WndPt.setY(m_pLineV->pt2.WndPt.y());
+		moveLine.pt1.WndPt.setX(m_pLineAxis2->pt1.WndPt.x());
+		moveLine.pt1.WndPt.setY(m_pLineAxis2->pt1.WndPt.y());
+		moveLine.pt2.WndPt.setX(m_pLineAxis2->pt2.WndPt.x());
+		moveLine.pt2.WndPt.setY(m_pLineAxis2->pt2.WndPt.y());
 		QPoint ptInter;
-		if (m_pLineV->pt1.WndPt.y() == m_pLineV->pt2.WndPt.y())
+		if (m_pLineAxis2->pt1.WndPt.y() == m_pLineAxis2->pt2.WndPt.y())
 		{
-			moveLine.pt1.WndPt.setY(m_pLineV->pt1.WndPt.y() + deltaPt.y());
-			moveLine.pt2.WndPt.setY(m_pLineV->pt2.WndPt.y() + deltaPt.y());			
-			GetInterPoint(moveLine.pt1.WndPt, moveLine.pt2.WndPt, m_pLineH->pt1.WndPt, m_pLineH->pt2.WndPt, ptInter);
+			moveLine.pt1.WndPt.setY(m_pLineAxis2->pt1.WndPt.y() + deltaPt.y());
+			moveLine.pt2.WndPt.setY(m_pLineAxis2->pt2.WndPt.y() + deltaPt.y());			
+			GetInterPoint(moveLine.pt1.WndPt, moveLine.pt2.WndPt, m_pLineAxis1->pt1.WndPt, m_pLineAxis1->pt2.WndPt, ptInter);
 			if (IsPointInRc(m_rcImgOnWnd, ptInter) == false)
-				return;
-			m_pLineV->pt1.WndPt.setY(m_pLineV->pt1.WndPt.y() + deltaPt.y());
-			m_pLineV->pt2.WndPt.setY(m_pLineV->pt2.WndPt.y() + deltaPt.y());
+				return false;
+			m_pLineAxis2->pt1.WndPt.setY(m_pLineAxis2->pt1.WndPt.y() + deltaPt.y());
+			m_pLineAxis2->pt2.WndPt.setY(m_pLineAxis2->pt2.WndPt.y() + deltaPt.y());
 		}
-		else if (m_pLineV->pt1.WndPt.x() == m_pLineV->pt2.WndPt.x())
+		else if (m_pLineAxis2->pt1.WndPt.x() == m_pLineAxis2->pt2.WndPt.x())
 		{
-			moveLine.pt1.WndPt.setX(m_pLineV->pt1.WndPt.x() + deltaPt.x());
-			moveLine.pt2.WndPt.setX(m_pLineV->pt2.WndPt.x() + deltaPt.x());
-			GetInterPoint(moveLine.pt1.WndPt, moveLine.pt2.WndPt, m_pLineH->pt1.WndPt, m_pLineH->pt2.WndPt, ptInter);
+			moveLine.pt1.WndPt.setX(m_pLineAxis2->pt1.WndPt.x() + deltaPt.x());
+			moveLine.pt2.WndPt.setX(m_pLineAxis2->pt2.WndPt.x() + deltaPt.x());
+			GetInterPoint(moveLine.pt1.WndPt, moveLine.pt2.WndPt, m_pLineAxis1->pt1.WndPt, m_pLineAxis1->pt2.WndPt, ptInter);
 			if (IsPointInRc(m_rcImgOnWnd, ptInter) == false)
-				return;
-			m_pLineV->pt1.WndPt.setX(m_pLineV->pt1.WndPt.x() + deltaPt.x());
-			m_pLineV->pt2.WndPt.setX(m_pLineV->pt2.WndPt.x() + deltaPt.x());
+				return false;
+			m_pLineAxis2->pt1.WndPt.setX(m_pLineAxis2->pt1.WndPt.x() + deltaPt.x());
+			m_pLineAxis2->pt2.WndPt.setX(m_pLineAxis2->pt2.WndPt.x() + deltaPt.x());
 		}
 		else
 		{
-			moveLine.pt1.WndPt.setX(m_pLineV->pt1.WndPt.x() + deltaPt.x());
-			moveLine.pt1.WndPt.setY(m_pLineV->pt1.WndPt.y() + deltaPt.y());
-			moveLine.pt2.WndPt.setX(m_pLineV->pt2.WndPt.x() + deltaPt.x());
-			moveLine.pt2.WndPt.setY(m_pLineV->pt2.WndPt.y() + deltaPt.y());
+			moveLine.pt1.WndPt.setX(m_pLineAxis2->pt1.WndPt.x() + deltaPt.x());
+			moveLine.pt1.WndPt.setY(m_pLineAxis2->pt1.WndPt.y() + deltaPt.y());
+			moveLine.pt2.WndPt.setX(m_pLineAxis2->pt2.WndPt.x() + deltaPt.x());
+			moveLine.pt2.WndPt.setY(m_pLineAxis2->pt2.WndPt.y() + deltaPt.y());
 			MprLine *pNewLineV = new MprLine;
 			GetLineAcrossRc(m_rcImgOnWnd, moveLine.pt1.WndPt, moveLine.pt2.WndPt, pNewLineV->pt1.WndPt, pNewLineV->pt2.WndPt);
-			GetInterPoint(pNewLineV->pt1.WndPt, pNewLineV->pt2.WndPt, m_pLineH->pt1.WndPt, m_pLineH->pt2.WndPt, ptInter);
+			GetInterPoint(pNewLineV->pt1.WndPt, pNewLineV->pt2.WndPt, m_pLineAxis1->pt1.WndPt, m_pLineAxis1->pt2.WndPt, ptInter);
 			if (IsPointInRc(m_rcImgOnWnd, ptInter) == false)
 			{
 				delete pNewLineV;
-				return;
+				return false;
 			}
-			*m_pLineV = *pNewLineV;
+			*m_pLineAxis2 = *pNewLineV;
 			delete pNewLineV;
 		}
-		ReCalInterPoint(m_pLineV, m_ptVStartInter, m_ptVEndInter);
-		UpdateRotatePoint(m_pLineV, m_ptVStartRotate, m_ptVEndRotate);
+		ReCalInterPoint(m_pLineAxis2, m_ptA2StartInter, m_ptA2EndInter);
+		UpdateRotatePoint(m_pLineAxis2, m_ptA2StartRotate, m_ptA2EndRotate);
 		m_ptCenter->WndPt = ptInter;
-		CalSliceLine(m_ptVStartInter, m_ptVEndInter, m_pLineVSliceTop, m_pTriVStartTop, m_pTriVEndTop, m_pLineVSliceBottom, m_pTriVStartBottom, m_pTriVEndBottom);
-	}	
+		CalSliceLine(m_ptA2StartInter, m_ptA2EndInter, m_pLineA2SliceTop, m_pLineA2SliceBottom);
+	}
+	MoveResliceControlCenter();
+	return true;
 }
 
-void OperateMprLines::MoveCenterPt(QPoint pt)
+bool OperateMprLines::MoveCenterPt(QPoint pt)
 {
 	m_ptCenter->WndPt.setX(pt.x());
 	m_ptCenter->WndPt.setY(pt.y());
 
-	if (m_ptCenter->WndPt.x() < m_rcImgOnWnd.left)
-		m_ptCenter->WndPt.setX(m_rcImgOnWnd.left);
-	if (m_ptCenter->WndPt.x() > m_rcImgOnWnd.right)
-		m_ptCenter->WndPt.setX(m_rcImgOnWnd.right);
-	if (m_ptCenter->WndPt.y() < m_rcImgOnWnd.top)
-		m_ptCenter->WndPt.setY(m_rcImgOnWnd.top);
-	if (m_ptCenter->WndPt.y() > m_rcImgOnWnd.bottom)
-		m_ptCenter->WndPt.setY(m_rcImgOnWnd.bottom);
+	m_ptCenter->WndPt.setX(max(m_ptCenter->WndPt.x(),int(m_rcImgOnWnd.left)));
+	m_ptCenter->WndPt.setX(min(m_ptCenter->WndPt.x(),int(m_rcImgOnWnd.right)));
+	m_ptCenter->WndPt.setY(max(m_ptCenter->WndPt.y(), int(m_rcImgOnWnd.top)));
+	m_ptCenter->WndPt.setY(min(m_ptCenter->WndPt.y(), int(m_rcImgOnWnd.bottom)));
 
 	if (1)//H
 	{
-		GetParalleLine(m_pLineH, m_ptCenter, m_pLineH->pt1, m_pLineH->pt2);
-		ReCalInterPoint(m_pLineH, m_ptHStartInter, m_ptHEndInter);
-		UpdateRotatePoint(m_pLineH, m_ptHStartRotate, m_ptHEndRotate);
-		CalSliceLine(m_ptHStartInter, m_ptHEndInter, m_pLineHSliceTop, m_pTriHStartTop, m_pTriHEndTop, m_pLineHSliceBottom, m_pTriHStartBottom, m_pTriHEndBottom);
+		GetParalleLine(m_pLineAxis1, m_ptCenter, m_pLineAxis1->pt1, m_pLineAxis1->pt2);
+		ReCalInterPoint(m_pLineAxis1, m_ptA1StartInter, m_ptA1EndInter);
+		UpdateRotatePoint(m_pLineAxis1, m_ptA1StartRotate, m_ptA1EndRotate);
+		CalSliceLine(m_ptA1StartInter, m_ptA1EndInter, m_pLineA1SliceTop, m_pLineA1SliceBottom);
 	}
 
 	if (2)//V
 	{
-		GetParalleLine(m_pLineV, m_ptCenter, m_pLineV->pt1, m_pLineV->pt2);
-		ReCalInterPoint(m_pLineV, m_ptVStartInter, m_ptVEndInter);
-		UpdateRotatePoint(m_pLineV, m_ptVStartRotate, m_ptVEndRotate);
-		CalSliceLine(m_ptVStartInter, m_ptVEndInter, m_pLineVSliceTop, m_pTriVStartTop, m_pTriVEndTop, m_pLineVSliceBottom, m_pTriVStartBottom, m_pTriVEndBottom);
+		GetParalleLine(m_pLineAxis2, m_ptCenter, m_pLineAxis2->pt1, m_pLineAxis2->pt2);
+		ReCalInterPoint(m_pLineAxis2, m_ptA2StartInter, m_ptA2EndInter);
+		UpdateRotatePoint(m_pLineAxis2, m_ptA2StartRotate, m_ptA2EndRotate);
+		CalSliceLine(m_ptA2StartInter, m_ptA2EndInter, m_pLineA2SliceTop, m_pLineA2SliceBottom);
 	}
+
+	MoveResliceControlCenter();
+	return true;
 }
 
 void OperateMprLines::GetParalleLine(MprLine *pMainLine, MprPoint *pt, MprPoint &pParalleLinePt1, MprPoint &pParalleLinePt2)
@@ -1647,157 +1389,144 @@ void OperateMprLines::GetParalleLine(MprLine *pMainLine, MprPoint *pt, MprPoint 
 	}
 }
 
-void OperateMprLines::MoveSliceTriangle(QPoint deltaPt)
+bool OperateMprLines::MoveSliceLines(QPoint deltaPt)
 {
-	if (m_moveObject == HTOPSLICE)
+	if (m_moveObject == A1TOPSLICE)
 	{
-		if (m_pLineH->pt1.WndPt.y() == m_pLineH->pt2.WndPt.y())
+		if (m_pLineAxis1->pt1.WndPt.y() == m_pLineAxis1->pt2.WndPt.y())
 		{
-			m_nSlicePos -= deltaPt.y();
+			m_nHWndSlicePos -= deltaPt.y();
 		}
-		else if (m_pLineH->pt1.WndPt.x() == m_pLineH->pt2.WndPt.x())
+		else if (m_pLineAxis1->pt1.WndPt.x() == m_pLineAxis1->pt2.WndPt.x())
 		{
-			m_nSlicePos += deltaPt.x();
+			m_nHWndSlicePos += deltaPt.x();
 		}
 		else
 		{
-			QPoint pt1 = m_pLineHSliceTop->pt1.WndPt;
+			QPoint pt1 = m_pLineA1SliceTop->pt1.WndPt;
 			pt1.setX(pt1.x() + deltaPt.x());
 			pt1.setY(pt1.y() + deltaPt.y());
 
-			CalDistanceOfParalleLine(pt1, m_pLineH, m_nSlicePos);			
+			CalDistanceOfParalleLine(pt1, m_pLineAxis1, m_nHWndSlicePos);
 		}
+		m_nHWndSlicePos = m_nHWndSlicePos < 2 ? 0:m_nHWndSlicePos;
+		m_nHWndSlicePos = min((LONG)m_nHWndSlicePos, (m_rcImgOnWnd.bottom - m_rcImgOnWnd.top) / 2);
+		CalSliceLine(m_ptA1StartInter, m_ptA1EndInter, m_pLineA1SliceTop, m_pLineA1SliceBottom);
 	}
-	else if (m_moveObject == HBOTTOMSLICE)
+	else if (m_moveObject == A1BOTTOMSLICE)
 	{
-		if (m_pLineH->pt1.WndPt.y() == m_pLineH->pt2.WndPt.y())
+		if (m_pLineAxis1->pt1.WndPt.y() == m_pLineAxis1->pt2.WndPt.y())
 		{
-			m_nSlicePos += deltaPt.y();
+			m_nHWndSlicePos += deltaPt.y();
 		}
-		else if (m_pLineH->pt1.WndPt.x() == m_pLineH->pt2.WndPt.x())
+		else if (m_pLineAxis1->pt1.WndPt.x() == m_pLineAxis1->pt2.WndPt.x())
 		{
-			m_nSlicePos -= deltaPt.x();
+			m_nHWndSlicePos -= deltaPt.x();
 		}
 		else
 		{
-			QPoint pt1 = m_pLineHSliceBottom->pt1.WndPt;
+			QPoint pt1 = m_pLineA1SliceBottom->pt1.WndPt;
 			pt1.setX(pt1.x() + deltaPt.x());
 			pt1.setY(pt1.y() + deltaPt.y());
 
-			CalDistanceOfParalleLine(pt1, m_pLineH, m_nSlicePos);
+			CalDistanceOfParalleLine(pt1, m_pLineAxis1, m_nHWndSlicePos);
 		}
+		m_nHWndSlicePos = m_nHWndSlicePos < 2 ? 0 : m_nHWndSlicePos;
+		m_nHWndSlicePos = min((LONG)m_nHWndSlicePos, (m_rcImgOnWnd.bottom - m_rcImgOnWnd.top) / 2);
+		CalSliceLine(m_ptA1StartInter, m_ptA1EndInter, m_pLineA1SliceTop, m_pLineA1SliceBottom);
 	}
-	else if (m_moveObject == VTOPSLICE)
+	else if (m_moveObject == A2TOPSLICE)
 	{
-		if (m_pLineV->pt1.WndPt.y() == m_pLineV->pt2.WndPt.y())
+		if (m_pLineAxis2->pt1.WndPt.y() == m_pLineAxis2->pt2.WndPt.y())
 		{
-			m_nSlicePos -= deltaPt.y();
+			m_nVWndSlicePos -= deltaPt.y();
 		}
-		else if (m_pLineV->pt1.WndPt.x() == m_pLineV->pt2.WndPt.x())
+		else if (m_pLineAxis2->pt1.WndPt.x() == m_pLineAxis2->pt2.WndPt.x())
 		{
-			m_nSlicePos += deltaPt.x();
+			m_nVWndSlicePos += deltaPt.x();
 		}
 		else
 		{
-			QPoint pt1 = m_pLineVSliceTop->pt1.WndPt;
+			QPoint pt1 = m_pLineA2SliceTop->pt1.WndPt;
 			pt1.setX(pt1.x() + deltaPt.x());
 			pt1.setY(pt1.y() + deltaPt.y());
 
-			CalDistanceOfParalleLine(pt1, m_pLineV, m_nSlicePos);
+			CalDistanceOfParalleLine(pt1, m_pLineAxis2, m_nVWndSlicePos);
 		}
+		m_nVWndSlicePos = m_nVWndSlicePos < 2 ? 0 : m_nVWndSlicePos;
+		m_nVWndSlicePos = min((LONG)m_nVWndSlicePos, (m_rcImgOnWnd.bottom - m_rcImgOnWnd.top) / 2);
+		CalSliceLine(m_ptA2StartInter, m_ptA2EndInter, m_pLineA2SliceTop, m_pLineA2SliceBottom);
+
 	}
-	else if(m_moveObject == VBOTTOMSLICE)
+	else if(m_moveObject == A2BOTTOMSLICE)
 	{
-		if (m_pLineV->pt1.WndPt.y() == m_pLineV->pt2.WndPt.y())
+		if (m_pLineAxis2->pt1.WndPt.y() == m_pLineAxis2->pt2.WndPt.y())
 		{
-			m_nSlicePos += deltaPt.y();
+			m_nVWndSlicePos += deltaPt.y();
 		}
-		else if (m_pLineV->pt1.WndPt.x() == m_pLineV->pt2.WndPt.x())
+		else if (m_pLineAxis2->pt1.WndPt.x() == m_pLineAxis2->pt2.WndPt.x())
 		{
-			m_nSlicePos -= deltaPt.x();
+			m_nVWndSlicePos -= deltaPt.x();
 		}
 		else
 		{
-			QPoint pt1 = m_pLineVSliceBottom->pt1.WndPt;
+			QPoint pt1 = m_pLineA2SliceBottom->pt1.WndPt;
 			pt1.setX(pt1.x() + deltaPt.x());
 			pt1.setY(pt1.y() + deltaPt.y());
-
-			CalDistanceOfParalleLine(pt1, m_pLineV, m_nSlicePos);
+			CalDistanceOfParalleLine(pt1, m_pLineAxis2, m_nVWndSlicePos);
 		}
+		m_nVWndSlicePos = m_nVWndSlicePos < 2 ? 0 : m_nVWndSlicePos;
+		m_nVWndSlicePos = min((LONG)m_nVWndSlicePos, (m_rcImgOnWnd.bottom - m_rcImgOnWnd.top) / 2);
+		CalSliceLine(m_ptA2StartInter, m_ptA2EndInter, m_pLineA2SliceTop,m_pLineA2SliceBottom);
 	}
-
-	if (m_nSlicePos < 0)
-		m_nSlicePos = 0;
-	if (m_nSlicePos > ((m_rcImgOnWnd.bottom - m_rcImgOnWnd.top) / 2))
-		m_nSlicePos = (m_rcImgOnWnd.bottom - m_rcImgOnWnd.top) / 2;
-
-	CalSliceLine(m_ptHStartInter, m_ptHEndInter, m_pLineHSliceTop, m_pTriHStartTop, m_pTriHEndTop, m_pLineHSliceBottom, m_pTriHStartBottom, m_pTriHEndBottom);
-	CalSliceLine(m_ptVStartInter, m_ptVEndInter, m_pLineVSliceTop, m_pTriVStartTop, m_pTriVEndTop, m_pLineVSliceBottom, m_pTriVStartBottom, m_pTriVEndBottom);
+	return true;
 }
 
-void OperateMprLines::CalSliceLine(MprPoint *pStart, MprPoint *pEnd, MprLine *pTopSlice, MprTriAngle *pTriST, MprTriAngle *pTriET, MprLine *pBottomSlice, MprTriAngle *pTriSB, MprTriAngle *pTriEB)
+void OperateMprLines::CalSliceLine(MprPoint *pStart, MprPoint *pEnd, MprLine *pTopSlice, MprLine *pBottomSlice)
 {
+	int nSlicePos = 0;
+	if (pStart == m_ptA1StartInter)
+		nSlicePos = m_nHWndSlicePos;
+	else
+		nSlicePos = m_nVWndSlicePos;
+
 	if (pStart->WndPt.y() == pEnd->WndPt.y())
 	{
 		pTopSlice->pt1.WndPt.setX(pStart->WndPt.x());
-		pTopSlice->pt1.WndPt.setY(pStart->WndPt.y() - m_nSlicePos);
+		pTopSlice->pt1.WndPt.setY(pStart->WndPt.y() - nSlicePos);
 		pTopSlice->pt2.WndPt.setX(pEnd->WndPt.x());
-		pTopSlice->pt2.WndPt.setY(pEnd->WndPt.y() - m_nSlicePos);
+		pTopSlice->pt2.WndPt.setY(pEnd->WndPt.y() - nSlicePos);
 
 		pBottomSlice->pt1.WndPt.setX(pStart->WndPt.x());
-		pBottomSlice->pt1.WndPt.setY(pStart->WndPt.y() + m_nSlicePos);
+		pBottomSlice->pt1.WndPt.setY(pStart->WndPt.y() + nSlicePos);
 		pBottomSlice->pt2.WndPt.setX(pEnd->WndPt.x());
-		pBottomSlice->pt2.WndPt.setY(pEnd->WndPt.y() + m_nSlicePos);
-
-		if (pStart->WndPt.x() < pEnd->WndPt.x())
-		{
-			GetTrianglePoint(pTopSlice->pt1.WndPt, pTopSlice->pt2.WndPt, m_nTriAngleDis, m_nTriAngleWidth, m_nTriAngleWidth / 2, *pTriST, *pTriET, true);
-			GetTrianglePoint(pBottomSlice->pt1.WndPt, pBottomSlice->pt2.WndPt, m_nTriAngleDis, m_nTriAngleWidth, m_nTriAngleWidth / 2, *pTriSB, *pTriEB, false);
-		}
-		else
-		{
-			GetTrianglePoint(pTopSlice->pt1.WndPt, pTopSlice->pt2.WndPt, m_nTriAngleDis, m_nTriAngleWidth, m_nTriAngleWidth / 2, *pTriST, *pTriET, false);
-			GetTrianglePoint(pBottomSlice->pt1.WndPt, pBottomSlice->pt2.WndPt, m_nTriAngleDis, m_nTriAngleWidth, m_nTriAngleWidth / 2, *pTriSB, *pTriEB, true);
-		}
+		pBottomSlice->pt2.WndPt.setY(pEnd->WndPt.y() + nSlicePos);
 	}
 	else if (pStart->WndPt.x() == pEnd->WndPt.x())
 	{
-		pTopSlice->pt1.WndPt.setX(pStart->WndPt.x() + m_nSlicePos);
+		pTopSlice->pt1.WndPt.setX(pStart->WndPt.x() + nSlicePos);
 		pTopSlice->pt1.WndPt.setY(pStart->WndPt.y());
-		pTopSlice->pt2.WndPt.setX(pEnd->WndPt.x() + m_nSlicePos);
+		pTopSlice->pt2.WndPt.setX(pEnd->WndPt.x() + nSlicePos);
 		pTopSlice->pt2.WndPt.setY(pEnd->WndPt.y());
 
-		pBottomSlice->pt1.WndPt.setX(pStart->WndPt.x() - m_nSlicePos);
+		pBottomSlice->pt1.WndPt.setX(pStart->WndPt.x() - nSlicePos);
 		pBottomSlice->pt1.WndPt.setY(pStart->WndPt.y());
-		pBottomSlice->pt2.WndPt.setX(pEnd->WndPt.x() - m_nSlicePos);
+		pBottomSlice->pt2.WndPt.setX(pEnd->WndPt.x() - nSlicePos);
 		pBottomSlice->pt2.WndPt.setY(pEnd->WndPt.y());
-
-		if (pStart->WndPt.y() < pEnd->WndPt.y())
-		{
-			GetTrianglePoint(pTopSlice->pt1.WndPt, pTopSlice->pt2.WndPt, m_nTriAngleDis, m_nTriAngleWidth, m_nTriAngleWidth / 2, *pTriST, *pTriET, true);
-			GetTrianglePoint(pBottomSlice->pt1.WndPt, pBottomSlice->pt2.WndPt, m_nTriAngleDis, m_nTriAngleWidth, m_nTriAngleWidth / 2, *pTriSB, *pTriEB, false);
-		}
-		else
-		{
-			GetTrianglePoint(pTopSlice->pt1.WndPt, pTopSlice->pt2.WndPt, m_nTriAngleDis, m_nTriAngleWidth, m_nTriAngleWidth / 2, *pTriST, *pTriET, false);
-			GetTrianglePoint(pBottomSlice->pt1.WndPt, pBottomSlice->pt2.WndPt, m_nTriAngleDis, m_nTriAngleWidth, m_nTriAngleWidth / 2, *pTriSB, *pTriEB, true);
-		}
 	}
 	else
 	{
-		double k = -(pEnd->WndPt.x() - pStart->WndPt.x()) * 1.00/ (pEnd->WndPt.y() - pStart->WndPt.y());
+		double k = (pEnd->WndPt.y() - pStart->WndPt.y()) * 1.00 / (pEnd->WndPt.x() - pStart->WndPt.x());
 		if ((k > 0.00 && (pStart->WndPt.x() < pEnd->WndPt.x())) || (k < 0.00 && (pStart->WndPt.x() > pEnd->WndPt.x())))
 		{
-			GetVerticalLine(pStart->WndPt, pEnd->WndPt, pStart->WndPt, m_nSlicePos, pBottomSlice->pt1.WndPt, pTopSlice->pt1.WndPt);
-			GetVerticalLine(pEnd->WndPt, pStart->WndPt, pEnd->WndPt, m_nSlicePos, pBottomSlice->pt2.WndPt, pTopSlice->pt2.WndPt);
+			GetVerticalLine(pStart->WndPt, pEnd->WndPt, pStart->WndPt, nSlicePos, pTopSlice->pt1.WndPt, pBottomSlice->pt1.WndPt);
+			GetVerticalLine(pEnd->WndPt, pStart->WndPt, pEnd->WndPt, nSlicePos, pTopSlice->pt2.WndPt, pBottomSlice->pt2.WndPt);
 		}
 		else
 		{
-			GetVerticalLine(pStart->WndPt, pEnd->WndPt, pStart->WndPt, m_nSlicePos, pTopSlice->pt1.WndPt, pBottomSlice->pt1.WndPt);
-			GetVerticalLine(pEnd->WndPt, pStart->WndPt, pEnd->WndPt, m_nSlicePos, pTopSlice->pt2.WndPt, pBottomSlice->pt2.WndPt);
+			GetVerticalLine(pStart->WndPt, pEnd->WndPt, pStart->WndPt, nSlicePos, pBottomSlice->pt1.WndPt, pTopSlice->pt1.WndPt);
+			GetVerticalLine(pEnd->WndPt, pStart->WndPt, pEnd->WndPt, nSlicePos, pBottomSlice->pt2.WndPt, pTopSlice->pt2.WndPt);
 		}
-		GetTrianglePoint(pTopSlice->pt1.WndPt, pTopSlice->pt2.WndPt, m_nTriAngleDis, m_nTriAngleWidth, m_nTriAngleWidth / 2, *pTriST, *pTriET, true);
-		GetTrianglePoint(pBottomSlice->pt1.WndPt, pBottomSlice->pt2.WndPt, m_nTriAngleDis, m_nTriAngleWidth, m_nTriAngleWidth / 2, *pTriSB, *pTriEB, false);
 	}
 }
 
@@ -1814,6 +1543,19 @@ void OperateMprLines::CalDistanceOfParalleLine(QPoint pPt, MprLine *pLine, int &
 	fdistance = qRound(fdis);
 }
 
+void OperateMprLines::CalImageDistance(QPoint pPt, MprLine *pLine, int &fdistance)
+{
+	FPOINT fA0; fA0.x = pLine->pt1.ImgPt.Int().x()*1.00; fA0.y = pLine->pt1.ImgPt.Int().y()*1.00;
+	FPOINT fA1; fA1.x = pLine->pt2.ImgPt.Int().x()*1.00; fA1.y = pLine->pt2.ImgPt.Int().y()*1.00;
+
+	double A = fA1.y - fA0.y;
+	double B = fA0.x - fA1.x;
+	double C = fA1.x * fA0.y - fA1.y * fA0.x;
+
+	double fdis = abs(A * pPt.x() + B * pPt.y() + C) / sqrt(pow(A, 2) + pow(B, 2));
+	fdistance = qRound(fdis);
+}
+
 void OperateMprLines::MoveRotateLine(QPoint pt)
 {
 	if (m_bActiveOblique == false)
@@ -1821,47 +1563,51 @@ void OperateMprLines::MoveRotateLine(QPoint pt)
 		return;
 	}
 
-	if (m_moveObject == HSTARTROTATE || m_moveObject == HENDROTATE)
+	if (m_moveObject == A1STARTROTATE || m_moveObject == A1ENDROTATE)
 	{
-		if (m_moveObject == HSTARTROTATE)
-			GetLineAcrossRc(m_rcImgOnWnd, pt, m_ptCenter->WndPt, m_pLineH->pt1.WndPt, m_pLineH->pt2.WndPt);
-		else if (m_moveObject == HENDROTATE)
-			GetLineAcrossRc(m_rcImgOnWnd, pt, m_ptCenter->WndPt, m_pLineH->pt2.WndPt, m_pLineH->pt1.WndPt);
+		if (m_moveObject == A1STARTROTATE)
+			GetLineAcrossRc(m_rcImgOnWnd, pt, m_ptCenter->WndPt, m_pLineAxis1->pt1.WndPt, m_pLineAxis1->pt2.WndPt);
+		else if (m_moveObject == A1ENDROTATE)
+			GetLineAcrossRc(m_rcImgOnWnd, pt, m_ptCenter->WndPt, m_pLineAxis1->pt2.WndPt, m_pLineAxis1->pt1.WndPt);
 		
-		MprLine pNewVLine;
-		GetVerticalLine(m_pLineH->pt1.WndPt, m_pLineH->pt2.WndPt, m_ptCenter->WndPt, 20, pNewVLine.pt1.WndPt, pNewVLine.pt2.WndPt);
-		GetLineAcrossRc(m_rcImgOnWnd, pNewVLine.pt1.WndPt, pNewVLine.pt2.WndPt, m_pLineV->pt1.WndPt, m_pLineV->pt2.WndPt);
+		MprLine pNewA2Line;
+		GetVerticalLine(m_pLineAxis1->pt1.WndPt, m_pLineAxis1->pt2.WndPt, m_ptCenter->WndPt, 20, pNewA2Line.pt1.WndPt, pNewA2Line.pt2.WndPt);
+		GetLineAcrossRc(m_rcImgOnWnd, pNewA2Line.pt1.WndPt, pNewA2Line.pt2.WndPt, m_pLineAxis2->pt1.WndPt, m_pLineAxis2->pt2.WndPt);
 
-		ReCalInterPoint(m_pLineH, m_ptHStartInter,m_ptHEndInter);
-		UpdateRotatePoint(m_pLineH, m_ptHStartRotate, m_ptHEndRotate);
-		CalSliceLine(m_ptHStartInter, m_ptHEndInter, m_pLineHSliceTop, m_pTriHStartTop, m_pTriHEndTop, m_pLineHSliceBottom, m_pTriHStartBottom, m_pTriHEndBottom);
+		ReCalInterPoint(m_pLineAxis1, m_ptA1StartInter,m_ptA1EndInter);
+		UpdateRotatePoint(m_pLineAxis1, m_ptA1StartRotate, m_ptA1EndRotate);
+		CalSliceLine(m_ptA1StartInter, m_ptA1EndInter, m_pLineA1SliceTop, m_pLineA1SliceBottom);
 
-		ReCalInterPoint(m_pLineV, m_ptVStartInter, m_ptVEndInter);
-		UpdateRotatePoint(m_pLineV, m_ptVStartRotate, m_ptVEndRotate);
-		CalSliceLine(m_ptVStartInter, m_ptVEndInter, m_pLineVSliceTop, m_pTriVStartTop, m_pTriVEndTop, m_pLineVSliceBottom, m_pTriVStartBottom, m_pTriVEndBottom);
+		ReCalInterPoint(m_pLineAxis2, m_ptA2StartInter, m_ptA2EndInter);
+		UpdateRotatePoint(m_pLineAxis2, m_ptA2StartRotate, m_ptA2EndRotate);
+		CalSliceLine(m_ptA2StartInter, m_ptA2EndInter, m_pLineA2SliceTop, m_pLineA2SliceBottom);
+
+		double dRotateAngle = RotateAxisByPoint(pt, m_moveObject);
+		RotateAxisByAngle(dRotateAngle, A2STARTROTATE);
 	}
 
-	if (m_moveObject == VSTARTROTATE || m_moveObject == VENDROTATE)
+	if (m_moveObject == A2STARTROTATE || m_moveObject == A2ENDROTATE)
 	{
-		if (m_moveObject == VSTARTROTATE)
-			GetLineAcrossRc(m_rcImgOnWnd, pt, m_ptCenter->WndPt, m_pLineV->pt1.WndPt, m_pLineV->pt2.WndPt);
-		else if (m_moveObject == VENDROTATE)
-			GetLineAcrossRc(m_rcImgOnWnd, pt, m_ptCenter->WndPt, m_pLineV->pt2.WndPt, m_pLineV->pt1.WndPt);
+		if (m_moveObject == A2STARTROTATE)
+			GetLineAcrossRc(m_rcImgOnWnd, pt, m_ptCenter->WndPt, m_pLineAxis2->pt1.WndPt, m_pLineAxis2->pt2.WndPt);
+		else if (m_moveObject == A2ENDROTATE)
+			GetLineAcrossRc(m_rcImgOnWnd, pt, m_ptCenter->WndPt, m_pLineAxis2->pt2.WndPt, m_pLineAxis2->pt1.WndPt);
 
-		MprLine pNewHLine;
-		GetVerticalLine(m_pLineV->pt1.WndPt, m_pLineV->pt2.WndPt, m_ptCenter->WndPt, 20, pNewHLine.pt1.WndPt, pNewHLine.pt2.WndPt);
-		GetLineAcrossRc(m_rcImgOnWnd, pNewHLine.pt1.WndPt, pNewHLine.pt2.WndPt, m_pLineH->pt1.WndPt, m_pLineH->pt2.WndPt);
+		MprLine pNewA1Line;
+		GetVerticalLine(m_pLineAxis2->pt1.WndPt, m_pLineAxis2->pt2.WndPt, m_ptCenter->WndPt, 20, pNewA1Line.pt1.WndPt, pNewA1Line.pt2.WndPt);
+		GetLineAcrossRc(m_rcImgOnWnd, pNewA1Line.pt1.WndPt, pNewA1Line.pt2.WndPt, m_pLineAxis1->pt1.WndPt, m_pLineAxis1->pt2.WndPt);
 
-		ReCalInterPoint(m_pLineV, m_ptVStartInter, m_ptVEndInter);
-		UpdateRotatePoint(m_pLineV, m_ptVStartRotate, m_ptVEndRotate);
-		CalSliceLine(m_ptVStartInter, m_ptVEndInter, m_pLineVSliceTop, m_pTriVStartTop, m_pTriVEndTop, m_pLineVSliceBottom, m_pTriVStartBottom, m_pTriVEndBottom);
+		ReCalInterPoint(m_pLineAxis2, m_ptA2StartInter, m_ptA2EndInter);
+		UpdateRotatePoint(m_pLineAxis2, m_ptA2StartRotate, m_ptA2EndRotate);
+		CalSliceLine(m_ptA2StartInter, m_ptA2EndInter, m_pLineA2SliceTop, m_pLineA2SliceBottom);
 
+		ReCalInterPoint(m_pLineAxis1, m_ptA1StartInter, m_ptA1EndInter);
+		UpdateRotatePoint(m_pLineAxis1, m_ptA1StartRotate, m_ptA1EndRotate);
+		CalSliceLine(m_ptA1StartInter, m_ptA1EndInter, m_pLineA1SliceTop, m_pLineA1SliceBottom);
 
-		ReCalInterPoint(m_pLineH, m_ptHStartInter, m_ptHEndInter);
-		UpdateRotatePoint(m_pLineH, m_ptHStartRotate, m_ptHEndRotate);
-		CalSliceLine(m_ptHStartInter, m_ptHEndInter, m_pLineHSliceTop, m_pTriHStartTop, m_pTriHEndTop, m_pLineHSliceBottom, m_pTriHStartBottom, m_pTriHEndBottom);
+		double dRotateAngle = RotateAxisByPoint(pt, m_moveObject);
+		RotateAxisByAngle(dRotateAngle, A1STARTROTATE);
 	}
-	
 }
 
 bool OperateMprLines::GetLineAcrossRc(RECT rc, QPoint p1, QPoint p2, QPoint &retP1, QPoint &retP2)
@@ -2134,35 +1880,212 @@ void OperateMprLines::AllCovertWndToImg()
 {
 	if (1) //横向
 	{
-		ConvertWndToImg(m_pLineH->pt1);
-		ConvertWndToImg(m_pLineH->pt2);
-		ConvertWndToImg(*m_ptHStartRotate);
-		ConvertWndToImg(*m_ptHEndRotate);
-		ConvertWndToImg(*m_ptHStartInter);
-		ConvertWndToImg(*m_ptHEndInter);
-		ConvertWndToImg(m_pLineHSliceTop->pt1);
-		ConvertWndToImg(m_pLineHSliceTop->pt2);
-		ConvertWndToImg(m_pLineHSliceBottom->pt1);
-		ConvertWndToImg(m_pLineHSliceBottom->pt2);
+		ConvertWndToImg(m_pLineAxis1->pt1);
+		ConvertWndToImg(m_pLineAxis1->pt2);
+		ConvertWndToImg(*m_ptA1StartRotate);
+		ConvertWndToImg(*m_ptA1EndRotate);
+		ConvertWndToImg(*m_ptA1StartInter);
+		ConvertWndToImg(*m_ptA1EndInter);
+		ConvertWndToImg(m_pLineA1SliceTop->pt1);
+		ConvertWndToImg(m_pLineA1SliceTop->pt2);
+		ConvertWndToImg(m_pLineA1SliceBottom->pt1);
+		ConvertWndToImg(m_pLineA1SliceBottom->pt2);
 	}
 
 	if (2)//纵向
 	{
-		ConvertWndToImg(m_pLineV->pt1);
-		ConvertWndToImg(m_pLineV->pt2);
-		ConvertWndToImg(*m_ptVStartRotate);
-		ConvertWndToImg(*m_ptVEndRotate);
-		ConvertWndToImg(*m_ptVStartInter);
-		ConvertWndToImg(*m_ptVEndInter);
-		ConvertWndToImg(m_pLineVSliceTop->pt1);
-		ConvertWndToImg(m_pLineVSliceTop->pt2);
-		ConvertWndToImg(m_pLineVSliceBottom->pt1);
-		ConvertWndToImg(m_pLineVSliceBottom->pt2);
+		ConvertWndToImg(m_pLineAxis2->pt1);
+		ConvertWndToImg(m_pLineAxis2->pt2);
+		ConvertWndToImg(*m_ptA2StartRotate);
+		ConvertWndToImg(*m_ptA2EndRotate);
+		ConvertWndToImg(*m_ptA2StartInter);
+		ConvertWndToImg(*m_ptA2EndInter);
+		ConvertWndToImg(m_pLineA2SliceTop->pt1);
+		ConvertWndToImg(m_pLineA2SliceTop->pt2);
+		ConvertWndToImg(m_pLineA2SliceBottom->pt1);
+		ConvertWndToImg(m_pLineA2SliceBottom->pt2);
 	}
 
 	if (3)//交点
 	{
 		ConvertWndToImg(*m_ptCenter);
 	}
+
+}
+
+int OperateMprLines::GetAxis1()
+{
+	if (m_nWndType == ORIIMG_SAGITTAL)
+		return 1;
+
+	if (m_nWndType == ORIIMG_CORONAL)
+		return 0;
+
+	return 0;
+}
+
+int OperateMprLines::GetAxis2()
+{
+	if (m_nWndType == ORIIMG_SAGITTAL)
+		return 2;
+
+	if (m_nWndType == ORIIMG_CORONAL)
+		return 2;
+
+	return 1;
+}
+
+int OperateMprLines::GetPlaneAxis1()
+{
+	if (m_nWndType == ORIIMG_AXIAL)
+	{
+		return 0;
+	}
+	if (m_nWndType == ORIIMG_CORONAL)
+	{
+		return 0;
+	}
+	return 1;
+}
+
+int OperateMprLines::GetPlaneAxis2()
+{
+	if (m_nWndType == ORIIMG_AXIAL)
+	{
+		return 1;
+	}
+	if (m_nWndType == ORIIMG_CORONAL)
+	{
+		return 2;
+	}
+	return 2;
+}
+
+void OperateMprLines::MoveResliceControlCenter()
+{
+	ConvertWndToImg(*m_ptCenter);
+	double deltaX = m_ptCenter->ImgPt.x - m_ptPreCenter.ImgPt.x;
+	double deltaY = m_ptCenter->ImgPt.y - m_ptPreCenter.ImgPt.y;
+
+	int nPlaneAxis1Id = GetPlaneAxis1();
+	int nPlaneAxis2Id = GetPlaneAxis2();
+
+	Hmy3DVector vecA1 = m_pResliceControl->GetAxis(nPlaneAxis1Id);
+	Hmy3DVector vecA2 = m_pResliceControl->GetAxis(nPlaneAxis2Id);
+
+	Hmy3DVector vecDeltaX = vecA1.Scale(deltaX*m_dSpacingY);
+	Hmy3DVector vecDeltaY = vecA2.Scale(deltaY*m_dSpacingX);
+	Hmy3DVector deltaVector = vecDeltaX.Add(vecDeltaY);
+	Hmy3DVector vecPreCenter = m_pResliceControl->GetCenter();
+	Hmy3DVector vecNewCenter = vecPreCenter.Add(deltaVector);
+	m_pResliceControl->SetCenter(vecNewCenter);
+
+	m_ptPreCenter = *m_ptCenter;
+
+}
+
+double OperateMprLines::RotateAxisByPoint(QPoint pt, MoveObject moveObject)
+{
+	double lastVector[2], curVector[2];
+	lastVector[0] = m_prePt.x() - m_ptCenter->WndPt.x();
+	lastVector[1] = m_prePt.y() - m_ptCenter->WndPt.y();
+	curVector[0] = pt.x() - m_ptCenter->WndPt.x();
+	curVector[1] = pt.y() - m_ptCenter->WndPt.y();
+
+	double lastNorm = sqrt(lastVector[0] * lastVector[0] + lastVector[1] * lastVector[1]);
+	double curNorm = sqrt(curVector[0] * curVector[0] + curVector[1] * curVector[1]);
+
+	double angle = acos((lastVector[0] * curVector[0] + lastVector[1] * curVector[1])/(lastNorm*curNorm));
+
+	double corss = lastVector[0] * curVector[1] - lastVector[1] * curVector[0];
+	if (corss < 0)
+		angle *= -1;
+
+	if (angle == 0)
+		return 0;
+
+	RotateAxisByAngle(angle, moveObject);
+	return angle;
+}
+
+void OperateMprLines::RotateAxisByAngle(double angle, MoveObject moveObject)
+{
+	int axis = -1;
+	if (moveObject == A1STARTROTATE || moveObject == A1ENDROTATE)
+		axis = GetPlaneAxis2();
+	else if (moveObject == A2STARTROTATE || moveObject == A2ENDROTATE)
+		axis = GetPlaneAxis1();
+
+	HmyPlane3D *planeToBeRotated = m_pResliceControl->GetPlane(axis);
+	HmyPlane3D *normalPlane = m_pResliceControl->GetPlane(m_nWndType);
+
+	double vectorToBeRotated[3], aboutAxis[3], rotatedVector[3];
+	planeToBeRotated->GetNormal(vectorToBeRotated);
+	normalPlane->GetNormal(aboutAxis);
+
+	this->RotateVectorAboutVector(vectorToBeRotated,
+		aboutAxis, angle, rotatedVector);
+	planeToBeRotated->SetNormal(rotatedVector);
+}
+
+void OperateMprLines::RotateVectorAboutVector(double vectorToBeRotated[3], double axis[3], /* vector about which we rotate */ double angle, /* angle in radians */ double output[3])
+{
+	//  let
+	//        [v] = [vx, vy, vz]      the vector to be rotated.
+	//        [l] = [lx, ly, lz]      the vector about rotation
+	//              | 1  0  0|
+	//        [i] = | 0  1  0|           the identity matrix
+	//              | 0  0  1|
+	//
+	//              |   0  lz -ly |
+	//        [L] = | -lz   0  lx |
+	//              |  ly -lx   0 |
+	//
+	//        d = sqrt(lx*lx + ly*ly + lz*lz)
+	//        a                       the angle of rotation
+	//
+	//    then
+	//
+	//   matrix operations gives:
+	//
+	//    [v] = [v]x{[i] + sin(a)/d*[L] + ((1 - cos(a))/(d*d)*([L]x[L]))}
+
+	// normalize the axis vector
+	double v[3] = { vectorToBeRotated[0],
+		vectorToBeRotated[1], vectorToBeRotated[2] };
+	double l[3] = { axis[0], axis[1], axis[2] };
+	vtkMath::Normalize(v);
+	vtkMath::Normalize(l);
+	const double u = sin(angle);
+	const double w = 1.0 - cos(angle);
+
+	output[0] = v[0] * (1 - w * (l[2] * l[2] + l[1] * l[1])) +
+		v[1] * (-u * l[2] + w * l[0] * l[1]) +
+		v[2] * (u * l[1] + w * l[0] * l[1]);
+	output[1] = v[0] * (u * l[2] + w * l[0] * l[1]) +
+		v[1] * (1 - w * (l[0] * l[0] + l[2] * l[2])) +
+		v[2] * (-u * l[0] + w * l[1] * l[2]);
+	output[2] = v[0] * (-u * l[1] + w * l[0] * l[2]) +
+		v[1] * (u * l[0] + w * l[1] * l[2]) +
+		v[2] * (1 - w * (l[1] * l[1] + l[0] * l[0]));
+}
+
+HmyLine3D OperateMprLines::CalInterSectingLine(HmyPlane3D *target, HmyPlane3D *reference)
+{
+	Hmy3DVector targetNormal = target->normal();
+	Hmy3DVector referenceNormal = reference->normal();
+
+	Hmy3DVector ptCenter = m_pResliceControl->GetCenter();
+
+	target->SetFromNormalAndCoplanarPoint(targetNormal, ptCenter);
+	reference->SetFromNormalAndCoplanarPoint(referenceNormal, ptCenter);
+
+	Hmy3DVector lineDirection, lineOrigin;
+	reference->IntersectPlane(*target, lineDirection,lineOrigin);
+	
+	HmyLine3D a;
+
+	return a;
+
 
 }

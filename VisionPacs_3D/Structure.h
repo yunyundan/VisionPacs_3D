@@ -65,7 +65,7 @@ typedef QMap<unsigned long, QString > MAP_TAGNAME;
 #define Ret_PrintingNow			302
 #define Ret_GetImgBoxUidEmpty	303
 
-typedef struct _DcmTag
+typedef struct _DcmHsTag
 {
 	unsigned long  nCode;     // Tag Code
 	unsigned long  nMask;     // Mask (for multiple-elements specifies the same entry in the table)
@@ -75,7 +75,7 @@ typedef struct _DcmTag
 	unsigned long   nMaxVM;    // Maximum Value Multiplicity
 	unsigned long  nDivideVM; // Value that should divide the Value Multiplicity
 
-	_DcmTag()
+	_DcmHsTag()
 	{
 		nCode = 0;
 		nMask = 0;
@@ -86,9 +86,9 @@ typedef struct _DcmTag
 		nDivideVM = 0;
 	}
 
-} DcmTag, *pDcmTag;
+} DcmHsTag, *pDcmTag;
 
-typedef struct _DcmVR
+typedef struct DcmHsVR
 {
 	unsigned long  nCode;		// Code (VR_AE, VR_AS, ...)
 	char pszName[256];			// Name ("Application Entity", "Age String", ...)
@@ -103,7 +103,7 @@ typedef struct _DcmVR
 	int nVrType;				//不知道,但很重要.待查
 	unsigned long nLenOfVrDes;	//VR域本身长度
 
-} DcmVR, *pDcmVR;
+} DcmHsVR, *pDcmVR;
 
 typedef struct _HsElement
 {
@@ -897,8 +897,8 @@ typedef struct _LutData
 	}
 }LutData;
 
-typedef QMap<unsigned long, DcmTag> MAP_TAGPROPERTY;
-typedef QMap<unsigned long, DcmVR> MAP_VRPROPERTY;
+typedef QMap<unsigned long, DcmHsTag> MAP_TAGPROPERTY;
+typedef QMap<unsigned long, DcmHsVR> MAP_VRPROPERTY;
 typedef QMap<QString, int> MAP_DCMFILE;
 
 typedef enum ENUM_HS_TRANSFER_SYNTAXES
@@ -967,24 +967,23 @@ typedef enum Enum_ImgInteractionStyleIds {
 
 //交互标记
 #define IMGSTSTEM_LOCTION			   0
-#define IMGSTSTEM_PICK				   5
 #define IMGSTSTEM_PAN				   1
 #define IMGSTSTEM_ZOOM				   2
 #define IMGSTSTEM_WL				   3
 #define IMGSTSTEM_BROWSER			   4
+#define IMGSTSTEM_PICK				   5
 
 
 //MPR 图像方位
-#define  ORIIMG_AXIAL					1
-#define  ORIIMG_CORONAL					2
-#define  ORIIMG_SAGITTAL				3
+#define  ORIIMG_SAGITTAL				0
+#define  ORIIMG_CORONAL					1
+#define  ORIIMG_AXIAL					2
 
-//#define  ORIIMG_AXIAL_R					0		//横断位，X方向是由右到左
-//#define  ORIIMG_AXIAL_L					1		//横断位，X方向是由左到右
-//#define  ORIIMG_CORONAL_R				2		//冠状位，X方向是由右到左
-//#define  ORIIMG_CORONAL_R				3		//冠状位，X方向是由左到右
-//#define  ORIIMG_SAGGITAL_A				4		//矢状位，X方向是由前到后
-//#define  ORIIMG_SAGGITAL_P				4		//矢状位，X方向是由后到前
+
+//窗口类型
+#define  SAGITTAL_WND				0
+#define  CORONAL_WND				1
+#define  AXIAL_WND					2
 
 
 typedef struct _INFOITEM
@@ -1076,53 +1075,33 @@ typedef struct _MODINFO
 
 }MODINFO;
 
+enum MoveObject {
+	A1LINE = 0,
+	A1STARTROTATE,
+	A1ENDROTATE,
+	A1TOPSLICE,
+	A1BOTTOMSLICE,
+	A2LINE,
+	A2STARTROTATE,
+	A2ENDROTATE,
+	A2TOPSLICE,
+	A2BOTTOMSLICE,
+	CENTERPOINT
+};
 
 typedef struct _MprLinesInfo
 {
-	//横向线段
-	QPoint ptH1;
-	QPoint ptH2;
-
-	//纵向线段
-	QPoint ptV1;
-	QPoint ptV2;
-
-	//层厚
-	double dSliceThick;
-
-	//中心点
-	QPoint ptCenter;
+	MoveObject moveObject;
 
 	//线所属窗口类型
 	int nWndType;
 
 	_MprLinesInfo()
 	{
-		ptV1 = QPoint(0, 0);
-		ptV2 = QPoint(0, 0);
-		ptH1 = QPoint(0, 0);
-		ptH2 = QPoint(0, 0);
-
-		dSliceThick = 0.00;
-		ptCenter = QPoint(0, 0);
-
+		moveObject = CENTERPOINT;
 		nWndType = ORIIMG_AXIAL;
 	}
 }MprLinesInfo;
-
-enum MoveObject {
-	HLINE = 0,
-	HSTARTROTATE,
-	HENDROTATE,
-	HTOPSLICE,
-	HBOTTOMSLICE,
-	VLINE,
-	VSTARTROTATE,
-	VENDROTATE,
-	VTOPSLICE,
-	VBOTTOMSLICE,
-	CENTERPOINT
-};
 
 typedef struct _FPOINT
 {
@@ -1136,7 +1115,7 @@ typedef struct _FPOINT
 
 	QPoint Int()
 	{
-		QPoint t(qRound(x), qRound(y));
+		QPoint t(x,y);
 		return t;
 	}
 }FPOINT;
@@ -1166,18 +1145,14 @@ typedef struct _MprLine//直线
 	}
 }MprLine;
 
-typedef struct _MprTriAngle//三角形
-{
-	QPoint ptTop;
-	QPoint ptBtm1;
-	QPoint ptBtm2;
-	bool bActive;
+//两个平面的状态
+#define Plane_Same		0
+#define Plane_Parallel	1
+#define Plane_Cross		2
+#define Plane_NoCross	3
 
-	_MprTriAngle()
-	{
-		ptTop = QPoint(0, 0);
-		ptBtm1 = QPoint(0, 0);
-		ptBtm2 = QPoint(0, 0);
-		bActive = false;
-	}
-}MprTriAngle;
+//多层叠加效果
+#define IMAGE_SLAB_MIN  0
+#define IMAGE_SLAB_MAX  1
+#define IMAGE_SLAB_MEAN 2
+#define IMAGE_SLAB_SUM  3

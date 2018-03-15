@@ -26,9 +26,10 @@ using namespace std;
 
 #include "HsDcmDic.h"
 
-#include "ltwrappr.h"
-#include "ltdic.h"
-#include "ltlck.h"
+//#include "ltwrappr.h"
+//#include "ltdic.h"
+//#include "ltlck.h"
 
 #include "Structure.h"
 #include "VtkHeader.h"
+

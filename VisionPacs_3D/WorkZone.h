@@ -5,6 +5,11 @@
 
 class CHsImage;
 class Vtk2DWnd;
+class Hmy3DVector;
+class HmyPlane3D;
+class HmyLine3D;
+class HmyImageData3D;
+class CResliceControl;
 
 namespace Ui {
 class WorkZone;
@@ -22,6 +27,7 @@ private:
     Ui::WorkZone *ui;
 
 	QVector<Vtk2DWnd*> m_v2DWnd;	//图像窗口队列
+
 	vector<CHsImage*> m_vImage;		//显示图像
 
 	int m_nOriImageType;			//原始图像类型
@@ -31,11 +37,16 @@ private:
 
 	bool m_bOblique;
 
+	int m_nLoadImageNum;
+
+	CResliceControl *m_pResliceControl;
+
 public:
 	void ClearImg(bool bIncludeVR);
 
 	void SetImageVector(vector<CHsImage*> vImage){ m_vImage = vImage; }
 
+	void LoadImageData();
 	void ProcessImageData();
 
 	void InitDisplayWnd();
@@ -49,6 +60,7 @@ public:
 
 	vtkSmartPointer<vtkImageData> m_pImageData;
 	void ***m_pImageArray;
+	HmyImageData3D *m_pHmyImageData3D;
 
 private:
 	void InitSignalsAndSlots();
@@ -57,10 +69,12 @@ private slots:
 	void Btn_VrOrientationClick();
 	void CB_VrModeChanged(QString sModeName);
 	void Btn_SetMprState(int nBtnID);
-	void OnMprLinesInfo(MprLinesInfo info);
+	void OnMprLinesInfoChange(MprLinesInfo info);
 	void CB_MprModeChanged(QString sModeName);
 	void OnEditSTChange(double dSliceThick);
 	void OnScrollBarChange(QString sWndName, int nValue);
+	void OnLoadImageFinished();
+
 signals:
 	void SetWaitProgress(int);
 	void MprLinesShowChange(bool);

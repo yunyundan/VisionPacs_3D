@@ -61,7 +61,7 @@ CHsImage::CHsImage()
 : m_pDs(NULL)
 , m_fOriSilceThick(0.00)
 , m_fCurSliceThick(0.00)
-,m_pBelongWnd(NULL)
+, m_pBelongWnd(NULL)
 {
 	SetRect(&m_WndRc, 0, 0, 0, 0);
 }
@@ -69,7 +69,6 @@ CHsImage::CHsImage()
 
 CHsImage::~CHsImage()
 {
-
 }
 
 void CHsImage::SetDs(CHsFile *pDS)
@@ -125,13 +124,13 @@ void CHsImage::SetWndRc(RECT rc)
 
 	//显示区域发生变化,要及时通知AnnoManager们所含的注释体
 	SIZE ImgSize = Hs_GetImgSize();
-
-
+	
 	if (m_pBelongWnd != NULL)
 	{
 		if (m_pBelongWnd->GetOperateLine())
 		{
-			m_pBelongWnd->GetOperateLine()->RefreshMprLinesPara(m_WndRc, m_ImgState.nCurOriPixCol, m_ImgState.nCurOriPixRow,m_ImgInfo.fPixelSpaceX,m_ImgInfo.fPixelSpaceY);
+			m_pBelongWnd->GetOperateLine()->RefreshMprLinesPara(m_WndRc, m_ImgState.nCurOriPixCol, m_ImgState.nCurOriPixRow
+				, m_ImgInfo.fPixelSpaceX, m_ImgInfo.fPixelSpaceY);
 		}
 	}
 }

@@ -298,7 +298,7 @@ void Vtk3DWnd::SetupCamera(QString sOrientationName)
 	//m_p3DRenderer->GetActiveCamera()->SetParallelScale(ParaScale*2/3);
 }
 
-void Vtk3DWnd::SetImageDate(vtkSmartPointer<vtkImageData> pImageData)
+void Vtk3DWnd::SetImageDateAndShow(vtkSmartPointer<vtkImageData> pImageData)
 {
 	m_pImgResample->SetInputData(pImageData);
 	m_pImgResample->Update();

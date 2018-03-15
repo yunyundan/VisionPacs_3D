@@ -117,9 +117,6 @@ private:
 
     int ShowElement(pHsElement p,int nLevel);
 
-	//根据我的Element获得Leadtools的DS中对应的ELe
-	pDICOMELEMENT GetLtEleByMyEle(pHsElement pMyEle, LDicomDS *pDS);
-
 	//分离Overlay和像素,并求最大值最小值----这些工作都是需要循环每个像素的,所以放到一起.减少循环次数
 	int SeparatePixdataAndOverlayByRow(CHsBaseImg &Img,unsigned long iRow,unsigned long nCol,long &nMin,long &nMax);
 
